@@ -11,7 +11,8 @@
 #ifndef colors_h
 #define colors_h
 
-struct RGB {
+struct RGB
+{
     RGB(byte red, byte green, byte blue) : r(red), b(blue), g(green){}
     byte r;
     byte g;
