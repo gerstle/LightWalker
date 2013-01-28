@@ -11,66 +11,34 @@
 // ----------------------------------------------------------------------------
 // Leg Class
 // ----------------------------------------------------------------------------
-
-// <gerstle> this is a dummy constructor used by the LightWalker constructor
-// to initialize the _legs vector. You must call Leg::init on the 0 index leg
-// of the _legs vector during setup
-Leg::Leg(int pixel_count) : _pixels(pixel_count, RGB(0x00, 0x00, 0x00))
+Leg::Leg()
 {
 }
 
-// <gerstle> This constructor is used by the initLegs function to add all the legs
-// after the first
-Leg::Leg(int pin, int pixel_count, int i) : _pixels(pixel_count, RGB(0x00, 0x00, 0x00))
+Leg::Leg(String n, int pin, int pixels)
 {
-//     Serial.println(26);
-//     init(pin, pixel_count, i);
-//     Serial.println(28);
-}
+    Serial.print("initing..."); Serial.print(n); Serial.print(" - "); Serial.print(pin); Serial.print(" - "); Serial.println(pixels);
 
-// Leg::Leg(int leg_type, int trigger_pin, int pixel_count)
-void Leg::init(int pin, int pixel_count, int i)
-{
-//     Serial.print("initing..."); Serial.print(pin); Serial.print(" - "); Serial.print(pixel_count); Serial.print(" - "); Serial.println(i);
-//     trigger_pin = pin;
-//     status = Initialized;
-//     _mode = None;
-//     legIndex = i;
+    name = n;
+    trigger_pin = pin;
+    pixel_count = pixels;
+    status = Initialized;
+    _mode = None;
 
-//     Serial.println(38);
-//     // <gerstle> The first leg is initialized by the dummy 
-//     // constructor and doesn't have the correct pixel count,
-//     // so make sure the _pixels.size() matches the passed in
-//     // pixel_count and fix if not
-//     Serial.print("pixel size: "); Serial.println(_pixels.size());
-//     int j = 0;
-//     for (vector<RGB>::iterator it = _pixels.begin(); pixel_count > _pixels.size(); ++it, j++)
-//         _pixels.push_back(COLOR_BLACK);
-//     Serial.print("pixel size: "); Serial.println(_pixels.size());
-//     Serial.print("j: "); Serial.println(j);
-//     Serial.println(45);
-// 
-//     int half = _pixels.size() / 2;
-// 
-//     if ((_pixels.size() % 2) > 0)
-//         lower_foot_border = half - 2;
-//     else
-//         lower_foot_border = half - 3;
-//     upper_foot_border = half + 2;
-//     Serial.println(54);
-// 
-//     off();
-//     Serial.println(57);
-}
+    int half = pixel_count / 2;
 
-int Leg::pixelCount()
-{
-    return _pixels.size();
+    if ((pixel_count % 2) > 0)
+        lower_foot_border = half - 2;
+    else
+        lower_foot_border = half - 3;
+    upper_foot_border = half + 2;
+
+    off();
 }
 
 void Leg::footdown()
 {
-    Serial.print("leg "); Serial.print(legIndex); Serial.println(" -> down");
+    Serial.print(name); Serial.println(" -> down");
     status = Down;
     _fade_rate = FOOT_DOWN_FADE_STEP;
     flash();
@@ -78,27 +46,28 @@ void Leg::footdown()
 
 void Leg::footup()
 {
-    Serial.print("leg "); Serial.print(legIndex); Serial.println(" -> up");
+    Serial.print(name); Serial.println(" -> up");
     _fade_rate = FOOT_UP_FADE_STEP;
     status = Up;
+    sameStatus();
 }
 
 void Leg::sameStatus()
 {
-//     Serial.print("leg "); Serial.print(legIndex); Serial.println(" -> same");
-    unsigned long currentTime;
+//     Serial.print("leg "); Serial.print(name); Serial.println(" -> same");
+    unsigned long currentTime = millis();
     switch (_mode)
     {
         case Flash:
-            if (currentTime < (_modeChangeTime + FLASH_INTERVAL))
-                flash();
-            else
-                ripple();
+//             if (currentTime <= (_modeChangeTime + flash_interval))
+//                 flash();
+//             else
+                sparkle();
             break;
 
-        case Ripple:
-            if (currentTime < (_modeChangeTime + RIPPLE_INTERVAL))
-                ripple();
+        case Sparkle:
+            if (currentTime <= (_modeChangeTime + SPARKLE_INTERVAL))
+                sparkle();
             else
                 fade();
             break;
@@ -115,28 +84,37 @@ void Leg::sameStatus()
 
 void Leg::flash()
 {
-    int i = 0;
-    for (vector<RGB>::iterator it = _pixels.begin(); it != _pixels.end(); ++it, i++)
+    Serial.println("flashing " + name);
+    for (int i = 0; i < pixel_count; i++)
     {
         if ((i < lower_foot_border) || (i > upper_foot_border))
-            setPixel(it, COLOR_BLACK, 0x00);
+            setPixel(i, COLOR_BLACK, 0x00);
         else
-            setPixel(it, COLOR_WHITE, 0x00);
+            setPixel(i, COLOR_WHITE, 0x00);
     }
-    _mode = Flash;
+    setMode(Flash);
 }
 
-void Leg::ripple()
+void Leg::sparkle()
 {
+    Serial.println("sparkling " + name);
     byte level;
+    int distance;
     for (int i = 0; i < lower_foot_border; i++)
     {
-        level = byte(random(0, ((255/lower_foot_border) * (i + 1))));
+        distance = lower_foot_border - i;
+        level = byte(random(0, ((255/(lower_foot_border * 3)) * (i + 1))));
+        _pixels[i] = RGB(level, level, level);
+    }
+
+    for (int i = upper_foot_border + 1; i < pixel_count; i++)
+    {
+        level = byte(random(0, ((255/(lower_foot_border * 3)) * (lower_foot_border - (i - upper_foot_border) + 1))));
         _pixels[i] = RGB(level, level, level);
     }
 
     displayPixels();
-    _mode = Ripple;
+    setMode(Sparkle);
 }
 
 // <gerstle> leg w/ 25 pixels is oriented like this (#'s are pixel index):
@@ -160,103 +138,90 @@ void Leg::ripple()
 // 
 void Leg::fade()
 {
+    Serial.println("fading " + name);
+    off();
 }
 
 void Leg::displayPixels()
 {
-    for (vector<RGB>::iterator it = _pixels.begin(); it != _pixels.end(); ++it)
-        LWUtils.sendColor(*it);
+    for (int i = 0; i < pixel_count; i++)
+        LWUtils.sendColor(_pixels[i]);
 }
 
-void Leg::setPixel(vector<RGB>::iterator it, RGB color, byte dimmer)
+void Leg::setPixel(int i, RGB color, byte dimmer)
 {
-    it->r = color.r - dimmer;
-    it->g = color.g - dimmer;
-    it->b = color.b - dimmer;
-    LWUtils.sendColor(*it);
+    _pixels[i].r = color.r - dimmer;
+    _pixels[i].g = color.g - dimmer;
+    _pixels[i].b = color.b - dimmer;
+    LWUtils.sendColor(_pixels[i]);
 }
 
 void Leg::off()
 {
-    int i = 0;
-    for (vector<RGB>::iterator it = _pixels.begin(); it != _pixels.end(); ++it, i++)
-        setPixel(it, COLOR_BLACK, 0x00);
-    _mode = Off;
+    for (int i = 0; i < pixel_count; i++)
+        setPixel(i, COLOR_BLACK, 0x00);
+    setMode(Off);
 }
 
 void Leg::setMode(LightModeEnum mode)
 {
+    if (_mode != mode)
+        _modeChangeTime = millis();
     _mode = mode;
-    _modeChangeTime = millis();
 }
 
 // ----------------------------------------------------------------------------
 // LightWalker Class
 // ----------------------------------------------------------------------------
 
-LightWalker::LightWalker(int leg_count) : _legs(leg_count, Leg(1))
+LightWalker::LightWalker(int x)
 {
 }
 
-void LightWalker::initLegs(vector<int> pins, vector<int> pixel_counts)
+void LightWalker::initLegs()
 {
     TCL.sendEmptyFrame();
 
-    Serial.println(pins.size());
-    Serial.println(pixel_counts.size());
-
-    Serial.print(_legs.size()); Serial.println(" starting legs");
-
-    // <gerstle> the constructor only sets 1 leg, so...
-    // init the first leg, create the rest
-    int i = 0;
-    for (vector<int>::iterator it = pins.begin(); it != pins.end(); ++it, i++)
-    {
-        Serial.print("                  i:"); Serial.println(i);
-        if (i == 0)
-        {
-            Serial.println(213);
-            _legs[i].init(*it, pixel_counts[i], i);
-            Serial.println(215);
-        }
-        else
-        {
-            Serial.println(219);
-            _legs.push_back(Leg(*it, pixel_counts[i], i));
-            Serial.println(220);
-        }
-    }
-
-    Serial.print(i); Serial.println(" loops");
-    Serial.print(_legs.size()); Serial.println(" legs initialized");
+    _legs[0] = Leg("left leg", TCL_MOMENTARY1, 25);
+    _legs[1] = Leg("right leg", TCL_MOMENTARY2, 25);
 }
 
 void LightWalker::off()
 {
     TCL.sendEmptyFrame();
-    for (vector<Leg>::iterator it = _legs.begin(); it != _legs.end(); ++it)
-        it->off();
+    for (int i = 0; i < LEG_COUNT; i++)
+        _legs[i].off();
 }
 
 // <gerstle> check for inputs
 void LightWalker:: walk()
 {
-    // <gerstle> foreach leg, check the sensor
     TCL.sendEmptyFrame();
-//     Serial.println("walk");
-    for (vector<Leg>::iterator it = _legs.begin(); it != _legs.end(); ++it)
+
+    unsigned long currentTime = millis();
+    bool displayStatus = false;
+    if (currentTime > (_laststatus + 2000))
+        displayStatus = true;
+
+    // <gerstle> foreach leg, check the sensor
+    for (int i = 0; i < LEG_COUNT; i++)
     {
-//         Serial.print("    leg "); Serial.println(it->legIndex);
-        bool sensorState = digitalRead(it->trigger_pin);
+        bool sensorState = digitalRead(_legs[i].trigger_pin);
+        
+        if (displayStatus)
+        {
+            Serial.print("    leg "); Serial.println(_legs[i].name);
+            Serial.print("        pin: "); Serial.println(_legs[i].trigger_pin);
+            Serial.print("        pin state: "); Serial.println(sensorState);
+            Serial.print("        status: "); Serial.println(_legs[i].status);
+            _laststatus = millis();
+        }
 
-//         Serial.print("        sensor: "); Serial.println(sensorState);
-//         Serial.print("        status: "); Serial.println(it->status);
-
-        if ((sensorState == LOW) && (it->status != Down))
-            it->footdown();
-        else if ((sensorState == HIGH) && (it->status != Up))
-            it->footup();
+        if ((sensorState == LOW) && (_legs[i].status != Down))
+            _legs[i].footdown();
+        else if ((sensorState == HIGH) && (_legs[i].status != Up))
+            _legs[i].footup();
         else
-            it->sameStatus();
+            _legs[i].sameStatus();
     }
 }
