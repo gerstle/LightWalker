@@ -21,9 +21,10 @@
 #define SPARKLE_INTERVAL 500
 
 // <gerstle> different settings for each mode
-#define FADE_RATE 250
-#define FOOT_DOWN_FADE_STEP 0x20
-#define FOOT_UP_FADE_STEP 0x40
+#define FOOT_DOWN_FADE_STEP 0x5
+#define FOOT_UP_FADE_STEP 0x15
+
+#define DEBUG 0
 
 enum FootStatusEnum
 {
@@ -48,9 +49,13 @@ class Leg
         int trigger_pin;
         int pixel_count;
         String name;
+        bool fade_on;
+        int foot_down_fade_step;
+        int foot_up_fade_step;
+        int max_brightness;
 
         Leg();
-        Leg(String n, int trigger_pin, int pixels);
+        Leg(String n, int trigger_pin, int pixels, int brightness);
 
         void footdown();
         void footup();
@@ -63,7 +68,6 @@ class Leg
         LightModeEnum _mode;
         unsigned long _modeChangeTime;
 
-        int _fade_step;
         int _fade_rate;
 
         void setPixel(int i, RGB color, byte dimmer);
@@ -79,7 +83,7 @@ class LightWalker
 {
     public:
 
-        LightWalker(int x);
+        LightWalker(int brightness);
         void initLegs();
         void off();
         void walk();
@@ -87,6 +91,7 @@ class LightWalker
     private:
         Leg _legs[LEG_COUNT];
         unsigned long _laststatus;
+        int _max_brightness;
 };
 
 #endif
