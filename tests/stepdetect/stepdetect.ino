@@ -1,6 +1,6 @@
 // Pretty decent first attempt at a step detect algorithm.
 //
-// Detecting most everything on just the z access, but I am
+// 31jan2013 - Detecting most everything on just the z access, but I am
 // getting a fair amount of false positives. I'm doing a lot of work to
 // capture a good moving average of z values, but not really 
 // doing that much with them. I should change to just using a max + min / 2
@@ -8,8 +8,20 @@
 // don't really see much of a justification for the reliance on an accurate
 // average. Maybe If I did more of a threshold for steps based on the average, 
 // I could get better detection on both hard and light steps?
+//
+// 2feb2013 - OK, had some time to think about this for a bit and I think I was
+// overcomplicating. I was also detecting the step _after_ it physically happened.
+// Not ideal. So, code that I wrote on 31jan2013 got moved into a detectStepDownSlope
+// function and I wrote a new one that just looks at a significant increase in the 
+// moving average. The thinking is that when the foot is hovering or at the top
+// of it's movement, the average increases rather slowly. When the foot hits the
+// ground, there's a significant spike in value and this single value causes
+// the average to jump significantly. This gets rid of a lot of noise and also 
+// detects the step closer to when the foot physically hits the ground. So,
+// now I have the detectStepAverageSpike function.
 // 
-// Basic setup is a single LED hooked to pin 13 and an ADXL345 hooked to i2c
+// Basic setup is a red LED hooked to pin 8 (with 330 ohm resistor) and a green
+// LED hooked up to pin 12 (with 330 ohm resistor) and an ADXL345 hooked to i2c
 
 
 #include <Wire.h>
@@ -17,14 +29,14 @@
 
 ADXL345 adxl; //variable adxl is an instance of the ADXL345 library
 
-int ledPin = 13;
+int redPin = 8;
+int greenPin = 12;
 
-unsigned long lastStepTime = millis();
 unsigned long currentTime = millis();
 int stepDuration = 250; // <cgerstle> a step lasts at least this long... ie, two steps can't occur within this time period
 int samplePrecisionThreshold = 15;
 
-const int valueCount = 20;
+const int valueCount = 25;
 int xValues[valueCount];
 int yValues[valueCount];
 int zValues[valueCount];
@@ -52,7 +64,8 @@ int aboveAverageCounter = 0; // <cgerstle> counts the number of cycles the zvalu
 
 void setup() 
 { 
-    pinMode(ledPin, OUTPUT);
+    pinMode(redPin, OUTPUT);
+    pinMode(greenPin, OUTPUT);
 
     randomSeed(analogRead(0)); //initialize random seed
 
@@ -110,44 +123,77 @@ void loop()
     adxl.readXYZ(&x, &y, &z); //read the accelerometer values and store them in variables  x,y,z
     currentTime = millis();
 
-    /*Serial.print(x); Serial.print(","); Serial.print(y); Serial.print(","); */Serial.print(z);
-        Serial.print(","); Serial.print(zAverage);// Serial.print(","); Serial.print(zMax);
-        Serial.print(","); Serial.print(aboveAverageCounter);
+//     Serial.print(x); Serial.print(","); Serial.print(y); Serial.print(","); Serial.print(z);
+//         Serial.print(","); Serial.print(zAverage);// Serial.print(","); Serial.print(zMax);
+        //Serial.print(","); Serial.print(aboveAverageCounter);
         //Serial.print(","); Serial.print(zMin);
         //Serial.println();
 
-
-    if ((currentTime > (lastStepTime + stepDuration)) &&
-        //(zOld < (zAverage + samplePrecisionThreshold)) &&
-        (zNew >= zAverage) && //(zNew < (zOld - samplePrecisionThreshold))) &&
-        ((z < zAverage) && (z <= (zNew - samplePrecisionThreshold))) &&
-        (aboveAverageCounter < 3))
-    {
-        digitalWrite(ledPin, HIGH);
-        Serial.println(",300---------------------------------- STEP!");
-        lastStepTime = currentTime;
-    }
-    else if (currentTime > (lastStepTime + stepDuration))
-    {
-        digitalWrite(ledPin, LOW);
-        Serial.println(",0");
-    }
-    else
-        Serial.println(",1");
+    if (valueIndex >= valueCount)
+        valueIndex = 0;
 
     if (z > zAverage)
         aboveAverageCounter++;
     else
         aboveAverageCounter = 0;
+   
+    zTotal = zTotal - zValues[valueIndex] + z;
+    zValues[valueIndex] = z;
+    zAverage = zTotal / valueCount;
 
+//     Serial.print(","); Serial.print(zAverage);
+
+    // <gerstle> step detection algorithms
+    detectStepDownSlope(x, y, z, currentTime);
+    detectStepAverageSpike(x, y, z, currentTime);
+
+    // <gerstle> tracking data
     zOld = zNew;
     zNew = z;
 
-    if (valueIndex >= valueCount)
-        valueIndex = 0;
-   
-    zTotal = zTotal - zValues[valueIndex] + zNew;
-    zValues[valueIndex] = zNew;
-    zAverage = zTotal / valueCount;
+}
 
+unsigned long lastDownSlopeStepTime = millis();
+void detectStepDownSlope(int x, int y, int z, unsigned long currentTime)
+{
+    if ((currentTime > (lastDownSlopeStepTime + stepDuration)) &&
+        //(zOld < (zAverage + samplePrecisionThreshold)) &&
+        (zNew >= zAverage) && //(zNew < (zOld - samplePrecisionThreshold))) &&
+        ((z < zAverage) && (z <= (zNew - samplePrecisionThreshold))) &&
+        (aboveAverageCounter < 3))
+    {
+        digitalWrite(redPin, HIGH);
+//         Serial.println(",300---------------------------------- STEP!");
+        lastDownSlopeStepTime = currentTime;
+    }
+    else if (currentTime > (lastDownSlopeStepTime + stepDuration))
+    {
+        digitalWrite(redPin, LOW);
+//         Serial.println(",0");
+    }
+//     else
+//         Serial.println(",1");
+}
+
+unsigned long lastSharpPeakTime = millis();
+int peakThreshold = 10;
+int zAverageOld = 0;
+void detectStepAverageSpike(int x, int y, int z, unsigned long currentTime)
+{
+    if ((currentTime > (lastSharpPeakTime + stepDuration)) &&
+        (zAverage >= (zAverageOld + peakThreshold)))
+    {
+//         Serial.println(",300--------------------------------------- STEP!");
+        digitalWrite(greenPin, HIGH);
+        lastSharpPeakTime = currentTime;
+    }
+    else if (currentTime > (lastSharpPeakTime + stepDuration))
+    {
+        digitalWrite(greenPin, LOW);
+//         Serial.println(",0");
+    }
+//     else
+//         Serial.println(",1");
+
+    zAverageOld = zAverage;
 }
