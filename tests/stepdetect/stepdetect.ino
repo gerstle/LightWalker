@@ -29,14 +29,15 @@
 
 ADXL345 adxl; //variable adxl is an instance of the ADXL345 library
 
-int redPin = 8;
-int greenPin = 12;
+int xPin = 7;
+int yPin = 8;
+int zPin = 12;
 
 unsigned long currentTime = millis();
-int stepDuration = 250; // <cgerstle> a step lasts at least this long... ie, two steps can't occur within this time period
-int samplePrecisionThreshold = 15;
+unsigned long lastSharpPeakTime = millis();
 
-const int valueCount = 25;
+const int valueCount = 20;
+int x, y, z;  
 int xValues[valueCount];
 int yValues[valueCount];
 int zValues[valueCount];
@@ -45,27 +46,29 @@ int valueIndex = 0;
 
 int xTotal = 0;
 int xAverage = 0;
-// int xMax = 0;
-// int xMin = 0;
+int xAverageOld = 0;
 
 int yTotal = 0;
 int yAverage = 0;
-// int yMax = 0;
-// int yMin = 0;
+int yAverageOld = 0;
 
 int zTotal = 0;
 int zAverage = 0;
-// int zMax = 0;
-// int zMin = 0;
-int zOld = 0;
-int zNew = 0;
+int zAverageOld = 0;
 
-int aboveAverageCounter = 0; // <cgerstle> counts the number of cycles the zvalue is above average
+// int aboveAverageCounter = 0; // <cgerstle> counts the number of cycles the zvalue is above average
+int xStepDuration = 750; // <cgerstle> a step lasts at least this long... ie, two steps can't occur within this time period
+int yStepDuration = 750; // <cgerstle> a step lasts at least this long... ie, two steps can't occur within this time period
+int zStepDuration = 250; // <cgerstle> a step lasts at least this long... ie, two steps can't occur within this time period
+int xPeakThreshold = 6;
+int yPeakThreshold = 6;
+int zPeakThreshold = 7;
 
 void setup() 
 { 
-    pinMode(redPin, OUTPUT);
-    pinMode(greenPin, OUTPUT);
+    pinMode(xPin, OUTPUT);
+    pinMode(yPin, OUTPUT);
+    pinMode(zPin, OUTPUT);
 
     randomSeed(analogRead(0)); //initialize random seed
 
@@ -96,10 +99,14 @@ void setup()
     adxl.setFreeFallThreshold(7); //(5 - 9) recommended - 62.5mg per increment
     adxl.setFreeFallDuration(45); //(20 - 70) recommended - 5ms per increment
 
-    int x,y,z;  
     for (valueIndex = 0; valueIndex < valueCount; valueIndex++)
     {
         adxl.readXYZ(&x, &y, &z); //read the accelerometer values and store them in variables  x,y,z
+
+        x = abs(x);
+        y = abs(y);
+        z = z;
+
         xValues[valueIndex] = x;
         yValues[valueIndex] = y;
         zValues[valueIndex] = z;
@@ -112,88 +119,115 @@ void setup()
     xAverage = xTotal / valueCount;
     yAverage = yTotal / valueCount;
     zAverage = zTotal / valueCount;
-    zOld = zValues[valueIndex - 2];
-    zNew = zValues[valueIndex - 1];
+
 } 
 
+bool stepDetected = false;
 void loop() 
 { 
-    // <gerstle> first off, get values from sensor
-    int x,y,z;  
-    adxl.readXYZ(&x, &y, &z); //read the accelerometer values and store them in variables  x,y,z
     currentTime = millis();
 
-//     Serial.print(x); Serial.print(","); Serial.print(y); Serial.print(","); Serial.print(z);
-//         Serial.print(","); Serial.print(zAverage);// Serial.print(","); Serial.print(zMax);
-        //Serial.print(","); Serial.print(aboveAverageCounter);
-        //Serial.print(","); Serial.print(zMin);
-        //Serial.println();
+    adxl.readXYZ(&x, &y, &z); //read the accelerometer values and store them in variables  x,y,z
+
+    x = abs(x);
+    y = abs(y);
+    z = z;
 
     if (valueIndex >= valueCount)
         valueIndex = 0;
 
-    if (z > zAverage)
-        aboveAverageCounter++;
-    else
-        aboveAverageCounter = 0;
+//     if (z > zAverage)
+//         aboveAverageCounter++;
+//     else
+//         aboveAverageCounter = 0;
+    xTotal = xTotal - xValues[valueIndex] + x;
+    xValues[valueIndex] = x;
+    xAverage = xTotal / valueCount;
+
+    yTotal = yTotal - yValues[valueIndex] + y;
+    yValues[valueIndex] = y;
+    yAverage = yTotal / valueCount;
    
     zTotal = zTotal - zValues[valueIndex] + z;
     zValues[valueIndex] = z;
     zAverage = zTotal / valueCount;
 
-//     Serial.print(","); Serial.print(zAverage);
+    // Serial.print(","); Serial.print(zAverage);
 
-    // <gerstle> step detection algorithms
-    detectStepDownSlope(x, y, z, currentTime);
-    detectStepAverageSpike(x, y, z, currentTime);
+    //detectStepDownSlope(x, y, z, currentTime);
 
-    // <gerstle> tracking data
-    zOld = zNew;
-    zNew = z;
+    Serial.print(x); Serial.print(","); Serial.print(y); Serial.print(","); Serial.print(z);
+        Serial.print(","); Serial.print(xAverage); Serial.print(","); Serial.print(xAverageOld);
+        Serial.print(","); Serial.print(yAverage); Serial.print(","); Serial.print(yAverageOld);
+        Serial.print(","); Serial.print(zAverage); Serial.print(","); Serial.print(zAverageOld);
+        // Serial.println();
 
-}
+    detectStepAverageSpike(currentTime);
 
-unsigned long lastDownSlopeStepTime = millis();
-void detectStepDownSlope(int x, int y, int z, unsigned long currentTime)
-{
-    if ((currentTime > (lastDownSlopeStepTime + stepDuration)) &&
-        //(zOld < (zAverage + samplePrecisionThreshold)) &&
-        (zNew >= zAverage) && //(zNew < (zOld - samplePrecisionThreshold))) &&
-        ((z < zAverage) && (z <= (zNew - samplePrecisionThreshold))) &&
-        (aboveAverageCounter < 3))
-    {
-        digitalWrite(redPin, HIGH);
-//         Serial.println(",300---------------------------------- STEP!");
-        lastDownSlopeStepTime = currentTime;
-    }
-    else if (currentTime > (lastDownSlopeStepTime + stepDuration))
-    {
-        digitalWrite(redPin, LOW);
-//         Serial.println(",0");
-    }
-//     else
-//         Serial.println(",1");
-}
-
-unsigned long lastSharpPeakTime = millis();
-int peakThreshold = 10;
-int zAverageOld = 0;
-void detectStepAverageSpike(int x, int y, int z, unsigned long currentTime)
-{
-    if ((currentTime > (lastSharpPeakTime + stepDuration)) &&
-        (zAverage >= (zAverageOld + peakThreshold)))
-    {
-//         Serial.println(",300--------------------------------------- STEP!");
-        digitalWrite(greenPin, HIGH);
-        lastSharpPeakTime = currentTime;
-    }
-    else if (currentTime > (lastSharpPeakTime + stepDuration))
-    {
-        digitalWrite(greenPin, LOW);
-//         Serial.println(",0");
-    }
-//     else
-//         Serial.println(",1");
-
+    xAverageOld = xAverage;
+    yAverageOld = yAverage;
     zAverageOld = zAverage;
+}
+
+// unsigned long lastDownSlopeStepTime = millis();
+// int samplePrecisionThreshold = 15;
+// void detectStepDownSlope(int x, int y, int z, unsigned long currentTime)
+// {
+//     // <gerstle> z takes precedence
+//     if ((currentTime > (lastDownSlopeStepTime + stepDuration)) &&
+//         (zOld >= zAverage) &&
+//         ((z < zAverage) && (z <= (zOld - samplePrecisionThreshold))) &&
+//         (aboveAverageCounter < 3))
+//     {
+//         digitalWrite(zPin, HIGH);
+//         lastDownSlopeStepTime = currentTime;
+//     }
+//     else if (currentTime > (lastDownSlopeStepTime + stepDuration))
+//         digitalWrite(zPin, LOW);
+// }
+
+bool detectStepAverageSpike(unsigned long currentTime)
+{
+    stepDetected = false;
+
+    if (currentTime > (lastSharpPeakTime + zStepDuration))
+        if (zAverage >= (zAverageOld + zPeakThreshold))
+        {
+            digitalWrite(xPin, LOW);
+            digitalWrite(yPin, LOW);
+            digitalWrite(zPin, HIGH);
+            stepDetected = true;
+            Serial.println(",0,0,300");
+//             zAverage = zAverageOld;
+//             zTotal = zTotal - zValues[valueIndex] + zAverageOld;
+//             zValues[valueIndex] = zAverageOld;
+        }
+        else
+            digitalWrite(zPin, LOW);
+
+
+    if (currentTime > (lastSharpPeakTime + xStepDuration))
+        if (!stepDetected && (xAverage >= (xAverageOld + xPeakThreshold)))
+        {
+            digitalWrite(xPin, HIGH);
+            stepDetected = true;
+            Serial.println(",300,0,0");
+        }
+        else
+            digitalWrite(xPin, LOW);
+
+    if (currentTime > (lastSharpPeakTime + yStepDuration))
+        if (!stepDetected && (yAverage >= (yAverageOld + yPeakThreshold)))
+        {
+            digitalWrite(yPin, HIGH);
+            stepDetected = true;
+            Serial.println(",0,300,0");
+        }
+        else
+            digitalWrite(yPin, LOW);
+
+    if (stepDetected)
+        lastSharpPeakTime = millis();
+    else
+        Serial.println(",0,0,0");
 }
