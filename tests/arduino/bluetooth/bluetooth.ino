@@ -7,6 +7,9 @@
  
  Jeremy Bridon
  jgbridon@gmail.com
+ 
+
+ // <gerstle> modified heavily 17feb2013
 \********************************************/
  
 // Included for serial communication
@@ -37,7 +40,8 @@ void setup()
 }
  
 // Main application loop
-char msg[64];
+const int msgLength = 64;
+char msg[msgLength];
 int i = 0;
 void loop()
 {
@@ -46,7 +50,7 @@ void loop()
         //Serial.println((char)bluetooth.read());
         i = 0;
         msg[i++] = (char)bluetooth.read();
-        while (msg[i - 1] != '\r')
+        while ((msg[i - 1] != '\r') && (msg[i - 1] > 0x0) && (msg[i - 1] <= 0x7F))
         {
             msg[i++] = (char)bluetooth.read();
             Serial.println(msg);
@@ -54,6 +58,9 @@ void loop()
 
         Serial.print("command: ");
         Serial.println(msg);
+
+        for (int j = 0; ((j < i) && (j < msgLength)); j++)
+            msg[j] = '\0';
     }
     if (Serial.available())
         bluetooth.print((char)Serial.read());

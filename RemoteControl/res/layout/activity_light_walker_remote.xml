@@ -1,0 +1,84 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/LinearLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".LightWalkerRemote" >
+
+    <LinearLayout
+        android:id="@+id/LinearLayout3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <EditText
+            android:id="@+id/commandText"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="10"
+            android:hint="@string/commandHint"
+            android:inputType="text" />
+	
+	    <Button
+	        android:id="@+id/buttonSend"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/commandSend" />
+	</LinearLayout>
+	
+    <TextView
+        android:id="@+id/bluetoothMessageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/bluetooth_response"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dip"
+        android:background="#2B3856" />
+    
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:shadowColor="@color/headerbackground"
+        android:text="@string/modeLabel"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <RadioGroup
+        android:id="@+id/modeRadioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <RadioButton
+            android:id="@+id/radioGravity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/modeGravityLabel" />
+
+        <RadioButton
+            android:id="@+id/radioEqualizer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/modeEqualizerLabel" />
+
+        <RadioButton
+            android:id="@+id/radioSparkle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.60"
+            android:text="@string/modeSparkleLabel" />
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/buttonModeConfig"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onConfigButtonClick"
+        android:text="@string/modeConfigButtonLabel" />
+
+
+</LinearLayout>
