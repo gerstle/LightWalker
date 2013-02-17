@@ -53,7 +53,7 @@ void loop()
         while ((msg[i - 1] != '\r') && (msg[i - 1] > 0x0) && (msg[i - 1] <= 0x7F))
         {
             msg[i++] = (char)bluetooth.read();
-            Serial.println(msg);
+            //Serial.println(msg);
         }
 
         Serial.print("command: ");
