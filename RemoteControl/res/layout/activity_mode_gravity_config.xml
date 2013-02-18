@@ -1,9 +1,11 @@
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/LinearLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".ModeGravityConfigActivity" >
-    
+
     <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
@@ -13,6 +15,35 @@
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <View
+        android:layout_width="match_parent"
         android:layout_height="2dip"
         android:background="#2B3856" />
-</TableLayout>
+
+    <Button
+        android:id="@+id/buttonX"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onXColorButtonClick"
+        android:text="@string/gravity_x_color" />
+
+    <Button
+        android:id="@+id/buttonY"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onYColorButtonClick"
+        android:text="@string/gravity_y_color" />
+
+    <Button
+        android:id="@+id/buttonZ"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onZColorButtonClick"
+        android:text="@string/gravity_z_color" />
+
+    <CheckBox
+        android:id="@+id/checkBox1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/gravity_rotate" />
+
+</LinearLayout>

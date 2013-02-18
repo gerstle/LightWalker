@@ -19,6 +19,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,6 +56,7 @@ public class LightWalkerRemote extends Activity {
 		AppUtil.mTitle = (TextView) findViewById(R.id.title_right_text);
         
         AppUtil.mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        AppUtil.mLightWalker = this;
 
         // If the adapter is null, then Bluetooth is not supported
         if (AppUtil.mBluetoothAdapter == null) {
@@ -64,6 +66,26 @@ public class LightWalkerRemote extends Activity {
         }
         
 		mRadioModeGroup = (RadioGroup) findViewById(R.id.modeRadioGroup);
+		mRadioModeGroup.setOnCheckedChangeListener(new OnCheckedChangeListener() 
+	    {
+	        public void onCheckedChanged(RadioGroup group, int checkedId) {
+	        	switch (checkedId)
+	    		{
+	    			case R.id.radioEqualizer:
+	    				sendMessage("equalizer:GO");
+	    				break;
+	    			case R.id.radioGravity:
+	    				sendMessage("gravity:GO");
+	    				break;
+	    			case R.id.radioSparkle:
+	    				sendMessage("sparkle:GO");
+	    				break;
+	    			case R.id.radioPulse:
+	    				sendMessage("pulse:GO");
+	    				break;
+	    		}       
+	        }
+	    });
 	}
 	
     @Override
@@ -139,8 +161,7 @@ public class LightWalkerRemote extends Activity {
         // Initialize the BluetoothChatService to perform bluetooth connections
         AppUtil.mChatService = new BluetoothChatService(this, AppUtil.mBluetoothHandler);
     }
-
-
+    
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -183,6 +204,11 @@ public class LightWalkerRemote extends Activity {
 				intent = new Intent(this, ModeSparkleConfigActivity.class);
 				startActivity(intent);
 				break;
+			case R.id.radioPulse:
+				//Toast.makeText(LightWalkerRemote.this, "sparkle", Toast.LENGTH_SHORT).show();
+				intent = new Intent(this, ModePulseConfigActivity.class);
+				startActivity(intent);
+				break;
 		}
 	}
 	
@@ -199,7 +225,7 @@ public class LightWalkerRemote extends Activity {
             }
         };
         
-	private void sendMessage(String message) {
+	public void sendMessage(String message) {
 		// Check that we're actually connected before trying anything
         if (AppUtil.mChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
             Toast.makeText(this, R.string.title_not_connected, Toast.LENGTH_SHORT).show();
@@ -217,10 +243,17 @@ public class LightWalkerRemote extends Activity {
 				e.printStackTrace();
 			}
             AppUtil.mChatService.write(send);
+            AppUtil.mBluetoothMessageTextView.setText(AppUtil.mBluetoothMessageLabel);
 
             // Reset out string buffer to zero and clear the edit text field
             mOutStringBuffer.setLength(0);
             mCommandText.setText(mOutStringBuffer);
+            try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				Log.d(AppUtil.TAG, "sleep interrupted");
+				e.printStackTrace();
+			}
         }
 	}
 

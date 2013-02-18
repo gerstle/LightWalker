@@ -3,6 +3,7 @@ package com.inappropirates.remotecontrol;
 import android.app.Application;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -15,6 +16,10 @@ public class AppUtil extends Application {
 	
 	public static final boolean DEBUG = true;
 	public static final String TAG = "LightWalkerRemote";
+	
+	public static final char mModeDelimiter = ':';
+	public static final char mKeyDelimiter = '=';
+	public static final char mColorDelimiter = ',';
 		
     public static BluetoothAdapter mBluetoothAdapter = null;
     public static BluetoothChatService mChatService = null;
@@ -22,6 +27,8 @@ public class AppUtil extends Application {
 
  	public static TextView mTitle;
     public static String mConnectedDeviceName = null;
+    
+    public static LightWalkerRemote mLightWalker = null;
     
     // Message types sent from the BluetoothChatService Handler
     public static final int MESSAGE_STATE_CHANGE = 1;
@@ -58,9 +65,7 @@ public class AppUtil extends Application {
                 }
                 break;
             case MESSAGE_WRITE:
-                //byte[] writeBuf = (byte[]) msg.obj;
-                // construct a string from the buffer
-                //String writeMessage = new String(writeBuf);
+            	
 
                 break;
             case MESSAGE_READ:
@@ -83,4 +88,17 @@ public class AppUtil extends Application {
             }
         }
     };
+    
+    public static String ConstructMessage(String mode, String key, String value) {
+    	return mode + mModeDelimiter + key + mKeyDelimiter + value;
+    }
+    
+    public static String Color2String(int color) {
+    	String rv = "";
+    	rv += "" + Color.red(color) + mColorDelimiter +
+    			Color.green(color) + mColorDelimiter +
+    			Color.blue(color);
+    	
+    	return rv;
+    }
 }

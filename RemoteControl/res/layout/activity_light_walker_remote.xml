@@ -69,8 +69,13 @@
             android:id="@+id/radioSparkle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.60"
             android:text="@string/modeSparkleLabel" />
+        
+        <RadioButton
+            android:id="@+id/radioPulse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/modePulseLabel" />
     </RadioGroup>
 
     <Button

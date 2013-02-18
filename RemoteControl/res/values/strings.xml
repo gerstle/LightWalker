@@ -32,5 +32,18 @@
     <string name="title_not_connected">not connected</string>
     <string name="bt_not_enabled_leaving">Bluetooth is not enabled, exiting</string>
     <string name="menu_bluetooth_settings">bluetooth</string>
-	<string name="bluetooth_response">LightWalker: </string>
+    <string name="bluetooth_response">LightWalker: </string>
+    <string name="gravity_x_color">x color</string>
+    <string name="gravity_y_color">y color</string>
+    <string name="gravity_z_color">z color</string>
+    <string name="gravity_rotate">rotate colors</string>
+    <string name="pick_color">pick a color</string>
+    <string name="title_activity_mode_pulse_config">ModePulseConfigActivity</string>
+	<string name="modePulseLabel">pulse</string>
+	<string name="pulse_color">pulse color</string>
+	<string name="pulse_sync_legs">synchronize legs</string>
+	<string name="pulse_min_pulse_rate_label">min pulse rate (ms)</string>
+	<string name="pulse_max_pulse_rate_label">max pulse rate(ms)</string>
+	<string name="pulse_min_pulse_rate">500</string>
+	<string name="pulse_max_pulse_rate">3000</string>
 </resources>
