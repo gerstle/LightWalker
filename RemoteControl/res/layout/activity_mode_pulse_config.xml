@@ -76,4 +76,16 @@
 
     </LinearLayout>
 
+    <CheckBox
+        android:id="@+id/checkBoxSynchronize"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/pulse_sync_legs" />
+
+    <CheckBox
+        android:id="@+id/checkBoxRandomColor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/pulse_random_color" />
+
 </LinearLayout>

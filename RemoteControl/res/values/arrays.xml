@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- MAKE SURE THIS LIST CORRESPONDS TO LIGHTWALKERMODES ENUM -->
+    <string-array name="modeList">
+        <item name="main">Main</item>
+        <item name="gravity">Gravity</item>
+        <item name="equalizer">Equalizer</item>
+        <item name="sparkle">Sparkle</item>
+        <item name="pulse">Pulse</item>
+    </string-array>
+</resources>

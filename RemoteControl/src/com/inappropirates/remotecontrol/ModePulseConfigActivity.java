@@ -35,9 +35,9 @@ public class ModePulseConfigActivity extends Activity {
 	public void onDestroy()
 	{
 		super.onDestroy();
-		AppUtil.mLightWalker.sendMessage(AppUtil.ConstructMessage("pulse", "Color", AppUtil.Color2String(mColor)));
-		AppUtil.mLightWalker.sendMessage(AppUtil.ConstructMessage("pulse", "MinPulseRate", ((EditText)findViewById(R.id.editTextMinPulseTime)).getText().toString()));
-		AppUtil.mLightWalker.sendMessage(AppUtil.ConstructMessage("pulse", "MaxPulseRate", ((EditText)findViewById(R.id.editTextMaxPulseTime)).getText().toString()));
+		//AppUtil.sendMessage(AppUtil.ConstructMessage(LightWalkerModes.Pulse, "Color", AppUtil.Color2String(mColor)));
+		//AppUtil.sendMessage(AppUtil.ConstructMessage(LightWalkerModes.Pulse, "MinPulseRate", ((EditText)findViewById(R.id.editTextMinPulseTime)).getText().toString()));
+		//AppUtil.sendMessage(AppUtil.ConstructMessage(LightWalkerModes.Pulse, "MaxPulseRate", ((EditText)findViewById(R.id.editTextMaxPulseTime)).getText().toString()));
 	}
 
 	public void onColorButtonClick(View v) {

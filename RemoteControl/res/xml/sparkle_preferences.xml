@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+       xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:robobunny="http://robobunny.com"
+       android:key="sparkle_preferences">
+    
+    <com.robobunny.SeekBarPreference
+        android:key="sparkleFootDownFadeRate"
+        android:title="foot down fade rate"
+        android:summary="adjust foot down fade rate"
+        android:defaultValue="2"
+        robobunny:min="1"
+        android:max="100"
+        robobunny:unitsLeft=""
+        robobunny:unitsRight="" />
+    
+</PreferenceScreen>

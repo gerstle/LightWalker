@@ -39,51 +39,11 @@
         android:layout_width="match_parent"
         android:layout_height="2dip"
         android:background="#2B3856" />
-    
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:shadowColor="@color/headerbackground"
-        android:text="@string/modeLabel"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <RadioGroup
-        android:id="@+id/modeRadioGroup"
+    <ListView
+        android:id="@+id/modeList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
-
-        <RadioButton
-            android:id="@+id/radioGravity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/modeGravityLabel" />
-
-        <RadioButton
-            android:id="@+id/radioEqualizer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/modeEqualizerLabel" />
-
-        <RadioButton
-            android:id="@+id/radioSparkle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/modeSparkleLabel" />
-        
-        <RadioButton
-            android:id="@+id/radioPulse"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/modePulseLabel" />
-    </RadioGroup>
-
-    <Button
-        android:id="@+id/buttonModeConfig"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:onClick="onConfigButtonClick"
-        android:text="@string/modeConfigButtonLabel" />
-
+    </ListView>
 
 </LinearLayout>

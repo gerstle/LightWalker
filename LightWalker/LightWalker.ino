@@ -81,32 +81,20 @@ bool ExecuteCommand(String input)
     //Serial.print("colonIndex: "); Serial.println(colonIndex);
     //Serial.print("mode string: "); Serial.println(modeString);
 
-    if (modeString == "gravity")
+    if (modeString == "Gravity")
         mode = Gravity;
-    else if (modeString == "equalizer")
+    else if (modeString == "Equalizer")
         mode = Equalizer;
-    else if (modeString == "sparkle")
+    else if (modeString == "Sparkle")
         mode = Sparkle;
-    else if (modeString == "pulse")
+    else if (modeString == "Pulse")
         mode = Pulse;
+    else if (modeString == "Main")
+        mode = Main;
     else
         return false;
 
-    switch (mode)
-    {
-        case Gravity:
-            Serial.println("gravity");
-            break;
-        case Equalizer:
-            Serial.println("equalizer");
-            break;
-        case Sparkle:
-            Serial.println("sparkle");
-            break;
-        case Pulse:
-            Serial.println("pulse");
-            break;
-    }
+    Serial.println(modeString);
 
     if (input.substring(colonIndex + 1, colonIndex + 3) == "GO")
     {
@@ -123,6 +111,11 @@ bool ExecuteCommand(String input)
 
         switch (mode)
         {
+            case Main:
+                if (key == "mainPrefMaxBrightness")
+                    LWConfigs.main.maxBrightness = value.toInt();
+                    Serial.print("max set to: "); Serial.println(LWConfigs.main.maxBrightness);
+                break;
             case Gravity:
 //                 if (key == "x")
 //                     ParseColor(value, &color); 
@@ -138,11 +131,11 @@ bool ExecuteCommand(String input)
             case Sparkle:
                 break;
             case Pulse:
-                if (key == "Color")
+                if (key == "pulsePrefColor")
                     ParseColor(value, &(LWConfigs.pulse.color)); 
-                else if (key == "MinPulseRate")
+                else if (key == "pulsePrefMinRate")
                     LWConfigs.pulse.minPulseTime = value.toInt();
-                else if (key == "MaxPulseRate")
+                else if (key == "pulsePrefMaxRate")
                     LWConfigs.pulse.maxPulseTime = value.toInt();
                 break;
         }

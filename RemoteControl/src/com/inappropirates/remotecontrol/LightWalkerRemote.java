@@ -1,12 +1,11 @@
 package com.inappropirates.remotecontrol;
 
-import java.io.UnsupportedEncodingException;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -16,10 +15,12 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioGroup;
-import android.widget.RadioGroup.OnCheckedChangeListener;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,34 +30,49 @@ import com.inappropirates.util.bluetooth.DeviceListActivity;
 @SuppressLint("HandlerLeak")
 public class LightWalkerRemote extends Activity {
 	
-	private RadioGroup mRadioModeGroup;
-  	private int mSelectedModeId;
-  	//private Button modeConfigButton;
+	private ListView modeListView;
   	
     // Intent request codes
     private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
     private static final int REQUEST_ENABLE_BT = 3;
+    
+    static final String EXTRA_MODE_NAME = "android.intent.extra.MODE_NAME";
             
-    private EditText mCommandText;
     private Button mSendButton;
-    private StringBuffer mOutStringBuffer;
+    
+    private SharedPreferences mPrefs;
 	  
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 		if(AppUtil.DEBUG) Log.e(AppUtil.TAG, "--Create--");
 		
 		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		setContentView(R.layout.activity_light_walker_remote);
 		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.custom_title);
 		
-        // Set up the custom title
+        AppUtil.mContext = getApplicationContext();
 		AppUtil.mTitle = (TextView) findViewById(R.id.title_left_text);
 		AppUtil.mTitle.setText(R.string.app_name);
 		AppUtil.mTitle = (TextView) findViewById(R.id.title_right_text);
         
         AppUtil.mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         AppUtil.mLightWalker = this;
+        
+        modeListView = (ListView) findViewById(R.id.modeList);
+        ArrayAdapter<String> mModeArrayAdapter = new ArrayAdapter<String>(modeListView.getContext(), R.layout.list_modes, getResources().getStringArray(R.array.modeList));
+        modeListView.setAdapter(mModeArrayAdapter);
+        
+        modeListView.setOnItemClickListener(new OnItemClickListener() {
+        	@Override
+        	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        		String itemName = (String)(modeListView.getItemAtPosition(position));
+        		Intent intent = new Intent(LightWalkerRemote.this, SettingsActivity.class);
+        		intent.putExtra(EXTRA_MODE_NAME, itemName);
+        		startActivity(intent);
+        	}
+        }); 
 
         // If the adapter is null, then Bluetooth is not supported
         if (AppUtil.mBluetoothAdapter == null) {
@@ -65,27 +81,8 @@ public class LightWalkerRemote extends Activity {
             return;
         }
         
-		mRadioModeGroup = (RadioGroup) findViewById(R.id.modeRadioGroup);
-		mRadioModeGroup.setOnCheckedChangeListener(new OnCheckedChangeListener() 
-	    {
-	        public void onCheckedChanged(RadioGroup group, int checkedId) {
-	        	switch (checkedId)
-	    		{
-	    			case R.id.radioEqualizer:
-	    				sendMessage("equalizer:GO");
-	    				break;
-	    			case R.id.radioGravity:
-	    				sendMessage("gravity:GO");
-	    				break;
-	    			case R.id.radioSparkle:
-	    				sendMessage("sparkle:GO");
-	    				break;
-	    			case R.id.radioPulse:
-	    				sendMessage("pulse:GO");
-	    				break;
-	    		}       
-	        }
-	    });
+		mPrefs = getSharedPreferences("main_preferences.xml", MODE_PRIVATE);
+        AppUtil.mSelectedMode = LightWalkerModes.valueOf(mPrefs.getString("mainPrefDefaultMode", LightWalkerModes.Pulse.toString()));
 	}
 	
     @Override
@@ -104,7 +101,9 @@ public class LightWalkerRemote extends Activity {
 	            setupBluetooth();
         	} else if (AppUtil.mChatService == null)
         		setupBluetooth();
-        }
+        
+        
+        this.modeListView.requestFocus();}
     }
 
 	@Override
@@ -138,11 +137,29 @@ public class LightWalkerRemote extends Activity {
         	AppUtil.mChatService.stop();
         }
     }
+    
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		Intent intent = null;
+	    switch (item.getItemId()) {
+	        case R.id.menu_bluetooth:
+	        	intent = new Intent(this, DeviceListActivity.class);
+	            startActivityForResult(intent, REQUEST_CONNECT_DEVICE_SECURE);
+	            return true;
+/*	        case R.id.menu_settings:
+	        	intent = new Intent(this, SettingsActivity.class);
+				intent.putExtra(EXTRA_MODE_NAME, "Main");
+	            startActivity(intent);
+*/	            
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
+	}
 
     private void setupBluetooth() {
     	// Initialize the compose field with a listener for the return key
-        mCommandText = (EditText) findViewById(R.id.commandText);
-        mCommandText.setOnEditorActionListener(mCommandListener);
+    	AppUtil.mCommandText = (EditText) findViewById(R.id.commandText);
+    	AppUtil.mCommandText.setOnEditorActionListener(mCommandListener);
 
         // Initialize the send button with a listener that for click events
         mSendButton = (Button) findViewById(R.id.buttonSend);
@@ -151,7 +168,7 @@ public class LightWalkerRemote extends Activity {
                 // Send a message using content of the edit text widget
                 TextView view = (TextView) findViewById(R.id.commandText);
                 String message = view.getText().toString();
-                sendMessage(message);
+                AppUtil.sendMessage(message);
             }
         });
         
@@ -168,97 +185,56 @@ public class LightWalkerRemote extends Activity {
 		getMenuInflater().inflate(R.menu.activity_light_walker_remote, menu);
 		return true;
 	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		Intent intent = null;
-	    switch (item.getItemId()) {
-	        case R.id.menu_bluetooth:
-	        	intent = new Intent(this, DeviceListActivity.class);
-	            startActivityForResult(intent, REQUEST_CONNECT_DEVICE_SECURE);
-	            return true;
-	        default:
-	            return super.onOptionsItemSelected(item);
-	    }
-	}
 
+	/*
 	public void onConfigButtonClick(View v) {
 	     // get selected radio button from radioGroup
-		mSelectedModeId = mRadioModeGroup.getCheckedRadioButtonId();
+		AppUtil.mSelectedModeId = mRadioModeGroup.getCheckedRadioButtonId();
 		
 		Intent intent;
-		switch (mSelectedModeId)
+		switch (AppUtil.mSelectedModeId)
 		{
 			case R.id.radioEqualizer:
 				//Toast.makeText(LightWalkerRemote.this, "eq", Toast.LENGTH_SHORT).show();
+				AppUtil.mSelectedMode = "equalizer";
 				intent = new Intent(this, ModeEqualizerConfigActivity.class);
 				startActivity(intent);
 				break;
 			case R.id.radioGravity:
+				AppUtil.mSelectedMode = "gravity";
 				//Toast.makeText(LightWalkerRemote.this, "gravity", Toast.LENGTH_SHORT).show();
 				intent = new Intent(this, ModeGravityConfigActivity.class);
 				startActivity(intent);
 				break;
 			case R.id.radioSparkle:
-				//Toast.makeText(LightWalkerRemote.this, "sparkle", Toast.LENGTH_SHORT).show();
-				intent = new Intent(this, ModeSparkleConfigActivity.class);
+				AppUtil.mSelectedMode = "sparkle";
+				intent = new Intent(this, SettingsActivity.class);
+				intent.putExtra(EXTRA_PREFERENCES_NAME, "sparkle_preferences");
 				startActivity(intent);
 				break;
 			case R.id.radioPulse:
-				//Toast.makeText(LightWalkerRemote.this, "sparkle", Toast.LENGTH_SHORT).show();
-				intent = new Intent(this, ModePulseConfigActivity.class);
-				startActivity(intent);
+				AppUtil.mSelectedMode = "pulse";
+				intent = new Intent(this, SettingsActivity.class);
+				intent.putExtra(EXTRA_PREFERENCES_NAME, "pulse_preferences");
+	            startActivity(intent);
 				break;
 		}
 	}
+	*/
 	
     private TextView.OnEditorActionListener mCommandListener =
-            new TextView.OnEditorActionListener() {
-            public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
-                // If the action is a key-up event on the return key, send the message
-                if (actionId == EditorInfo.IME_NULL && event.getAction() == KeyEvent.ACTION_UP) {
-                    String message = view.getText().toString();
-                    sendMessage(message);
-                }
-                if(AppUtil.DEBUG) Log.i(AppUtil.TAG, "END onEditorAction");
-                return true;
+        new TextView.OnEditorActionListener() {
+        public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
+            // If the action is a key-up event on the return key, send the message
+            if (actionId == EditorInfo.IME_NULL && event.getAction() == KeyEvent.ACTION_UP) {
+                String message = view.getText().toString();
+                AppUtil.sendMessage(message);
             }
-        };
+            if(AppUtil.DEBUG) Log.i(AppUtil.TAG, "END onEditorAction");
+            return true;
+        }
+    };
         
-	public void sendMessage(String message) {
-		// Check that we're actually connected before trying anything
-        if (AppUtil.mChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
-            Toast.makeText(this, R.string.title_not_connected, Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Check that there's actually something to send
-        if (message.length() > 0) {
-            // Get the message bytes and tell the BluetoothChatService to write
-            byte[] send = null;
-			try {
-				send = message.getBytes("US-ASCII");
-			} catch (UnsupportedEncodingException e) {
-				Log.d(AppUtil.TAG, "code not encode to ASCII");
-				e.printStackTrace();
-			}
-            AppUtil.mChatService.write(send);
-            AppUtil.mBluetoothMessageTextView.setText(AppUtil.mBluetoothMessageLabel);
-
-            // Reset out string buffer to zero and clear the edit text field
-            mOutStringBuffer.setLength(0);
-            mCommandText.setText(mOutStringBuffer);
-            try {
-				Thread.sleep(50);
-			} catch (InterruptedException e) {
-				Log.d(AppUtil.TAG, "sleep interrupted");
-				e.printStackTrace();
-			}
-        }
-	}
-
-
-    
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (AppUtil.DEBUG) Log.d(AppUtil.TAG, "onActivityResult " + resultCode);
         switch (requestCode) {
@@ -279,12 +255,9 @@ public class LightWalkerRemote extends Activity {
                         // Send a message using content of the edit text widget
                         TextView view = (TextView) findViewById(R.id.commandText);
                         String message = view.getText().toString();
-                        sendMessage(message);
+                        AppUtil.sendMessage(message);
                     }
                 });
-                
-                // Initialize the buffer for outgoing messages
-                mOutStringBuffer = new StringBuffer("");
             }
             break;
         case REQUEST_ENABLE_BT:

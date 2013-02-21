@@ -71,7 +71,7 @@ public class ModeGravityConfigActivity extends Activity {
 	            		mXButton.setBackgroundColor(mXColor);
 	            		mDirection = Direction.NONE;
 	            		
-	            		AppUtil.mLightWalker.sendMessage(AppUtil.ConstructMessage("gravity", "x", AppUtil.Color2String(mXColor)));
+	            		//AppUtil.sendMessage(AppUtil.ConstructMessage(LightWalkerModes.Gravity, "x", AppUtil.Color2String(mXColor)));
 	            		break;
 	            	case Y:
 	            		message = "Y: ";
@@ -79,7 +79,7 @@ public class ModeGravityConfigActivity extends Activity {
 	            		mYButton.setBackgroundColor(mYColor);
 	            		mDirection = Direction.NONE;
 	            		
-	            		AppUtil.mLightWalker.sendMessage(AppUtil.ConstructMessage("gravity", "y", AppUtil.Color2String(mYColor)));
+	            		//AppUtil.sendMessage(AppUtil.ConstructMessage(LightWalkerModes.Gravity, "y", AppUtil.Color2String(mYColor)));
 	            		break;
 	            	case Z:
 	            		message = "Z: ";
@@ -87,7 +87,7 @@ public class ModeGravityConfigActivity extends Activity {
 	            		mZButton.setBackgroundColor(mZColor);
 	            		mDirection = Direction.NONE;
 	            		
-	            		AppUtil.mLightWalker.sendMessage(AppUtil.ConstructMessage("gravity", "z", AppUtil.Color2String(mZColor)));
+	            		//AppUtil.sendMessage(AppUtil.ConstructMessage(LightWalkerModes.Gravity, "z", AppUtil.Color2String(mZColor)));
 	            		break;
             	}
             	

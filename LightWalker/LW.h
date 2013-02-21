@@ -19,7 +19,7 @@ class LW
 {
     public:
 
-        LW(int brightness);
+        LW(int x);
         void initLegs(WalkingModeEnum mode);
         void off();
         void walk();
@@ -28,7 +28,6 @@ class LW
     private:
         Leg _legs[LEG_COUNT];
         unsigned long _laststatus;
-        int _max_brightness;
         WalkingModeEnum _mode;
 };
 

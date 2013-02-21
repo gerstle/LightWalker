@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:robobunny="http://robobunny.com"
+    android:key="main_preferences" >
+ 	
+	<com.robobunny.SeekBarPreference
+        android:key="mainPrefLegCount"
+        android:title="@string/main_pref_leg_count"
+        android:summary="adjust leg count"
+        android:defaultValue="2"
+        android:max="4"
+        robobunny:min="1"
+        robobunny:unitsLeft=""
+        robobunny:unitsRight="" />
+
+	<com.robobunny.SeekBarPreference
+        android:key="mainPrefPixelsPerLeg"
+        android:title="@string/main_pref_pixels_per_leg"
+        android:summary="adjust pixels per leg"
+        android:defaultValue="25"
+        android:max="200"
+        robobunny:min="1"
+        robobunny:unitsLeft=""
+        robobunny:unitsRight="" />
+	
+	<com.robobunny.SeekBarPreference
+        android:key="mainPrefMaxBrightness"
+        android:title="@string/main_pref_max_brightness"
+        android:summary="adjust the max brightness of an led"
+        android:defaultValue="200"
+        android:max="255"
+        robobunny:min="50"
+        robobunny:unitsLeft=""
+        robobunny:unitsRight="" />
+	
+	<ListPreference 
+        android:key="mainPrefDefaultMode"
+        android:title="default mode"
+        android:summary="default mode"
+        android:defaultValue="LightWalkerModes.Pulse" 
+        android:entries="@array/modeList"
+        android:entryValues="@array/modeList" /> 
+</PreferenceScreen>

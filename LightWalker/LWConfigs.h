@@ -26,10 +26,19 @@
 
 enum WalkingModeEnum
 {
+    Main,
     Gravity,
     Equalizer,
     Sparkle,
     Pulse
+};
+
+struct MainConfigs
+{
+    MainConfigs() : maxBrightness(200), defaultMode(Pulse) {}
+
+    int maxBrightness;
+    WalkingModeEnum defaultMode;
 };
 
 struct PulseConfigs
@@ -47,6 +56,7 @@ class LWConfigsClass
 {
     public:
         PulseConfigs pulse;
+        MainConfigs main;
 };
 
 extern LWConfigsClass LWConfigs;

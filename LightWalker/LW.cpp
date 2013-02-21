@@ -12,9 +12,11 @@
 // LW Class
 // ----------------------------------------------------------------------------
 
-LW::LW(int brightness)
+LW::LW(int x)
 {
-    _max_brightness = brightness;
+    // <gerstle> ignore the x, something about the arduino compiler
+    // needing a single int class constructor. Or I don't know
+    // what I'm doing.
 }
 
 void LW::initLegs(WalkingModeEnum mode)
@@ -22,8 +24,8 @@ void LW::initLegs(WalkingModeEnum mode)
     _mode = mode;
     TCL.sendEmptyFrame();
 
-    _legs[0] = Leg("left leg", 2, 25, _max_brightness, mode);
-    _legs[1] = Leg("right leg", 3, 25, _max_brightness, mode);
+    _legs[0] = Leg("left leg", 2, 25, 0, mode);
+    _legs[1] = Leg("right leg", 3, 25, 0, mode);
 }
 
 void LW::setMode(WalkingModeEnum mode)
@@ -109,15 +111,6 @@ void LW:: walk()
             case Pulse:
                 _legs[i].pulse_pulse();    
                 break;
-        }
-
-//         _legs[i].sparkle_foot_down_fade_step = analogRead(TCL_POT1);
-//         _legs[i].sparkle_foot_up_fade_step = analogRead(TCL_POT4);
-        //_legs[i].max_brightness = analogRead(TCL_POT3);
-
-        if (displayStatus && DEBUG)
-        {
-            Serial.print("    brightness "); Serial.println(_legs[i].max_brightness);
         }
     }
     TCL.sendEmptyFrame();

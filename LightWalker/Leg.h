@@ -45,10 +45,9 @@ class Leg
         int trigger_pin;
         int pixel_count;
         String name;
-        byte max_brightness;
 
         Leg();
-        Leg(String n, int trigger_pin, int pixels, int brightness, WalkingModeEnum mode);
+        Leg(String n, int trigger_pin, int pixels, int x, WalkingModeEnum mode);
         void off();
         void setWalkingMode(WalkingModeEnum mode);
 
@@ -76,7 +75,7 @@ class Leg
         void _displayPixels();
         void _setLightMode(LightModeEnum mode);
         RGB _pixels[MAX_PIXELS_PER_LEG];
-        void _dimPixel(byte *pixel, byte dim);
+        void _applyMaxBrightness(byte *pixel, float value, int i);
 
         // <gerstle> Sparkle stuff        
         void _sparkle_flash();

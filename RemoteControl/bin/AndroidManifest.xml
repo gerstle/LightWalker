@@ -45,6 +45,10 @@
             android:name="com.inappropirates.remotecontrol.ModePulseConfigActivity"
             android:label="@string/title_activity_mode_pulse_config" >
         </activity>
+        <activity
+            android:name="com.inappropirates.remotecontrol.SettingsActivity"
+            android:label="@string/menu_settings" >
+        </activity>
     </application>
 
 </manifest>

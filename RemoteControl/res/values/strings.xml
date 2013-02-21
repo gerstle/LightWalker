@@ -2,13 +2,15 @@
 <resources>
 
     <string name="app_name">LightWalker Remote</string>
-    <string name="menu_settings">Settings</string>
+    <string name="menu_settings">settings</string>
     <string name="btStatusLabel">bluetooth status:</string>
 
     <string-array name="btStatusValues">
         <item>-</item>
     </string-array>
 
+    <string name="menu_bluetooth_settings">bluetooth</string>
+    
     <string name="modeLabel">Mode</string>
     <string name="modeSparkleLabel">sparkle</string>
     <string name="modeGravityLabel">gravity</string>
@@ -31,7 +33,7 @@
     <string name="title_connecting">connecting…</string>
     <string name="title_not_connected">not connected</string>
     <string name="bt_not_enabled_leaving">Bluetooth is not enabled, exiting</string>
-    <string name="menu_bluetooth_settings">bluetooth</string>
+    
     <string name="bluetooth_response">LightWalker: </string>
     <string name="gravity_x_color">x color</string>
     <string name="gravity_y_color">y color</string>
@@ -46,4 +48,20 @@
 	<string name="pulse_max_pulse_rate_label">max pulse rate(ms)</string>
 	<string name="pulse_min_pulse_rate">500</string>
 	<string name="pulse_max_pulse_rate">3000</string>
+	<string name="pulse_random_color">random color</string>
+	
+	<string name="main_pref_leg_count">number o\' legs</string>
+	<string name="main_pref_pixels_per_leg">pixels per leg</string>
+	<string name="main_pref_max_brightness">max brightness</string>
+	
+	
+    <string name="pref_send_report">Send crash reports</string>
+    <string name="pref_send_report_summary">Helps to fix bugs</string>
+    <string name="pref_sync_frequency">Sync frequency</string>
+    <string name="pref_sync_frequency_summary">Set the sync frequency</string>
+    <string name="pref_user_name">Set username</string>
+    <string name="pref_user_name_summary">Set your username</string>
+     
+    <string name="pref_user_profile">User Profile</string>
+    <string name="pref_update_setting">Update Settings</string>
 </resources>
