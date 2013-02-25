@@ -20,13 +20,13 @@ class LW
     public:
 
         LW(int x);
-        void initLegs(WalkingModeEnum mode);
+        void initLegs(Leg* legs, WalkingModeEnum mode);
         void off();
         void walk();
         void setMode(WalkingModeEnum mode);
 
     private:
-        Leg _legs[LEG_COUNT];
+        Leg* _legs;
         unsigned long _laststatus;
         WalkingModeEnum _mode;
 };

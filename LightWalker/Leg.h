@@ -14,13 +14,6 @@
 #include "LWUtils.h"
 #include "LWConfigs.h"
 
-// <gerstle> milliseconds for each mode
-#define SPARKLE_INTERVAL 500
-
-// <gerstle> sparkle settings
-#define SPARKLE_FOOT_DOWN_FADE_STEP 0x5
-#define SPARKLE_FOOT_UP_FADE_STEP 0x15
-
 enum FootStatusEnum
 {
     Initialized,
@@ -43,11 +36,10 @@ class Leg
         // <gerstle> Generic
         FootStatusEnum status;
         int trigger_pin;
-        int pixel_count;
         String name;
 
         Leg();
-        Leg(String n, int trigger_pin, int pixels, int x, WalkingModeEnum mode);
+        void Init(String n, int trigger_pin, WalkingModeEnum mode);
         void off();
         void setWalkingMode(WalkingModeEnum mode);
 
@@ -74,7 +66,7 @@ class Leg
         void _setPixel(int i, RGB color, byte dimmer);
         void _displayPixels();
         void _setLightMode(LightModeEnum mode);
-        RGB _pixels[MAX_PIXELS_PER_LEG];
+        RGB _pixels[PIXELS_PER_LEG];
         void _applyMaxBrightness(byte *pixel, float value, int i);
 
         // <gerstle> Sparkle stuff        

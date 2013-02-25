@@ -3,15 +3,55 @@
        xmlns:android="http://schemas.android.com/apk/res/android"
        xmlns:robobunny="http://robobunny.com"
        android:key="sparkle_preferences">
-    
-    <com.robobunny.SeekBarPreference
-        android:key="sparkleFootDownFadeRate"
+       
+	<com.robobunny.SeekBarPreference
+        android:key="sparkleFootUpFadeRate"
         android:title="foot down fade rate"
-        android:summary="adjust foot down fade rate"
-        android:defaultValue="2"
+        android:defaultValue="3"
         robobunny:min="1"
-        android:max="100"
+        android:max="50"
         robobunny:unitsLeft=""
         robobunny:unitsRight="" />
     
+    <com.robobunny.SeekBarPreference
+        android:key="sparkleFootUpFadeRate"
+        android:title="foot up fade rate"
+        android:defaultValue="2"
+        robobunny:min="1"
+        android:max="50"
+        robobunny:unitsLeft=""
+        robobunny:unitsRight="" />
+    
+    <com.robobunny.SeekBarPreference
+        android:key="sparklePrefFlashLength"
+        android:title="length of flash time (ms)"
+        android:defaultValue="200"
+        android:max="3000"
+        robobunny:min="0"
+        robobunny:unitsLeft=""
+		robobunny:unitsRight="" />
+        
+    <com.robobunny.SeekBarPreference
+        android:key="sparklePrefSparkleLength"
+        android:title="length of sparkle time (ms)"
+        android:defaultValue="5000"
+        android:max="100000"
+        robobunny:min="0"
+        robobunny:unitsLeft=""
+		robobunny:unitsRight="" />
+    
+    <com.inappropirates.remotecontrol.ColorPickerPreference
+        android:key="sparklePrefFootFlashColor"
+        android:title="foot flash color"
+        />
+    
+    <com.inappropirates.remotecontrol.ColorPickerPreference
+        android:key="sparklePrefFootSparkleColor"
+        android:title="foot sparkle color"
+        />
+    
+    <com.inappropirates.remotecontrol.ColorPickerPreference
+        android:key="sparklePrefLegSparkleColor"
+        android:title="leg sparkle color"
+        />    
 </PreferenceScreen>

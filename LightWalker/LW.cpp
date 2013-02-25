@@ -19,13 +19,12 @@ LW::LW(int x)
     // what I'm doing.
 }
 
-void LW::initLegs(WalkingModeEnum mode)
+void LW::initLegs(Leg* legs, WalkingModeEnum mode)
 {
     _mode = mode;
+    _legs = legs;
     TCL.sendEmptyFrame();
-
-    _legs[0] = Leg("left leg", 2, 25, 0, mode);
-    _legs[1] = Leg("right leg", 3, 25, 0, mode);
+    setMode(_mode);
 }
 
 void LW::setMode(WalkingModeEnum mode)

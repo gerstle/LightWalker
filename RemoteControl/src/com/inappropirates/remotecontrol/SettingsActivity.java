@@ -105,7 +105,10 @@ public class SettingsActivity extends PreferenceActivity {
     }
     
     private boolean keyIsColor(String key) {
-    	if (key.equals("pulsePrefColor"))
+    	if ((key.equals("pulsePrefColor")) ||
+    	  	(key.equals("sparklePrefFootFlashColor")) ||
+    	  	(key.equals("sparklePrefFootSparkleColor")) ||
+    	  	(key.equals("sparklePrefLegSparkleColor")))
     		return true;
     	else
     		return false;

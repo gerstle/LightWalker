@@ -16,6 +16,7 @@
 #define TXPIN 10
 #define RXPIN 9 
 
+Leg legs[LEG_COUNT];
 LW lw(150);
 SoftwareSerial bluetooth(RXPIN, TXPIN);
 
@@ -38,7 +39,9 @@ void setup()
     TCL.sendEmptyFrame();
 
     // <gerstle> LightWalker control setup
-    lw.initLegs(Pulse);
+    legs[0].Init("left leg", 2, Pulse);
+    legs[1].Init("right leg", 2, Pulse);
+    lw.initLegs((Leg *) &legs, Pulse);
 }
 
 const int msgLength = 64;
@@ -129,6 +132,20 @@ bool ExecuteCommand(String input)
             case Equalizer:
                 break;
             case Sparkle:
+                if (key == "sparklePrefFootFlashColor")
+                    ParseColor(value, &(LWConfigs.sparkle.footFlashColor)); 
+                else if (key == "sparklePrefFootSparkleColor")
+                    ParseColor(value, &(LWConfigs.sparkle.footSparkleColor)); 
+                else if (key == "sparklePrefLegSparkleColor")
+                    ParseColor(value, &(LWConfigs.sparkle.legSparkleColor)); 
+                else if (key == "sparklePrefFlashLength")
+                    LWConfigs.sparkle.flashLength = value.toInt();
+                else if (key == "sparklePrefSparkleLength")
+                    LWConfigs.sparkle.sparkleLength = value.toInt();
+                else if (key == "sparklePrefFootDownFadeRate")
+                    LWConfigs.sparkle.footDownFadeRate = byte(value.toInt());
+                else if (key == "sparklePrefFootUpFadeRate")
+                    LWConfigs.sparkle.footUpFadeRate = byte(value.toInt());
                 break;
             case Pulse:
                 if (key == "pulsePrefColor")
@@ -137,6 +154,16 @@ bool ExecuteCommand(String input)
                     LWConfigs.pulse.minPulseTime = value.toInt();
                 else if (key == "pulsePrefMaxRate")
                     LWConfigs.pulse.maxPulseTime = value.toInt();
+                else if (key == "pulsePrefRandomColor")
+                    if (value == "true")
+                        LWConfigs.pulse.randomColor = true;
+                    else
+                        LWConfigs.pulse.randomColor = false;
+                else if (key == "pulsePrefSyncLegs")
+                    if (value == "true")
+                        LWConfigs.pulse.syncLegs = true;
+                    else
+                        LWConfigs.pulse.syncLegs = false;
                 break;
         }
 
