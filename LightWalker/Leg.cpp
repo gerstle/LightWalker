@@ -110,7 +110,7 @@ void Leg::_sparkle_flash()
     for (int i = 0; i < PIXELS_PER_LEG; i++)
     {
         if ((i < lower_foot_border) || (i > upper_foot_border))
-            _setPixel(i, COLOR_BLACK, 0x00);
+            _setPixel(i, COLORS[BLACK], 0x00);
         else
             _setPixel(i, LWConfigs.sparkle.footFlashColor, 0x00);
     }
@@ -168,7 +168,7 @@ void Leg::_sparkle_fade()
                 still_fading = true;
             }
             else
-                _setPixel(i, COLOR_BLACK, 0x00);
+                _setPixel(i, COLORS[BLACK], 0x00);
 
             if (still_fading)
                 _setLightMode(Fade);
@@ -183,23 +183,31 @@ void Leg::pulse_pulse()
 {
     unsigned long currentTime = millis();
 
-    if (currentTime >= (_lightModeChangeTime + _pulse_length))
+    if (currentTime >= (_lightModeChangeTime + (_pulse_length * 2)))
     {
-        _lightModeChangeTime = currentTime;
-        _pulse_isDimming = !_pulse_isDimming;
-
         _pulse_length = random(LWConfigs.pulse.minPulseTime, LWConfigs.pulse.maxPulseTime);
-    }
+        _lightModeChangeTime = currentTime;
+        _pulse_isDimming = false;
 
-    
+        if (LWConfigs.pulse.randomColor)
+        {
+            int color = random(WHITE, COLOR_COUNT);
+            LWConfigs.pulse.color.r = COLORS[color].r;
+            LWConfigs.pulse.color.g = COLORS[color].g;
+            LWConfigs.pulse.color.b = COLORS[color].b;
+        }
+    }
+    else if (currentTime >= (_lightModeChangeTime + _pulse_length))
+        _pulse_isDimming = true;
+
     int value = 0;
     
     if (_pulse_isDimming)
-        value = _pulse_length - (currentTime - _lightModeChangeTime);
+        value = (_pulse_length * 2) - (currentTime - _lightModeChangeTime);
     else
         value = currentTime - _lightModeChangeTime;
-    float brightness = ((float)map(value, 0, _pulse_length, 0, 100) / 100);
 
+    float brightness = ((float)map(value, 0, _pulse_length, 0, 100) / 100);
     byte r = byte((float)LWConfigs.pulse.color.r * (brightness * brightness * brightness));
     byte g = byte((float)LWConfigs.pulse.color.g * (brightness * brightness * brightness));
     byte b = byte((float)LWConfigs.pulse.color.b * (brightness * brightness * brightness));
@@ -249,30 +257,9 @@ void Leg::_setPixel(int i, RGB color, byte dimmer)
         Serial.print("_setPixel:: "); Serial.print(_pixels[i].r); Serial.print(" - "); Serial.print(_pixels[i].g); Serial.print(" - "); Serial.print(_pixels[i].b); Serial.print(" dim: "); Serial.println(dimmer);
     }
 
-    // <gerstle> if any of the colors are over LWConfigs.main.maxBrightness
-    // step down all the pixels. hopefully that doesn't change
-    // the color
-    // do the offending pixel last!
-    if (_pixels[i].r > LWConfigs.main.maxBrightness)
-    {
-        _applyMaxBrightness(&_pixels[i].g, (float)_pixels[i].r, i);
-        _applyMaxBrightness(&_pixels[i].b, (float)_pixels[i].r, i);
-        _applyMaxBrightness(&_pixels[i].r, (float)_pixels[i].r, i);
-    }
-
-    if (_pixels[i].g > LWConfigs.main.maxBrightness)
-    {
-        _applyMaxBrightness(&_pixels[i].r, (float)_pixels[i].g, i);
-        _applyMaxBrightness(&_pixels[i].b, (float)_pixels[i].g, i);
-        _applyMaxBrightness(&_pixels[i].g, (float)_pixels[i].g, i);
-    }
-
-    if (_pixels[i].b > LWConfigs.main.maxBrightness)
-    {
-        _applyMaxBrightness(&_pixels[i].r, (float)_pixels[i].b, i);
-        _applyMaxBrightness(&_pixels[i].g, (float)_pixels[i].b, i);
-        _applyMaxBrightness(&_pixels[i].b, (float)_pixels[i].b, i);
-    }
+    _pixels[i].r = map(_pixels[i].r, 0, 255, 0, LWConfigs.main.maxBrightness);
+    _pixels[i].g = map(_pixels[i].g, 0, 255, 0, LWConfigs.main.maxBrightness);
+    _pixels[i].b = map(_pixels[i].b, 0, 255, 0, LWConfigs.main.maxBrightness);
 
     if ((i == 0) && false)
     {
@@ -282,17 +269,10 @@ void Leg::_setPixel(int i, RGB color, byte dimmer)
     LWUtils.sendColor(_pixels[i]);
 }
 
-void Leg::_applyMaxBrightness(byte *pixel, float value, int i)
-{
-    float diffPercentage = (float)1 - ((value - (float)LWConfigs.main.maxBrightness)/value);
-    *pixel = byte((float)(*pixel) * diffPercentage);
-//     Serial.print("                       "); Serial.println(LWConfigs.main.maxBrightness); Serial.print("\t"); Serial.print(*pixel);
-}
-
 void Leg::off()
 {
     for (int i = 0; i < PIXELS_PER_LEG; i++)
-        _setPixel(i, COLOR_BLACK, 0x00);
+        _setPixel(i, COLORS[BLACK], 0x00);
     _setLightMode(Off);
 }
 

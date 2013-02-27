@@ -40,7 +40,7 @@ void setup()
 
     // <gerstle> LightWalker control setup
     legs[0].Init("left leg", 2, Pulse);
-    legs[1].Init("right leg", 2, Pulse);
+    //legs[1].Init("right leg", 3, Pulse);
     lw.initLegs((Leg *) &legs, Pulse);
 }
 
@@ -64,6 +64,7 @@ void loop()
         //Serial.print("received: ");
         //Serial.println(msg);
 
+        msg[i -1] = '\0';
         if (ExecuteCommand(String(msg)))
             bluetooth.print("OK\r");
 

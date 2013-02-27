@@ -19,7 +19,7 @@
 
 #include "colors.h"
 
-#define LEG_COUNT 2
+#define LEG_COUNT 1
 #define PIXELS_PER_LEG 25
 
 #define DEBUG 1
@@ -43,7 +43,7 @@ struct MainConfigs
 
 struct SparkleConfigs
 {
-    SparkleConfigs() : footFlashColor(COLOR_WHITE), footSparkleColor(COLOR_WHITE), legSparkleColor(COLOR_WHITE), footDownFadeRate(0x4), footUpFadeRate(0x8), flashLength(500), sparkleLength(500) {}
+    SparkleConfigs() : footFlashColor(COLORS[WHITE]), footSparkleColor(COLORS[WHITE]), legSparkleColor(COLORS[WHITE]), footDownFadeRate(0x4), footUpFadeRate(0x8), flashLength(500), sparkleLength(500) {}
 
     RGB footFlashColor;
     RGB footSparkleColor;
@@ -56,7 +56,7 @@ struct SparkleConfigs
 
 struct PulseConfigs
 {
-    PulseConfigs() : color(COLOR_WHITE), minBrightness(0), maxBrightness(200), minPulseTime(1000), maxPulseTime(5000), randomColor(false), syncLegs(false) {}
+    PulseConfigs() : color(COLORS[WHITE]), minBrightness(0), maxBrightness(200), minPulseTime(1000), maxPulseTime(5000), randomColor(false), syncLegs(false) {}
 
     RGB color;
     int minBrightness;
