@@ -19,13 +19,14 @@
 
 #include "colors.h"
 
-#define LEG_COUNT 1
+#define LEG_COUNT 2
 #define PIXELS_PER_LEG 25
 
 #define DEBUG 1
 
 enum WalkingModeEnum
 {
+    MasterOff,
     Main,
     Gravity,
     Equalizer,

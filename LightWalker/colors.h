@@ -15,8 +15,8 @@
 
 struct RGB
 {
-    RGB(byte red, byte green, byte blue) : r(red), b(blue), g(green){}
-    RGB() : r(0x00), b(0x00), g(0x00){}
+    RGB(byte red, byte green, byte blue) : r(red), b(blue), g(green){ }
+    RGB() : r(0xc3), g(0xc4), b(0xc5){}
     byte r;
     byte g;
     byte b;

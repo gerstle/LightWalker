@@ -20,15 +20,21 @@ class LW
     public:
 
         LW(int x);
-        void initLegs(Leg* legs, WalkingModeEnum mode);
+        void initLegs(WalkingModeEnum mode);
         void off();
         void walk();
         void setMode(WalkingModeEnum mode);
 
     private:
-        Leg* _legs;
+        Leg _legs[LEG_COUNT];
         unsigned long _laststatus;
         WalkingModeEnum _mode;
+
+        unsigned long _lightModeChangeTime;
+
+        // <gerstle> pulse
+        int _pulse_length;
+        bool _pulse_isDimming;
 };
 
 #endif
