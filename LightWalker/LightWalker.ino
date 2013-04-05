@@ -16,37 +16,36 @@
 #define TXPIN 10
 #define RXPIN 9 
 
-Leg legs[LEG_COUNT];
+//RGB pixels[LEG_COUNT][PIXELS_PER_LEG];
 LW lw(150);
 SoftwareSerial bluetooth(RXPIN, TXPIN);
 
 void setup()
 {
     // <gerstle> general setup
-    randomSeed(long(millis()));
     Serial.begin(9600);
+    Serial.println("setting up...");
+    randomSeed(long(millis()));
 
     // <gerstle> bluetooth setup
     pinMode(RXPIN, INPUT);
     pinMode(TXPIN, OUTPUT);
     bluetooth.begin(57600);
  
-    Serial.println("Walking!");
 
     // <gerstle> lights setup
     TCL.begin();
     TCL.setupDeveloperShield();
     TCL.sendEmptyFrame();
 
-    // <gerstle> LightWalker control setup
-    legs[0].Init("left leg", 2, Pulse);
-    legs[1].Init("right leg", 2, Pulse);
-    lw.initLegs((Leg *) &legs, Pulse);
+    lw.initLegs(Pulse);
+    lw.setMode(MasterOff);
+    bluetooth.print("SettingsPlease\r");
+    Serial.println("Walking!");
 }
 
-const int msgLength = 64;
+const int msgLength = 128;
 char msg[msgLength];
-int i = 0;
 void loop()
 {
     // <cgerstle> get commands from bluetooth
@@ -61,10 +60,11 @@ void loop()
         while ((msg[i - 1] != '\r') && (msg[i - 1] > 0x0) && (msg[i - 1] <= 0x7F) && (i < msgLength))
             msg[i++] = (char)bluetooth.read();
 
-        //Serial.print("received: ");
-        //Serial.println(msg);
+//         Serial.print("received: ");
+//         Serial.println(msg);
 
-        if (ExecuteCommand(String(msg)))
+        msg[i - 1] = '\0';
+        if (ExecuteCommand(msg))
             bluetooth.print("OK\r");
 
         for (int j = 0; ((j < i) && (j < msgLength)); j++)
@@ -75,51 +75,54 @@ void loop()
     lw.walk();
 }
 
-bool ExecuteCommand(String input)
+bool ExecuteCommand(char input[])
 {
-    int colonIndex = input.indexOf(':');
-    String modeString = input.substring(0, colonIndex);
-    WalkingModeEnum mode;
+    char *pKey;
+    char *pValue;
+    pValue = strchr(input, '=');
 
-    //Serial.print("colonIndex: "); Serial.println(colonIndex);
-    //Serial.print("mode string: "); Serial.println(modeString);
-
-    if (modeString == "Gravity")
-        mode = Gravity;
-    else if (modeString == "Equalizer")
-        mode = Equalizer;
-    else if (modeString == "Sparkle")
-        mode = Sparkle;
-    else if (modeString == "Pulse")
-        mode = Pulse;
-    else if (modeString == "Main")
-        mode = Main;
-    else
+    if (pValue == NULL)
         return false;
 
-    Serial.println(modeString);
+    pKey = input;
+    *pValue = '\0';
+    pValue++;
 
-    if (input.substring(colonIndex + 1, colonIndex + 3) == "GO")
+    Serial.print("key: "); Serial.print(pKey); Serial.print(" value: "); Serial.println(pValue);
+
+    // ------------------------------------------------------------------------
+    // MAIN
+    // ------------------------------------------------------------------------
+    if (strcmp(pKey, "mainPrefMaxBrightness") == 0)
     {
-        Serial.println("go!");
+        LWConfigs.main.maxBrightness = atoi(pValue);
+        Serial.print("max set to: "); Serial.println(LWConfigs.main.maxBrightness);
+    }
+
+    // ------------------------------------------------------------------------
+    // Mode
+    // ------------------------------------------------------------------------
+    else if (strcmp(pKey, "mode") == 0)
+    {
+        WalkingModeEnum mode;
+
+        if (strcmp(pValue, "gravity") == 0)
+            mode = Gravity;
+        else if (strcmp(pValue, "equalizer") == 0)
+            mode = Equalizer;
+        else if (strcmp(pValue, "sparkle") == 0)
+            mode = Sparkle;
+        else if (strcmp(pValue, "pulse") == 0)
+            mode = Pulse;
+        else
+            return false;
+
         lw.setMode(mode);
     }
-    else
-    {
-        int equalsIndex = input.indexOf('=');
-        String key = input.substring(colonIndex + 1, equalsIndex);
-        String value = input.substring(equalsIndex + 1);
 
-        Serial.print("key: "); Serial.print(key); Serial.print(" value: "); Serial.println(value);
-
-        switch (mode)
-        {
-            case Main:
-                if (key == "mainPrefMaxBrightness")
-                    LWConfigs.main.maxBrightness = value.toInt();
-                    Serial.print("max set to: "); Serial.println(LWConfigs.main.maxBrightness);
-                break;
-            case Gravity:
+    // ------------------------------------------------------------------------
+    // Gravity
+    // ------------------------------------------------------------------------
 //                 if (key == "x")
 //                     ParseColor(value, &color); 
 //                 else if (key == "y")
@@ -127,64 +130,100 @@ bool ExecuteCommand(String input)
 //                 else if (key == "z")
 //                     ParseColor(value, &color); 
 
-                //Serial.print(key); Serial.print(" -> "); Serial.print(color.r); Serial.print(","); Serial.print(color.g); Serial.print(","); Serial.println(color.b);
-                break;
-            case Equalizer:
-                if (key == "equalizerPrefColor")
-                    ParseColor(value, &(LWConfigs.equalizer.color)); 
-                if (key == "equalizerPrefBrightness")
-                    LWConfigs.equalizer.brightnessPercent = value.toInt();
-                break;
-            case Sparkle:
-                if (key == "sparklePrefFootFlashColor")
-                    ParseColor(value, &(LWConfigs.sparkle.footFlashColor)); 
-                else if (key == "sparklePrefFootSparkleColor")
-                    ParseColor(value, &(LWConfigs.sparkle.footSparkleColor)); 
-                else if (key == "sparklePrefLegSparkleColor")
-                    ParseColor(value, &(LWConfigs.sparkle.legSparkleColor)); 
-                else if (key == "sparklePrefFlashLength")
-                    LWConfigs.sparkle.flashLength = value.toInt();
-                else if (key == "sparklePrefSparkleLength")
-                    LWConfigs.sparkle.sparkleLength = value.toInt();
-                else if (key == "sparklePrefFootDownFadeRate")
-                    LWConfigs.sparkle.footDownFadeRate = byte(value.toInt());
-                else if (key == "sparklePrefFootUpFadeRate")
-                    LWConfigs.sparkle.footUpFadeRate = byte(value.toInt());
-                break;
-            case Pulse:
-                if (key == "pulsePrefColor")
-                    ParseColor(value, &(LWConfigs.pulse.color)); 
-                else if (key == "pulsePrefMinRate")
-                    LWConfigs.pulse.minPulseTime = value.toInt();
-                else if (key == "pulsePrefMaxRate")
-                    LWConfigs.pulse.maxPulseTime = value.toInt();
-                else if (key == "pulsePrefRandomColor")
-                    if (value == "true")
-                        LWConfigs.pulse.randomColor = true;
-                    else
-                        LWConfigs.pulse.randomColor = false;
-                else if (key == "pulsePrefSyncLegs")
-                    if (value == "true")
-                        LWConfigs.pulse.syncLegs = true;
-                    else
-                        LWConfigs.pulse.syncLegs = false;
-                break;
-        }
-
+    // ------------------------------------------------------------------------
+    // SPARKLE
+    // ------------------------------------------------------------------------
+    else if (strcmp(pKey, "sparklePrefFootFlashColor") == 0)
+    {
+//         sparkle.footFlashColor.r = ParseColor(pValue);
+//         sparkle.footFlashColor.g = ParseColor(strchr(pValue, ':') + 1);
+//         sparkle.footFlashColor.b = ParseColor(value);
+        ParseColor(pValue, &(LWConfigs.sparkle.footFlashColor));
     }
+    else if (strcmp(pKey, "sparklePrefFootSparkleColor") == 0)
+    {
+//         sparkle.footSparkleColor.r = ParseColor(value);
+//         sparkle.footSparkleColor.g = ParseColor(value);
+//         sparkle.footSparkleColor.b = ParseColor(value);
+        ParseColor(pValue, &(LWConfigs.sparkle.footSparkleColor));
+    }
+    else if (strcmp(pKey, "sparklePrefLegSparkleColor") == 0)
+    {
+//         sparkle.legSparkleColor.r = ParseColor(value);
+//         sparkle.legSparkleColor.g = ParseColor(value);
+//         sparkle.legSparkleColor.b = ParseColor(value);
+        ParseColor(pValue, &(LWConfigs.sparkle.legSparkleColor));
+    }
+    else if (strcmp(pKey, "sparklePrefFlashLength") == 0)
+        LWConfigs.sparkle.flashLength = atoi(pValue);
+    else if (strcmp(pKey, "sparklePrefSparkleLength") == 0)
+        LWConfigs.sparkle.sparkleLength = atoi(pValue);
+    else if (strcmp(pKey, "sparklePrefFootDownFadeRate") == 0)
+        LWConfigs.sparkle.footDownFadeRate = byte(atoi(pValue));
+    else if (strcmp(pKey, "sparklePrefFootUpFadeRate") == 0)
+        LWConfigs.sparkle.footUpFadeRate = byte(atoi(pValue));
+
+    // ------------------------------------------------------------------------
+    // PULSE
+    // ------------------------------------------------------------------------
+    else if (strcmp(pKey, "pulsePrefColor") == 0)
+    {
+//         pulse.color.r = ParseColor(value);
+//         pulse.color.g = ParseColor(value);
+//         pulse.color.b = ParseColor(value);
+        ParseColor(pValue, &(LWConfigs.pulse.color));
+    }
+    else if (strcmp(pKey, "pulsePrefMinRate") == 0)
+        LWConfigs.pulse.minPulseTime = atoi(pValue);
+    else if (strcmp(pKey, "pulsePrefMaxRate") == 0)
+        LWConfigs.pulse.maxPulseTime = atoi(pValue);
+    else if (strcmp(pKey, "pulsePrefRandomColor") == 0)
+        if (strcmp(pValue, "true") == 0)
+            LWConfigs.pulse.randomColor = true;
+        else
+            LWConfigs.pulse.randomColor = false;
+    else if (strcmp(pKey, "pulsePrefSyncLegs") == 0)
+        if (strcmp(pValue, "true") == 0)
+            LWConfigs.pulse.syncLegs = true;
+        else
+            LWConfigs.pulse.syncLegs = false;
+
+    // ------------------------------------------------------------------------
+    // EQUALIZER
+    // ------------------------------------------------------------------------
+    else if (strcmp(pKey, "equalizerPrefColor") == 0)
+        ParseColor(value, &(LWConfigs.equalizer.color)); 
+    else if (strcmp(pKey, "equalizerPrefBrightness" == 0)
+        LWConfigs.equalizer.brightnessPercent = value.toInt();
 
     return true;
 }
 
-void ParseColor(String colorString, RGB *color)
+void ParseColor(char colorString[], RGB *color)
 {
-    int commaIndex = colorString.indexOf(',');
+    char *pValue = colorString;
+    char *pComma = strchr(colorString, ',');
+    *pComma = '\0';
 
-    (*color).r = byte(colorString.substring(0, commaIndex).toInt());
-    
-    colorString = colorString.substring(commaIndex + 1);
-    commaIndex = colorString.indexOf(',');
+    (*color).r = byte(atoi(pValue));
 
-    (*color).g = byte(colorString.substring(0, commaIndex).toInt());
-    (*color).b = byte(colorString.substring(commaIndex + 1).toInt());
+    pValue = pComma + 1;
+    pComma = strchr(pValue, ',');
+    *pComma = '\0';
+
+    (*color).g = byte(atoi(pValue));
+    (*color).b = byte(atoi(pComma + 1));
 }
+
+// <gerstle> just get the first integer off of the string and return it
+// byte ParseColor(char colorString[])
+// {
+//     char *pComma = strchr(colorString, ',');
+//     *pComma = '\0';
+//     byte rv;
+// 
+//     rv = byte(atoi(colorString));
+//     *pComma = ':';
+// 
+//     return rv;
+// }

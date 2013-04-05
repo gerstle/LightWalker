@@ -8,6 +8,8 @@
 
 #include  "LW.h"
 
+// Leg LW::_legs[LEG_COUNT] = { Leg(), Leg() };
+
 // ----------------------------------------------------------------------------
 // LW Class
 // ----------------------------------------------------------------------------
@@ -17,12 +19,17 @@ LW::LW(int x)
     // <gerstle> ignore the x, something about the arduino compiler
     // needing a single int class constructor. Or I don't know
     // what I'm doing.
+
 }
 
-void LW::initLegs(Leg* legs, WalkingModeEnum mode)
+void LW::initLegs(WalkingModeEnum mode)
 {
+    _legs[0].Init(String("left leg"), 2, mode);
+    Serial.println(_legs[0].name);
+    _legs[1].Init(String("right leg"), 3, mode);
+    Serial.println(_legs[1].name);
+
     _mode = mode;
-    _legs = legs;
     TCL.sendEmptyFrame();
     setMode(_mode);
 }
@@ -30,6 +37,7 @@ void LW::initLegs(Leg* legs, WalkingModeEnum mode)
 void LW::setMode(WalkingModeEnum mode)
 {
     _mode = mode;
+    _lightModeChangeTime = millis();
     for (int i = 0; i < LEG_COUNT; i++)
         _legs[i].setWalkingMode(mode);
 
@@ -44,6 +52,8 @@ void LW::setMode(WalkingModeEnum mode)
                 Serial.print("    max bright: "); Serial.println(LWConfigs.pulse.maxBrightness);
                 Serial.print("    min pulse time: "); Serial.println(LWConfigs.pulse.minPulseTime);
                 Serial.print("    max pulse time: "); Serial.println(LWConfigs.pulse.maxPulseTime);
+                Serial.print("    random color: "); Serial.println(LWConfigs.pulse.randomColor);
+                Serial.print("    sync: "); Serial.println(LWConfigs.pulse.syncLegs);
                 break;
             case Gravity:
                 break;
@@ -69,6 +79,7 @@ void LW:: walk()
 
     unsigned long currentTime = millis();
     bool displayStatus = false;
+    bool pulseChangeColor = false;
     if (currentTime > (_laststatus + 2000))
         displayStatus = false;
 
@@ -99,10 +110,10 @@ void LW:: walk()
                 else
                     _legs[i].sparkle_sameStatus();
 
-                if (digitalRead(TCL_SWITCH2) == HIGH)
+                //if (LWConfigs.
                     _legs[i].sparkle_fade_on = true;
-                else
-                    _legs[i].sparkle_fade_on = false;
+                //else
+                    //_legs[i].sparkle_fade_on = false;
                 break;
 
             case Gravity:
@@ -113,7 +124,24 @@ void LW:: walk()
                 break;
 
             case Pulse:
-                _legs[i].pulse_pulse();    
+                if (LWConfigs.pulse.syncLegs && (currentTime >= (_lightModeChangeTime + (_pulse_length * 2))))
+                {
+                    _pulse_length = random(LWConfigs.pulse.minPulseTime, LWConfigs.pulse.maxPulseTime);
+                    _lightModeChangeTime = currentTime;
+                    _pulse_isDimming = false;
+                    pulseChangeColor = true;
+                }
+                else if (currentTime >= (_lightModeChangeTime + _pulse_length))
+                    _pulse_isDimming = true;
+                
+                int value;
+                if (LWConfigs.pulse.syncLegs)
+                    if (_pulse_isDimming)
+                        value = (_pulse_length * 2) - (currentTime - _lightModeChangeTime);
+                    else
+                        value = currentTime - _lightModeChangeTime;
+
+                _legs[i].pulse_pulse(currentTime, _lightModeChangeTime, _pulse_length, value, pulseChangeColor);
                 break;
         }
     }

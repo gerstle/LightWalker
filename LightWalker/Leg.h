@@ -45,15 +45,13 @@ class Leg
 
         // <gerstle> Sparkle
         bool sparkle_fade_on;
-        int sparkle_foot_down_fade_step;
-        int sparkle_foot_up_fade_step;
 
         void sparkle_footdown();
         void sparkle_footup();
         void sparkle_sameStatus();
 
         // <gerstle> pulse
-        void pulse_pulse();
+        void pulse_pulse(unsigned long syncCurrentTime, unsigned long syncTime, int syncLength, int syncValue, bool changeColor);
 
         // <gerstle>
         void equalizer_listen();
@@ -81,6 +79,7 @@ class Leg
         // <gerstle> Pulse stuff
         bool _pulse_isDimming;
         int _pulse_length;
+        RGB _pulse_color;
 };
 
 #endif
