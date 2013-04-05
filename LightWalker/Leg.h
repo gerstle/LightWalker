@@ -55,6 +55,9 @@ class Leg
         // <gerstle> pulse
         void pulse_pulse();
 
+        // <gerstle>
+        void equalizer_listen();
+
     private:
         // <gerstle> Generic stuff
         int lower_foot_border;

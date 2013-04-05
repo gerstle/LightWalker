@@ -1,10 +1,13 @@
 package com.inappropirates.remotecontrol;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Locale;
+import java.util.Map;
 
 import android.app.Application;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
@@ -13,7 +16,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.inappropirates.util.bluetooth.BluetoothChatService;
+import com.inappropirates.util.BluetoothChatService;
+import com.inappropirates.util.RMSThread;
 
 public class AppUtil extends Application {
 	
@@ -21,7 +25,6 @@ public class AppUtil extends Application {
 	public static final String TAG = "LightWalkerRemote";
 	public static Context mContext;
 	
-	public static final char mModeDelimiter = ':';
 	public static final char mKeyDelimiter = '=';
 	public static final char mColorDelimiter = ',';
 		
@@ -50,6 +53,8 @@ public class AppUtil extends Application {
     public static TextView mBluetoothMessageTextView;
     public static String mBluetoothMessageLabel;
     
+    private static RMSThread mRMSThread = null;
+    
 	public static final Handler mBluetoothHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -63,21 +68,29 @@ public class AppUtil extends Application {
                     
                     // Initialize the buffer for outgoing messages
                     mOutStringBuffer = new StringBuffer("");
-                	switch (mSelectedMode)
-    	    		{
-    	    			case Equalizer:
-    	    				AppUtil.sendMessage("equalizer:GO");
-    	    				break;
-    	    			case Gravity:
-    	    				AppUtil.sendMessage("gravity:GO");
-    	    				break;
-    	    			case Sparkle:
-    	    				AppUtil.sendMessage("sparkle:GO");
-    	    				break;
-    	    			case Pulse:
-    	    				AppUtil.sendMessage("pulse:GO");
-    	    				break;
-    	    		}       
+                    String modeName = mSelectedMode.toString().toLowerCase(Locale.ENGLISH);
+                    SharedPreferences pref = mContext.getSharedPreferences(modeName  + "_preferences", MODE_PRIVATE);
+                    
+                    AppUtil.sendModeSettings(mSelectedMode, pref);
+                    AppUtil.sendMessage("mode=" + modeName);
+                    
+                    if (mSelectedMode == LightWalkerModes.Equalizer)
+                    {
+                    	mRMSThread = new RMSThread(mRMSHandler);
+                    	mRMSThread.recording = true;
+                    	mRMSThread.start();
+                    }
+                    else if (mRMSThread != null)
+                    {
+                    	mRMSThread.recording = false;
+                		try {
+            				mRMSThread.join();
+            			} catch (InterruptedException e) {
+            			} finally {
+            				mRMSThread = null;
+            			}
+                    }
+                    
                     break;
                 case BluetoothChatService.STATE_CONNECTING:
                     mTitle.setText(R.string.title_connecting);
@@ -98,6 +111,14 @@ public class AppUtil extends Application {
                 String readMessage = new String(readBuf, 0, msg.arg1);
                 mBluetoothMessageTextView.setText(mBluetoothMessageLabel + readMessage);
                 
+                if (readMessage.equals("SettingsPlease"))
+                {
+                	String modeName = mSelectedMode.toString().toLowerCase(Locale.ENGLISH);
+                    SharedPreferences pref = mContext.getSharedPreferences(modeName  + "_preferences", MODE_PRIVATE);
+                    AppUtil.sendModeSettings(mSelectedMode, pref);
+                    AppUtil.sendMessage("mode=" + modeName);
+                }
+                
                 break;
             case MESSAGE_DEVICE_NAME:
                 // save the connected device's name
@@ -109,6 +130,17 @@ public class AppUtil extends Application {
                 Toast.makeText(mApplicationContext, msg.getData().getString(TOAST),
                                Toast.LENGTH_SHORT).show();
                 break;
+            }
+        }
+    };
+    
+    public static final Handler mRMSHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+            case RMSThread.FREQUENCY_CHANGE:
+            	AppUtil.sendMessage(AppUtil.ConstructMessage("equalizerPrefBrightness", String.valueOf((int) Math.round((msg.arg1 / (msg.arg2 * 3)) * 100))));
+            	break;
             }
         }
     };
@@ -144,9 +176,44 @@ public class AppUtil extends Application {
 			}
         }
 	}
+	
+	public static void sendModeSettings(LightWalkerModes mode, SharedPreferences prefs) {
+    	Map<String,?> keys = prefs.getAll();
+
+		String value = null;
+		for(Map.Entry<String,?> entry : keys.entrySet()) {
+			// <cgerstle> the colors have gotta be handled special like
+			if (keyIsColor(entry.getKey()))
+				value = AppUtil.Color2String((Integer)entry.getValue());
+			else
+			{
+				Object o = entry.getValue();
+				if (o instanceof Integer)
+					value = o.toString();
+				else if (o instanceof String)
+					value = (String) o;
+				else if (o instanceof Boolean)
+					value = o.toString();
+			}
+			
+			if ((value != null) && (value.length() > 0))
+				sendMessage(AppUtil.ConstructMessage(entry.getKey(), value));
+		}
+    }
     
-    public static String ConstructMessage(LightWalkerModes mode, String key, String value) {
-    	return mode.toString() + mModeDelimiter + key + mKeyDelimiter + value;
+    public static String ConstructMessage(String key, String value) {
+    	return key + mKeyDelimiter + value;
+    }
+    
+    public static boolean keyIsColor(String key) {
+    	if ((key.equals("pulsePrefColor")) ||
+    	  	(key.equals("sparklePrefFootFlashColor")) ||
+    	  	(key.equals("sparklePrefFootSparkleColor")) ||
+    	  	(key.equals("sparklePrefLegSparkleColor")) ||
+    	  	(key.equals("equalizerPrefColor")))
+    		return true;
+    	else
+    		return false;
     }
     
     public static String Color2String(int color) {

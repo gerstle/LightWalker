@@ -130,6 +130,10 @@ bool ExecuteCommand(String input)
                 //Serial.print(key); Serial.print(" -> "); Serial.print(color.r); Serial.print(","); Serial.print(color.g); Serial.print(","); Serial.println(color.b);
                 break;
             case Equalizer:
+                if (key == "equalizerPrefColor")
+                    ParseColor(value, &(LWConfigs.equalizer.color)); 
+                if (key == "equalizerPrefBrightness")
+                    LWConfigs.equalizer.brightnessPercent = value.toInt();
                 break;
             case Sparkle:
                 if (key == "sparklePrefFootFlashColor")

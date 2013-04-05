@@ -1,8 +1,6 @@
 package com.inappropirates.remotecontrol;
 
 import java.util.Locale;
-import java.util.Map;
-
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -16,7 +14,6 @@ public class SettingsActivity extends PreferenceActivity {
 	private String mPreferencesName = "";
 	private SharedPreferences mPrefs;
 	
-    @SuppressLint("DefaultLocale")
 	@SuppressWarnings("deprecation")
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,7 +44,7 @@ public class SettingsActivity extends PreferenceActivity {
 		public void onSharedPreferenceChanged(SharedPreferences sharedPrefs, String key) {
 			String value = null;
 			
-			if (keyIsColor(key))
+			if (AppUtil.keyIsColor(key))
 				value = AppUtil.Color2String(sharedPrefs.getInt(key, Color.BLACK));
 			else
 			{
@@ -67,7 +64,7 @@ public class SettingsActivity extends PreferenceActivity {
 			}
 			
 			if ((value != null) && (value.length() > 0))
-				AppUtil.sendMessage(AppUtil.ConstructMessage(mMode, key, value));			
+				AppUtil.sendMessage(AppUtil.ConstructMessage(key, value));			
 		}
     };
     
@@ -75,42 +72,8 @@ public class SettingsActivity extends PreferenceActivity {
     	if ((mode != LightWalkerModes.Main) && (mode != AppUtil.mSelectedMode))
     	{
     		AppUtil.mSelectedMode = mode;
-    		AppUtil.sendMessage(mode.toString() + ":GO");
-    		sendModeSettings();
+    		AppUtil.sendModeSettings(mMode, mPrefs);
+    		AppUtil.sendMessage("mode=" + mode.toString().toLowerCase(Locale.ENGLISH));
     	}
-    }
-    
-    private void sendModeSettings() {
-    	Map<String,?> keys = mPrefs.getAll();
-
-		String value = null;
-		for(Map.Entry<String,?> entry : keys.entrySet()) {
-			// <cgerstle> the colors have gotta be handled special like
-			if (keyIsColor(entry.getKey()))
-				value = AppUtil.Color2String((Integer)entry.getValue());
-			else
-			{
-				Object o = entry.getValue();
-				if (o instanceof Integer)
-					value = o.toString();
-				else if (o instanceof String)
-					value = (String) o;
-				else if (o instanceof Boolean)
-					value = o.toString();
-			}
-			
-			if ((value != null) && (value.length() > 0))
-				AppUtil.sendMessage(AppUtil.ConstructMessage(mMode, entry.getKey(), value));
-		}
-    }
-    
-    private boolean keyIsColor(String key) {
-    	if ((key.equals("pulsePrefColor")) ||
-    	  	(key.equals("sparklePrefFootFlashColor")) ||
-    	  	(key.equals("sparklePrefFootSparkleColor")) ||
-    	  	(key.equals("sparklePrefLegSparkleColor")))
-    		return true;
-    	else
-    		return false;
     }
 }

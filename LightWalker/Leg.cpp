@@ -216,6 +216,24 @@ void Leg::pulse_pulse()
 
 }
 
+void Leg::equalizer_listen()
+{
+    float brightness = (float) LWConfigs.equalizer.brightnessPercent / 100;
+
+    byte r = byte((float)LWConfigs.equalizer.color.r * (brightness * brightness * brightness));
+    byte g = byte((float)LWConfigs.equalizer.color.g * (brightness * brightness * brightness));
+    byte b = byte((float)LWConfigs.equalizer.color.b * (brightness * brightness * brightness));
+
+    for (int i = 0; i < PIXELS_PER_LEG; i++)
+    {
+        _pixels[i].r = r;
+        _pixels[i].b = b;
+        _pixels[i].g = g;
+        _setPixel(i, _pixels[i], 0);
+    }
+    
+}
+
 void Leg::_displayPixels()
 {
     for (int i = 0; i < PIXELS_PER_LEG; i++)
@@ -315,7 +333,9 @@ void Leg::setWalkingMode(WalkingModeEnum mode)
         case Pulse:
             _pulse_isDimming = false;
             _pulse_length = random(LWConfigs.pulse.minPulseTime, LWConfigs.pulse.maxPulseTime);
-
+            break;
+        case Equalizer:
+            // <gerstle> do nothing
             break;
     }
 }

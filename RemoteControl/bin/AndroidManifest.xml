@@ -37,7 +37,7 @@
             android:label="@string/title_activity_mode_gravity_config" >
         </activity>
         <activity
-            android:name="com.inappropirates.util.bluetooth.DeviceListActivity"
+            android:name="com.inappropirates.util.DeviceListActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/select_device"
             android:theme="@android:style/Theme.Dialog" />

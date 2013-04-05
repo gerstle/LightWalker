@@ -21,7 +21,7 @@
  * 		1. be part of my package
  */
 
-package com.inappropirates.util.bluetooth;
+package com.inappropirates.util;
 
 import java.util.Set;
 

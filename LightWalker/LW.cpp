@@ -47,6 +47,10 @@ void LW::setMode(WalkingModeEnum mode)
                 break;
             case Gravity:
                 break;
+            case Equalizer:
+                Serial.println("equalizer configs");
+                Serial.print("    color: "); Serial.print(LWConfigs.equalizer.color.r); Serial.print(" - "); Serial.print(LWConfigs.equalizer.color.g); Serial.print(" - "); Serial.println(LWConfigs.equalizer.color.b);
+                break;
         }
     }
 }
@@ -105,6 +109,7 @@ void LW:: walk()
                 break;
 
             case Equalizer:
+                _legs[i].equalizer_listen();
                 break;
 
             case Pulse:

@@ -67,12 +67,21 @@ struct PulseConfigs
     bool syncLegs;
 };
 
+struct EqualizerConfigs
+{
+    EqualizerConfigs() : color(COLOR_WHITE) {}
+    RGB color;
+    int brightnessPercent;
+};
+
 class LWConfigsClass
 {
     public:
+        MainConfigs main;
+
         PulseConfigs pulse;
         SparkleConfigs sparkle;
-        MainConfigs main;
+        EqualizerConfigs equalizer;
 };
 
 extern LWConfigsClass LWConfigs;

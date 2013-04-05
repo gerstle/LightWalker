@@ -7,6 +7,8 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -24,8 +26,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.inappropirates.util.bluetooth.BluetoothChatService;
-import com.inappropirates.util.bluetooth.DeviceListActivity;
+import com.inappropirates.util.BluetoothChatService;
+import com.inappropirates.util.DeviceListActivity;
 
 @SuppressLint("HandlerLeak")
 public class LightWalkerRemote extends Activity {
@@ -101,7 +103,6 @@ public class LightWalkerRemote extends Activity {
 	            setupBluetooth();
         	} else if (AppUtil.mChatService == null)
         		setupBluetooth();
-        
         
         this.modeListView.requestFocus();}
     }

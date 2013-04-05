@@ -23,7 +23,7 @@
  * 		3. Send/receive messages slightly different
  */
 
-package com.inappropirates.util.bluetooth;
+package com.inappropirates.util;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -442,8 +442,8 @@ public class BluetoothChatService {
                 			eom = true;
                 	}
                 	
-                	if (AppUtil.DEBUG) Log.e(AppUtil.TAG, "Received: " + new String(buffer, 0, byteIndex));
-                	m = mHandler.obtainMessage(AppUtil.MESSAGE_READ, byteIndex, -1, buffer);
+                	if (AppUtil.DEBUG) Log.e(AppUtil.TAG, "Received: " + new String(buffer, 0, (byteIndex - 1)));
+                	m = mHandler.obtainMessage(AppUtil.MESSAGE_READ, byteIndex - 1, -1, buffer);
                 	m.sendToTarget();
                 	byteIndex = 0;
                 } catch (IOException e) {
