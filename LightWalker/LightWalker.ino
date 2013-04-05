@@ -192,7 +192,7 @@ bool ExecuteCommand(char input[])
     // EQUALIZER
     // ------------------------------------------------------------------------
     else if (strcmp(pKey, "equalizerPrefColor") == 0)
-        ParseColor(value, &(LWConfigs.equalizer.color)); 
+        ParseColor(pValue, &(LWConfigs.equalizer.color));
     else if (strcmp(pKey, "equalizerPrefBrightness" == 0)
         LWConfigs.equalizer.brightnessPercent = value.toInt();
 

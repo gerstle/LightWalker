@@ -70,7 +70,7 @@ struct PulseConfigs
 
 struct EqualizerConfigs
 {
-    EqualizerConfigs() : color(COLOR_WHITE) {}
+    EqualizerConfigs() : color(COLORS[WHITE]) {}
     RGB color;
     int brightnessPercent;
 };
