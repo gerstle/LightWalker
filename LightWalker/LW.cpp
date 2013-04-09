@@ -8,60 +8,56 @@
 
 #include  "LW.h"
 
-// Leg LW::_legs[LEG_COUNT] = { Leg(), Leg() };
-
 // ----------------------------------------------------------------------------
 // LW Class
 // ----------------------------------------------------------------------------
 
-LW::LW(int x)
+void LW::initLegs(WalkingModeEnum m)
 {
-    // <gerstle> ignore the x, something about the arduino compiler
-    // needing a single int class constructor. Or I don't know
-    // what I'm doing.
-
-}
-
-void LW::initLegs(WalkingModeEnum mode)
-{
-    _legs[0].Init(String("left leg"), 2, mode);
+    _legs[0].Init(&config, "left leg", 2, mode);
     Serial.println(_legs[0].name);
-    _legs[1].Init(String("right leg"), 3, mode);
+    _legs[1].Init(&config, "right leg", 3, mode);
     Serial.println(_legs[1].name);
 
-    _mode = mode;
-    TCL.sendEmptyFrame();
-    setMode(_mode);
+    mode = m;
+    setMode(mode);
 }
 
-void LW::setMode(WalkingModeEnum mode)
+void LW::setMode(WalkingModeEnum m)
 {
-    _mode = mode;
+    mode = m;
     _lightModeChangeTime = millis();
     for (int i = 0; i < LEG_COUNT; i++)
         _legs[i].setWalkingMode(mode);
 
-    if (DEBUG)
+    switch (mode)
     {
-        switch (mode)
-        {
-            case Pulse:
-                Serial.println("pulse configs");
-                Serial.print("    color: "); Serial.print(LWConfigs.pulse.color.r); Serial.print(" - "); Serial.print(LWConfigs.pulse.color.g); Serial.print(" - "); Serial.println(LWConfigs.pulse.color.b);
-                Serial.print("    min bright: "); Serial.println(LWConfigs.pulse.minBrightness);
-                Serial.print("    max bright: "); Serial.println(LWConfigs.pulse.maxBrightness);
-                Serial.print("    min pulse time: "); Serial.println(LWConfigs.pulse.minPulseTime);
-                Serial.print("    max pulse time: "); Serial.println(LWConfigs.pulse.maxPulseTime);
-                Serial.print("    random color: "); Serial.println(LWConfigs.pulse.randomColor);
-                Serial.print("    sync: "); Serial.println(LWConfigs.pulse.syncLegs);
-                break;
-            case Gravity:
-                break;
-            case Equalizer:
-                Serial.println("equalizer configs");
-                Serial.print("    color: "); Serial.print(LWConfigs.equalizer.color.r); Serial.print(" - "); Serial.print(LWConfigs.equalizer.color.g); Serial.print(" - "); Serial.println(LWConfigs.equalizer.color.b);
-                break;
-        }
+        case equalizer:
+            int tmp, value;
+
+            valueTotal = 0;
+
+            digitalWrite(AUDIO_RESET_PIN, HIGH);
+            digitalWrite(AUDIO_RESET_PIN, LOW);
+            for (valueIndex = 0; valueIndex < VALUE_COUNT; valueIndex++)
+            {
+                for (int i = 0; i < 7; i++)
+                {
+                    digitalWrite(AUDIO_STROBE_PIN, LOW);
+                    delayMicroseconds(30); // to allow the output to settle
+                    tmp = analogRead(AUDIO_LEFT_PIN);
+
+                    if (i == 0)
+                        value = tmp;
+
+                    digitalWrite(AUDIO_STROBE_PIN, HIGH);
+                }
+                values[valueIndex] = value;
+                valueTotal += values[valueIndex];
+            }
+            
+            valueAvg = valueTotal / VALUE_COUNT;
+            break;
     }
 }
 
@@ -73,7 +69,7 @@ void LW::off()
 }
 
 // <gerstle> check for inputs
-void LW:: walk()
+void LW::walk()
 {
     TCL.sendEmptyFrame();
 
@@ -90,16 +86,16 @@ void LW:: walk()
         
         if (displayStatus && DEBUG)
         {
-            Serial.print("    leg "); Serial.println(_legs[i].name);
-            Serial.print("        pin: "); Serial.println(_legs[i].trigger_pin);
-            Serial.print("        pin state: "); Serial.println(sensorState);
-            Serial.print("        status: "); Serial.println(_legs[i].status);
+//             Serial.print("    leg "); Serial.println(_legs[i].name);
+//             Serial.print("        pin: "); Serial.println(_legs[i].trigger_pin);
+//             Serial.print("        pin state: "); Serial.println(sensorState);
+//             Serial.print("        status: "); Serial.println(_legs[i].status);
             _laststatus = millis();
         }
 
-        switch (_mode)
+        switch (mode)
         {
-            case Sparkle:
+            case sparkle:
 
                 //if ((sensorState == LOW) && (_legs[i].status != Down))
                 if ((sensorState == HIGH) && (_legs[i].status != Down))
@@ -110,23 +106,20 @@ void LW:: walk()
                 else
                     _legs[i].sparkle_sameStatus();
 
-                //if (LWConfigs.
-                    _legs[i].sparkle_fade_on = true;
-                //else
-                    //_legs[i].sparkle_fade_on = false;
+                _legs[i].sparkle_fade_on = true;
                 break;
 
-            case Gravity:
+            case gravity:
                 break;
 
-            case Equalizer:
-                _legs[i].equalizer_listen();
+            case equalizer:
+                equalizer_listen();
                 break;
 
-            case Pulse:
-                if (LWConfigs.pulse.syncLegs && (currentTime >= (_lightModeChangeTime + (_pulse_length * 2))))
+            case pulse:
+                if (config.pulse.syncLegs && (currentTime >= (_lightModeChangeTime + (_pulse_length * 2))))
                 {
-                    _pulse_length = random(LWConfigs.pulse.minPulseTime, LWConfigs.pulse.maxPulseTime);
+                    _pulse_length = random(config.pulse.minPulseTime, config.pulse.maxPulseTime);
                     _lightModeChangeTime = currentTime;
                     _pulse_isDimming = false;
                     pulseChangeColor = true;
@@ -135,7 +128,7 @@ void LW:: walk()
                     _pulse_isDimming = true;
                 
                 int value;
-                if (LWConfigs.pulse.syncLegs)
+                if (config.pulse.syncLegs)
                     if (_pulse_isDimming)
                         value = (_pulse_length * 2) - (currentTime - _lightModeChangeTime);
                     else
@@ -146,4 +139,59 @@ void LW:: walk()
         }
     }
     TCL.sendEmptyFrame();
+}
+
+void LW::equalizer_listen()
+{
+    int level;
+    int tmp;
+    byte r, g, b = 0;
+    float brightness;
+
+    // <gerstle> get the value
+    digitalWrite(AUDIO_RESET_PIN, HIGH);
+    digitalWrite(AUDIO_RESET_PIN, LOW);
+
+    for (int i = 0; i < 7; i++)
+    {
+        digitalWrite(AUDIO_STROBE_PIN, LOW);
+        delayMicroseconds(30); // to allow the output to settle
+
+        tmp = analogRead(AUDIO_LEFT_PIN);
+        if (i == 0)
+            level = tmp;
+        digitalWrite(AUDIO_STROBE_PIN, HIGH);
+    }
+
+    if (valueIndex >= VALUE_COUNT)
+        valueIndex = 0;
+
+    valueTotal = valueTotal - values[valueIndex] + level;
+    values[valueIndex] = level;
+    valueAvg = valueTotal / VALUE_COUNT;
+
+//     Serial.print(config.equalizer.RMSThreshold); Serial.print("\t"); Serial.print(level); Serial.print("\t"); Serial.print(valueAvg);
+
+    if (valueAvg <= 0)
+    {
+//         Serial.println();
+        return;
+    }
+    
+    if (level < config.equalizer.RMSThreshold)
+        level = 0;
+
+    brightness = (float)level / ((float)valueAvg * 2);
+    //Serial.print("\t"); Serial.print(level); Serial.print("\t"); Serial.println(brightness); 
+    if (config.equalizer.allLights)
+    {
+        r = byte((float)config.equalizer.color.r * (brightness * brightness * brightness));
+        g = byte((float)config.equalizer.color.g * (brightness * brightness * brightness));
+        b = byte((float)config.equalizer.color.b * (brightness * brightness * brightness));
+    }
+
+    for (int i = 0; i < LEG_COUNT; i++)
+        _legs[i].equalizer_listen(brightness, r, g, b);
+
+    valueIndex++;
 }

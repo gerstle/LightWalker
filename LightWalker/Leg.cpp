@@ -13,18 +13,19 @@
 // ----------------------------------------------------------------------------
 Leg::Leg()
 {
-    name = "one";
+    name[0] = '\0';
 }
 
-void Leg::Init(String n, int pin, WalkingModeEnum mode)
+void Leg::Init(LWConfigs *c, char n[], int pin, WalkingModeEnum mode)
 {
-    name = n;
+    config = c;
+    strcpy(name, n);
     trigger_pin = pin;
     status = Initialized;
     _lightMode = None;
     _lightModeChangeTime = millis();
 
-    _sparkle_fade_rate = LWConfigs.sparkle.footDownFadeRate;
+    _sparkle_fade_rate = config->sparkle.footDownFadeRate;
 
     sparkle_fade_on = true;
 
@@ -43,10 +44,9 @@ void Leg::sparkle_footdown()
     if (DEBUG)
     {
         Serial.print(name); Serial.println(" -> down");
-        Serial.print("fade rate to -> "); Serial.println(LWConfigs.sparkle.footDownFadeRate);
     }
 
-    _sparkle_fade_rate = LWConfigs.sparkle.footDownFadeRate;
+    _sparkle_fade_rate = config->sparkle.footDownFadeRate;
     _sparkle_flash();
 }
 
@@ -55,10 +55,9 @@ void Leg::sparkle_footup()
     if (DEBUG)
     {
         Serial.print(name); Serial.println(" -> up");
-        Serial.print("fade rate to -> "); Serial.println(LWConfigs.sparkle.footUpFadeRate);
     }
 
-    _sparkle_fade_rate = LWConfigs.sparkle.footUpFadeRate;
+    _sparkle_fade_rate = config->sparkle.footUpFadeRate;
     if (_sparkle_fade_rate <= 0)
         _sparkle_fade_rate = 2;
     status = Up;
@@ -76,7 +75,7 @@ void Leg::sparkle_sameStatus()
             break;
 
         case SparkleSparkle:
-            if (currentTime <= (_lightModeChangeTime + LWConfigs.sparkle.sparkleLength))
+            if (currentTime <= (_lightModeChangeTime + config->sparkle.sparkleLength))
                 _sparkle_sparkle();
             else
                 _sparkle_fade();
@@ -94,20 +93,13 @@ void Leg::sparkle_sameStatus()
 
 void Leg::_sparkle_flash()
 {
-    if (false)
-    {
-        Serial.println("_sparkle_flashing " + name);
-        Serial.print("    PIXELS_PER_LEG:"); Serial.println(PIXELS_PER_LEG);
-        Serial.print("    lower foot border:"); Serial.println(lower_foot_border);
-        Serial.print("    upper foot border:"); Serial.println(upper_foot_border);
-    }
-
+    //Serial.println("flashing " + name);
     for (int i = 0; i < PIXELS_PER_LEG; i++)
     {
         if ((i < lower_foot_border) || (i > upper_foot_border))
             _setPixel(i, COLORS[BLACK], 0x00);
         else
-            _setPixel(i, LWConfigs.sparkle.footFlashColor, 0x00);
+            _setPixel(i, config->sparkle.footFlashColor, 0x00);
     }
     _setLightMode(Flash);
 }
@@ -121,34 +113,21 @@ void Leg::_sparkle_sparkle()
     for (int i = 0; i < lower_foot_border; i++)
     {
         distance = lower_foot_border - i;
-//         level = byte(random(0, ((LWConfigs.main.maxBrightness/(lower_foot_border * 3)) * (i + 1))));
-//         _pixels[i].r = level;
-//         _pixels[i].g = level;
-//         _pixels[i].b = level;
-        int limit = (LWConfigs.main.maxBrightness/(lower_foot_border * 3)) * (i + 1);
+        int limit = (config->main.maxBrightness/(lower_foot_border * 3)) * (i + 1);
         brightness = ((float)map(random(0, limit), 0, limit, 0, 100)) / 100;
-        _pixels[i].r = byte((float)LWConfigs.sparkle.legSparkleColor.r * brightness);
-        _pixels[i].g = byte((float)LWConfigs.sparkle.legSparkleColor.g * brightness);
-        _pixels[i].b = byte((float)LWConfigs.sparkle.legSparkleColor.b * brightness);
+        _pixels[i].r = byte((float)config->sparkle.legSparkleColor.r * brightness);
+        _pixels[i].g = byte((float)config->sparkle.legSparkleColor.g * brightness);
+        _pixels[i].b = byte((float)config->sparkle.legSparkleColor.b * brightness);
     }
 
     for (int i = upper_foot_border + 1; i < PIXELS_PER_LEG; i++)
     {
         // <gerstle> white sparkle
-//         level = byte(random(0, ((LWConfigs.main.maxBrightness/(lower_foot_border * 3)) * (lower_foot_border - (i - upper_foot_border) + 1))));
-//         _pixels[i].r = level;
-//         _pixels[i].g = level;
-//         _pixels[i].b = level;
-        int limit = (LWConfigs.main.maxBrightness/(lower_foot_border * 3)) * (lower_foot_border - (i - upper_foot_border) + 1);
+        int limit = (config->main.maxBrightness/(lower_foot_border * 3)) * (lower_foot_border - (i - upper_foot_border) + 1);
         brightness = ((float)map(random(0, limit), 0, limit, 0, 100)) / 100;
-        _pixels[i].r = byte((float)LWConfigs.sparkle.legSparkleColor.r * brightness);
-        _pixels[i].g = byte((float)LWConfigs.sparkle.legSparkleColor.g * brightness);
-        _pixels[i].b = byte((float)LWConfigs.sparkle.legSparkleColor.b * brightness);
-
-        // <gerstle> random color sparkle
-//         _pixels[i].r = byte(random(0, ((max_brightness/(lower_foot_border * 3)) * (lower_foot_border - (i - upper_foot_border) + 1))));
-//         _pixels[i].g = byte(random(0, ((max_brightness/(lower_foot_border * 3)) * (lower_foot_border - (i - upper_foot_border) + 1))));
-//         _pixels[i].b = byte(random(0, ((max_brightness/(lower_foot_border * 3)) * (lower_foot_border - (i - upper_foot_border) + 1))));
+        _pixels[i].r = byte((float)config->sparkle.legSparkleColor.r * brightness);
+        _pixels[i].g = byte((float)config->sparkle.legSparkleColor.g * brightness);
+        _pixels[i].b = byte((float)config->sparkle.legSparkleColor.b * brightness);
     }
 
     _displayPixels();
@@ -167,8 +146,6 @@ void Leg::_sparkle_fade()
                 ((_pixels[i].g - _sparkle_fade_rate) > 0x00) ||
                 ((_pixels[i].b - _sparkle_fade_rate) > 0x00))
             {
-                
-//                 Serial.print("_sparklefade "); Serial.print(name); Serial.print(" to: "); Serial.print(_pixels[i].r - _sparkle_fade_rate); Serial.print(" - "); Serial.print(_pixels[i].g - _sparkle_fade_rate); Serial.print(" - "); Serial.println(_pixels[i].b - _sparkle_fade_rate);
                 _setPixel(i, _pixels[i], _sparkle_fade_rate);
                 still_fading = true;
             }
@@ -186,11 +163,8 @@ void Leg::_sparkle_fade()
 
 void Leg::pulse_pulse(unsigned long currentTime, unsigned long syncTime, int syncLength, int syncValue, bool changeColor)
 {
-    //unsigned long currentTime = millis();
-
-    if (LWConfigs.pulse.syncLegs)
+    if (config->pulse.syncLegs)
     {
-        //currentTime = syncCurrentTime;
         _lightModeChangeTime = syncTime;
         _pulse_length = syncLength;
     }
@@ -199,9 +173,9 @@ void Leg::pulse_pulse(unsigned long currentTime, unsigned long syncTime, int syn
 
     if (currentTime >= (_lightModeChangeTime + (_pulse_length * 2)))
     {
-        if (!LWConfigs.pulse.syncLegs)
+        if (!config->pulse.syncLegs)
         {
-            _pulse_length = random(LWConfigs.pulse.minPulseTime, LWConfigs.pulse.maxPulseTime);
+            _pulse_length = random(config->pulse.minPulseTime, config->pulse.maxPulseTime);
             _lightModeChangeTime = currentTime;
         }
 
@@ -213,7 +187,7 @@ void Leg::pulse_pulse(unsigned long currentTime, unsigned long syncTime, int syn
 
     if (changeColor)
     {
-        if (LWConfigs.pulse.randomColor)
+        if (config->pulse.randomColor)
         {
             int color = random(WHITE, COLOR_COUNT);
             _pulse_color.r = COLORS[color].r;
@@ -222,15 +196,16 @@ void Leg::pulse_pulse(unsigned long currentTime, unsigned long syncTime, int syn
         }
         else
         {
-            _pulse_color.r = LWConfigs.pulse.color.r;
-            _pulse_color.g = LWConfigs.pulse.color.g;
-            _pulse_color.b = LWConfigs.pulse.color.b;
+//         Serial.print("color to:: "); Serial.print(config->pulse.color.r); Serial.print(" - "); Serial.print(config->pulse.color.g); Serial.print(" - "); Serial.println(config->pulse.color.b);
+            _pulse_color.r = config->pulse.color.r;
+            _pulse_color.g = config->pulse.color.g;
+            _pulse_color.b = config->pulse.color.b;
         }
     }
 
     int value = 0;
 
-    if (LWConfigs.pulse.syncLegs)
+    if (config->pulse.syncLegs)
         value = syncValue;
     else
         if (_pulse_isDimming)
@@ -239,12 +214,9 @@ void Leg::pulse_pulse(unsigned long currentTime, unsigned long syncTime, int syn
             value = currentTime - _lightModeChangeTime;
 
     float brightness = ((float)map(value, 0, _pulse_length, 0, 100) / 100);
-    
     byte r = byte((float)_pulse_color.r * (brightness * brightness * brightness));
     byte g = byte((float)_pulse_color.g * (brightness * brightness * brightness));
     byte b = byte((float)_pulse_color.b * (brightness * brightness * brightness));
-
-    //Serial.print(newColor.r); Serial.print(" - "); Serial.print(newColor.g); Serial.print(" - "); Serial.println(newColor.b);
 
     for (int i = 0; i < PIXELS_PER_LEG; i++)
     {
@@ -256,22 +228,44 @@ void Leg::pulse_pulse(unsigned long currentTime, unsigned long syncTime, int syn
 
 }
 
-void Leg::equalizer_listen()
+void Leg::equalizer_listen(float level_percent, byte r, byte g, byte b)
 {
-    float brightness = (float) LWConfigs.equalizer.brightnessPercent / 100;
-
-    byte r = byte((float)LWConfigs.equalizer.color.r * (brightness * brightness * brightness));
-    byte g = byte((float)LWConfigs.equalizer.color.g * (brightness * brightness * brightness));
-    byte b = byte((float)LWConfigs.equalizer.color.b * (brightness * brightness * brightness));
-
-    for (int i = 0; i < PIXELS_PER_LEG; i++)
+    if (config->equalizer.allLights)
     {
-        _pixels[i].r = r;
-        _pixels[i].b = b;
-        _pixels[i].g = g;
-        _setPixel(i, _pixels[i], 0);
+        for (int i = 0; i < PIXELS_PER_LEG; i++)
+        {
+            _pixels[i].r = r;
+            _pixels[i].b = b;
+            _pixels[i].g = g;
+            _setPixel(i, _pixels[i], 0);
+        }
     }
-    
+    else
+    {
+        int i = 0;
+        int half = PIXELS_PER_LEG / 2;
+        int lower_threshold = half - (level_percent * half);
+        int upper_threshold = (level_percent * half) + half;
+
+        for (i = 0; i < PIXELS_PER_LEG; i++)
+        {
+            if (((i < half) && (i < lower_threshold)) ||
+                ((i > half) && (i > upper_threshold)))
+            {
+                _pixels[i].r = 0;
+                _pixels[i].g = 0;
+                _pixels[i].b = 0;
+            }
+            else
+            {
+                _pixels[i].r = config->equalizer.color.r;
+                _pixels[i].g = config->equalizer.color.g;
+                _pixels[i].b = config->equalizer.color.b;
+            }
+
+            _setPixel(i, _pixels[i], 0);
+        }
+    }
 }
 
 void Leg::_displayPixels()
@@ -282,10 +276,10 @@ void Leg::_displayPixels()
 
 void Leg::_setPixel(int i, RGB color, byte dimmer)
 {
-    if ((i == 0) && false)
-    {
-        Serial.print("_setPixel before:: "); Serial.print(color.r); Serial.print(" - "); Serial.print(color.g); Serial.print(" - "); Serial.print(color.b); Serial.print(" dim: "); Serial.println(dimmer);
-    }
+//     if ((i == 0) && false)
+//     {
+//         Serial.print("_setPixel before:: "); Serial.print(color.r); Serial.print(" - "); Serial.print(color.g); Serial.print(" - "); Serial.print(color.b); Serial.print(" dim: "); Serial.println(dimmer);
+//     }
 
     if (color.r > dimmer)
         _pixels[i].r = color.r - dimmer;
@@ -307,9 +301,9 @@ void Leg::_setPixel(int i, RGB color, byte dimmer)
         Serial.print("_setPixel:: "); Serial.print(_pixels[i].r); Serial.print(" - "); Serial.print(_pixels[i].g); Serial.print(" - "); Serial.print(_pixels[i].b); Serial.print(" dim: "); Serial.println(dimmer);
     }
 
-    _pixels[i].r = map(_pixels[i].r, 0, 255, 0, LWConfigs.main.maxBrightness);
-    _pixels[i].g = map(_pixels[i].g, 0, 255, 0, LWConfigs.main.maxBrightness);
-    _pixels[i].b = map(_pixels[i].b, 0, 255, 0, LWConfigs.main.maxBrightness);
+    _pixels[i].r = map(_pixels[i].r, 0, 255, 0, config->main.maxBrightness);
+    _pixels[i].g = map(_pixels[i].g, 0, 255, 0, config->main.maxBrightness);
+    _pixels[i].b = map(_pixels[i].b, 0, 255, 0, config->main.maxBrightness);
 
     if ((i == 0) && false)
     {
@@ -342,13 +336,13 @@ void Leg::setWalkingMode(WalkingModeEnum mode)
 
     switch (_walkingMode)
     {
-        case MasterOff:
+        case masterOff:
             off();
-        case Pulse:
+        case pulse:
             _pulse_isDimming = false;
-            _pulse_length = random(LWConfigs.pulse.minPulseTime, LWConfigs.pulse.maxPulseTime);
+            _pulse_length = random(config->pulse.minPulseTime, config->pulse.maxPulseTime);
             break;
-        case Equalizer:
+        case equalizer:
             // <gerstle> do nothing
             break;
     }

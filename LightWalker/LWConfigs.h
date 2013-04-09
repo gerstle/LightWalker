@@ -8,6 +8,8 @@
  * A copy is included in the file LICENSE
  ****************************************************************************/
 
+#pragma once
+
 #ifndef LWConfigs_h
 #define LWConfigs_h
 
@@ -17,73 +19,69 @@
 #include "WProgram.h"
 #endif
 
-#include "colors.h"
+#include "Enums.h"
+#include "MainConfigs.h"
+#include "PulseConfigs.h"
+#include "SparkleConfigs.h"
+#include "EqualizerConfigs.h"
 
 #define LEG_COUNT 2
 #define PIXELS_PER_LEG 25
 
 #define DEBUG 1
 
-enum WalkingModeEnum
+enum Preferences
 {
-    MasterOff,
-    Main,
-    Gravity,
-    Equalizer,
-    Sparkle,
-    Pulse
+    // ------------------------------------------------------------------------
+    // Main
+    // ------------------------------------------------------------------------
+	prefMainLegCount,
+	prefMainPixelsPerLeg,
+	prefMainMaxBrightness,
+	prefMainDefaultMode,
+
+	//------------------------------------------------------------------------
+	//Mode
+	//------------------------------------------------------------------------
+	prefMode,
+
+	//------------------------------------------------------------------------
+	//Pulse
+	//------------------------------------------------------------------------
+	prefPulseMinRate,
+	prefPulseMaxRate,
+	prefPulseRandomColor,
+	prefPulseSyncLegs,
+	prefPulseColor,
+
+	//------------------------------------------------------------------------
+	//Sparkle
+	//------------------------------------------------------------------------
+	prefSparkleFootUpFadeRate,
+	prefSparkleFootDownFadeRate,
+	prefSparkleFlashLength,
+	prefSparkleSparkleLength,
+	prefSparkleFootFlashColor,
+	prefSparkleFootSparkleColor,
+	prefSparkleLegSparkleColor,
+
+	//------------------------------------------------------------------------
+	//Equalizer
+	//------------------------------------------------------------------------
+	prefEqualizerColor,
+	prefEqualizerLevel,
+    prefEqualizerRMSThreshold,
+    prefEqualizerAllLights
 };
 
-struct MainConfigs
-{
-    MainConfigs() : maxBrightness(200), defaultMode(Pulse) {}
-
-    int maxBrightness;
-    WalkingModeEnum defaultMode;
-};
-
-struct SparkleConfigs
-{
-    SparkleConfigs() : footFlashColor(COLORS[WHITE]), footSparkleColor(COLORS[WHITE]), legSparkleColor(COLORS[WHITE]), footDownFadeRate(0x4), footUpFadeRate(0x8), flashLength(500), sparkleLength(500) {}
-
-    RGB footFlashColor;
-    RGB footSparkleColor;
-    RGB legSparkleColor;
-    int flashLength;
-    int sparkleLength;
-    byte footDownFadeRate;
-    byte footUpFadeRate;
-};
-
-struct PulseConfigs
-{
-    PulseConfigs() : color(COLORS[WHITE]), minBrightness(0), maxBrightness(200), minPulseTime(1000), maxPulseTime(5000), randomColor(false), syncLegs(false) {}
-
-    RGB color;
-    int minBrightness;
-    int maxBrightness;
-    int minPulseTime;
-    int maxPulseTime;
-    bool randomColor;
-    bool syncLegs;
-};
-
-struct EqualizerConfigs
-{
-    EqualizerConfigs() : color(COLORS[WHITE]) {}
-    RGB color;
-    int brightnessPercent;
-};
-
-class LWConfigsClass
+class LWConfigs
 {
     public:
-        MainConfigs main;
+        LWConfigs() : main(), pulse(), sparkle(), equalizer() {}
 
+        MainConfigs main;
         PulseConfigs pulse;
         SparkleConfigs sparkle;
         EqualizerConfigs equalizer;
 };
-
-extern LWConfigsClass LWConfigs;
 #endif

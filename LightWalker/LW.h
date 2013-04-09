@@ -15,20 +15,34 @@
 #include "LWConfigs.h"
 #include "Leg.h"
 
+#include "MainConfigs.h"
+#include "PulseConfigs.h"
+#include "SparkleConfigs.h"
+#include "EqualizerConfigs.h"
+
+#define VALUE_COUNT 50
+
 class LW
 {
     public:
-
-        LW(int x);
-        void initLegs(WalkingModeEnum mode);
+        LW() : config(), _laststatus(millis()), mode(masterOff), _lightModeChangeTime(millis()), _pulse_length(0), _pulse_isDimming(0), valueIndex(0), valueTotal(0), valueAvg(0) {}
+        void initLegs(WalkingModeEnum m);
         void off();
         void walk();
-        void setMode(WalkingModeEnum mode);
+        void equalizer_listen();
+        void setMode(WalkingModeEnum m);
+
+        LWConfigs config;
+        WalkingModeEnum mode;
+
+        int values[VALUE_COUNT];
+        int valueIndex;
+        double valueTotal;
+        int valueAvg;
 
     private:
         Leg _legs[LEG_COUNT];
         unsigned long _laststatus;
-        WalkingModeEnum _mode;
 
         unsigned long _lightModeChangeTime;
 

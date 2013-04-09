@@ -36,10 +36,9 @@ class Leg
         // <gerstle> Generic
         FootStatusEnum status;
         int trigger_pin;
-        char name[10];
+        String name;
 
-        Leg();
-        void Init(LWConfigs *c, char n[], int trigger_pin, WalkingModeEnum mode);
+        Leg(String n, int trigger_pin, WalkingModeEnum mode);
         void off();
         void setWalkingMode(WalkingModeEnum mode);
 
@@ -53,23 +52,19 @@ class Leg
         // <gerstle> pulse
         void pulse_pulse(unsigned long syncCurrentTime, unsigned long syncTime, int syncLength, int syncValue, bool changeColor);
 
-        // <gerstle>
-        void equalizer_listen(float level_percent, byte r, byte g, byte b);
-
     private:
-        LWConfigs *config;
-
         // <gerstle> Generic stuff
+//         RGB *_pixels;
+        byte _pixels[PIXELS_PER_LEG][3];
         int lower_foot_border;
         int upper_foot_border;
         LightModeEnum _lightMode;
         unsigned long _lightModeChangeTime;
         WalkingModeEnum _walkingMode;
 
-        void _setPixel(int i, RGB color, byte dimmer);
+        void _setPixel(int i, byte r, byte g, byte b, byte dimmer);
         void _displayPixels();
         void _setLightMode(LightModeEnum mode);
-        RGB _pixels[PIXELS_PER_LEG];
         void _applyMaxBrightness(byte *pixel, float value, int i);
 
         // <gerstle> Sparkle stuff        
@@ -81,8 +76,10 @@ class Leg
         // <gerstle> Pulse stuff
         bool _pulse_isDimming;
         int _pulse_length;
-        RGB _pulse_color;
-
+//         RGB _pulse_color;
+        byte _pulse_r;
+        byte _pulse_g;
+        byte _pulse_b;
 };
 
 #endif
