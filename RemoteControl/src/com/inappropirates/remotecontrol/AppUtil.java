@@ -53,7 +53,7 @@ public class AppUtil extends Application {
     public static TextView mBluetoothMessageTextView;
     public static String mBluetoothMessageLabel;
     
-    private static RMSThread mRMSThread = null;
+    public static RMSThread mRMSThread = null;
     
 	public static final Handler mBluetoothHandler = new Handler() {
         @Override
@@ -71,26 +71,7 @@ public class AppUtil extends Application {
                     String modeName = mSelectedMode.toString().toLowerCase(Locale.ENGLISH);
                     SharedPreferences pref = mContext.getSharedPreferences(modeName  + "_preferences", MODE_PRIVATE);
                     
-                    AppUtil.sendModeSettings(mSelectedMode, pref);
-                    AppUtil.sendMessage("mode=" + modeName);
-                    
-                    if (mSelectedMode == LightWalkerModes.Equalizer)
-                    {
-                    	mRMSThread = new RMSThread(mRMSHandler);
-                    	mRMSThread.recording = true;
-                    	mRMSThread.start();
-                    }
-                    else if (mRMSThread != null)
-                    {
-                    	mRMSThread.recording = false;
-                		try {
-            				mRMSThread.join();
-            			} catch (InterruptedException e) {
-            			} finally {
-            				mRMSThread = null;
-            			}
-                    }
-                    
+                    AppUtil.setMode(mSelectedMode, pref, true);
                     break;
                 case BluetoothChatService.STATE_CONNECTING:
                     mTitle.setText(R.string.title_connecting);
@@ -115,10 +96,8 @@ public class AppUtil extends Application {
                 {
                 	String modeName = mSelectedMode.toString().toLowerCase(Locale.ENGLISH);
                     SharedPreferences pref = mContext.getSharedPreferences(modeName  + "_preferences", MODE_PRIVATE);
-                    AppUtil.sendModeSettings(mSelectedMode, pref);
-                    AppUtil.sendMessage("mode=" + modeName);
+                    AppUtil.setMode(mSelectedMode, pref, true);
                 }
-                
                 break;
             case MESSAGE_DEVICE_NAME:
                 // save the connected device's name
@@ -127,7 +106,7 @@ public class AppUtil extends Application {
                                + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
                 break;
             case MESSAGE_TOAST:
-                Toast.makeText(mApplicationContext, msg.getData().getString(TOAST),
+                Toast.makeText(mApplicationContext, msg.getData().getString(TOAST), 
                                Toast.LENGTH_SHORT).show();
                 break;
             }
@@ -139,11 +118,44 @@ public class AppUtil extends Application {
         public void handleMessage(Message msg) {
             switch (msg.what) {
             case RMSThread.FREQUENCY_CHANGE:
-            	AppUtil.sendMessage(AppUtil.ConstructMessage("equalizerPrefBrightness", String.valueOf((int) Math.round((msg.arg1 / (msg.arg2 * 3)) * 100))));
+            	if (AppUtil.mChatService.getState() == BluetoothChatService.STATE_CONNECTED)
+            		AppUtil.sendMessage(AppUtil.ConstructMessage("prefEqualizerLevel", String.valueOf((int) Math.round((msg.arg1 / (msg.arg2 * 3)) * 100))));
             	break;
             }
         }
     };
+    
+    public static void setMode(LightWalkerModes mode, SharedPreferences prefs) {
+    	AppUtil.setMode(mode, prefs, false);
+    }
+    
+    public static void setMode(LightWalkerModes mode, SharedPreferences prefs, boolean override) {
+    	if (((mode != LightWalkerModes.main) && (mode != AppUtil.mSelectedMode)) || override)
+    	{
+            if (mode == LightWalkerModes.equalizer)
+            {
+            	mRMSThread = new RMSThread(AppUtil.mRMSHandler);
+            	mRMSThread.mRMSThreshold = prefs.getInt("prefEqualizerRMSThreshold", 200);
+            	mRMSThread.mFrequencyThreshold = prefs.getInt("prefEqualizerFrequencyThreshold", 20);
+            	mRMSThread.mRecording = true;
+            	mRMSThread.start();
+            }
+            else if (mRMSThread != null)
+            {
+            	mRMSThread.mRecording = false;
+        		try {
+    				mRMSThread.join();
+    			} catch (InterruptedException e) {
+    			} finally {
+    				mRMSThread = null;
+    			}
+            }
+            
+    		AppUtil.mSelectedMode = mode;
+    		AppUtil.sendModeSettings(mode, prefs);
+    		AppUtil.sendMessage(AppUtil.ConstructMessage("prefMode", String.valueOf(mode.ordinal())));
+    	}
+    }
     
 	public static void sendMessage(String message) {
 		// Check that we're actually connected before trying anything
@@ -163,17 +175,19 @@ public class AppUtil extends Application {
 				e.printStackTrace();
 			}
             AppUtil.mChatService.write(send);
-            AppUtil.mBluetoothMessageTextView.setText(AppUtil.mBluetoothMessageLabel);
+            //AppUtil.mBluetoothMessageTextView.setText(AppUtil.mBluetoothMessageLabel);
 
             // Reset out string buffer to zero and clear the edit text field
             mOutStringBuffer.setLength(0);
+            /*
             mCommandText.setText(mOutStringBuffer);
             try {
-				Thread.sleep(50);
+				Thread.sleep(10);
 			} catch (InterruptedException e) {
 				Log.d(AppUtil.TAG, "sleep interrupted");
 				e.printStackTrace();
 			}
+			*/
         }
 	}
 	
@@ -193,7 +207,7 @@ public class AppUtil extends Application {
 				else if (o instanceof String)
 					value = (String) o;
 				else if (o instanceof Boolean)
-					value = o.toString();
+					value = ((Boolean) o) ? "1" : "0";
 			}
 			
 			if ((value != null) && (value.length() > 0))
@@ -202,15 +216,15 @@ public class AppUtil extends Application {
     }
     
     public static String ConstructMessage(String key, String value) {
-    	return key + mKeyDelimiter + value;
+    	return String.valueOf(Preferences.valueOf(key).ordinal()) + mKeyDelimiter + value;
     }
     
     public static boolean keyIsColor(String key) {
-    	if ((key.equals("pulsePrefColor")) ||
-    	  	(key.equals("sparklePrefFootFlashColor")) ||
-    	  	(key.equals("sparklePrefFootSparkleColor")) ||
-    	  	(key.equals("sparklePrefLegSparkleColor")) ||
-    	  	(key.equals("equalizerPrefColor")))
+    	if ((key.equals("prefPulseColor")) ||
+    	  	(key.equals("prefSparkleFootFlashColor")) ||
+    	  	(key.equals("prefSparkleFootSparkleColor")) ||
+    	  	(key.equals("prefSparkleLegSparkleColor")) ||
+    	  	(key.equals("prefEqualizerColor")))
     		return true;
     	else
     		return false;

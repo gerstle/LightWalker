@@ -6,7 +6,7 @@ bluetooth
 * vcc -> 5v
 * gnd -> ground
 * cts-i -> rts-o
-* tx-o -> arduino digital 9
+* tx-o -> arduino digital 12
 * rx-i -> arduino digital 10
 
 LED

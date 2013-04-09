@@ -1,11 +1,14 @@
 package com.inappropirates.remotecontrol;
 
 import java.util.Locale;
+
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+
+import com.inappropirates.util.RMSThread;
 
 @SuppressLint("DefaultLocale")
 public class SettingsActivity extends PreferenceActivity {
@@ -21,7 +24,7 @@ public class SettingsActivity extends PreferenceActivity {
  
         // get the custom preferences name from the extra data in the intent
         mModeName = getIntent().getExtras().getString(LightWalkerRemote.EXTRA_MODE_NAME);
-        mMode = LightWalkerModes.valueOf(mModeName);
+        mMode = LightWalkerModes.valueOf(mModeName.toLowerCase(Locale.ENGLISH));
        	mPreferencesName = mModeName.toLowerCase(Locale.ENGLISH) + "_preferences";
 
         getPreferenceManager().setSharedPreferencesName(mPreferencesName);
@@ -29,8 +32,8 @@ public class SettingsActivity extends PreferenceActivity {
         mPrefs = getSharedPreferences(mPreferencesName, MODE_PRIVATE);
         mPrefs.registerOnSharedPreferenceChangeListener(spChanged);
         
-        if (mMode != LightWalkerModes.Main)
-        	setMode(mMode);
+        if (mMode != LightWalkerModes.main)
+        	AppUtil.setMode(mMode, mPrefs);
     }
     
     @Override
@@ -55,7 +58,8 @@ public class SettingsActivity extends PreferenceActivity {
 						value = Integer.toString(sharedPrefs.getInt(key, 0));
 					} catch (ClassCastException e1) {
 						try {
-							value = Boolean.toString(sharedPrefs.getBoolean(key, false));
+							boolean boolValue = sharedPrefs.getBoolean(key, false);
+							value = boolValue ? "1" : "0";
 						} catch (ClassCastException e2) {
 							
 						}
@@ -64,16 +68,12 @@ public class SettingsActivity extends PreferenceActivity {
 			}
 			
 			if ((value != null) && (value.length() > 0))
-				AppUtil.sendMessage(AppUtil.ConstructMessage(key, value));			
+				AppUtil.sendMessage(AppUtil.ConstructMessage(key, value));
+			
+			if (key.compareTo("prefEqualizerRMSThreshold") == 0)
+				AppUtil.mRMSThread.mRMSThreshold = sharedPrefs.getInt(key,  200);
+			else if (key.compareTo("prefEqualizerFrequencyThreshold") == 0)
+				AppUtil.mRMSThread.mFrequencyThreshold = sharedPrefs.getInt(key,  20);
 		}
     };
-    
-    private void setMode(LightWalkerModes mode) {
-    	if ((mode != LightWalkerModes.Main) && (mode != AppUtil.mSelectedMode))
-    	{
-    		AppUtil.mSelectedMode = mode;
-    		AppUtil.sendModeSettings(mMode, mPrefs);
-    		AppUtil.sendMessage("mode=" + mode.toString().toLowerCase(Locale.ENGLISH));
-    	}
-    }
 }

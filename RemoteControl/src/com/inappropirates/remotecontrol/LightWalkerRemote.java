@@ -84,7 +84,7 @@ public class LightWalkerRemote extends Activity {
         }
         
 		mPrefs = getSharedPreferences("main_preferences.xml", MODE_PRIVATE);
-        AppUtil.mSelectedMode = LightWalkerModes.valueOf(mPrefs.getString("mainPrefDefaultMode", LightWalkerModes.Pulse.toString()));
+        AppUtil.mSelectedMode = LightWalkerModes.valueOf(mPrefs.getString("mainPrefDefaultMode", LightWalkerModes.pulse.toString()));
 	}
 	
     @Override
@@ -230,6 +230,7 @@ public class LightWalkerRemote extends Activity {
             if (actionId == EditorInfo.IME_NULL && event.getAction() == KeyEvent.ACTION_UP) {
                 String message = view.getText().toString();
                 AppUtil.sendMessage(message);
+                view.setText("");
             }
             if(AppUtil.DEBUG) Log.i(AppUtil.TAG, "END onEditorAction");
             return true;

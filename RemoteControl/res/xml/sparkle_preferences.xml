@@ -5,7 +5,7 @@
        android:key="sparkle_preferences">
        
 	<com.robobunny.SeekBarPreference
-        android:key="sparkleFootUpFadeRate"
+        android:key="prefSparkleFootUpFadeRate"
         android:title="foot down fade rate"
         android:defaultValue="3"
         robobunny:min="1"
@@ -14,7 +14,7 @@
         robobunny:unitsRight="" />
     
     <com.robobunny.SeekBarPreference
-        android:key="sparkleFootUpFadeRate"
+        android:key="preSparkleFootUpFadeRate"
         android:title="foot up fade rate"
         android:defaultValue="2"
         robobunny:min="1"
@@ -23,7 +23,7 @@
         robobunny:unitsRight="" />
     
     <com.robobunny.SeekBarPreference
-        android:key="sparklePrefFlashLength"
+        android:key="prefSparkleFlashLength"
         android:title="length of flash time (ms)"
         android:defaultValue="200"
         android:max="3000"
@@ -32,7 +32,7 @@
 		robobunny:unitsRight="" />
         
     <com.robobunny.SeekBarPreference
-        android:key="sparklePrefSparkleLength"
+        android:key="prefSparkleSparkleLength"
         android:title="length of sparkle time (ms)"
         android:defaultValue="5000"
         android:max="100000"
@@ -41,17 +41,17 @@
 		robobunny:unitsRight="" />
     
     <com.inappropirates.remotecontrol.ColorPickerPreference
-        android:key="sparklePrefFootFlashColor"
+        android:key="prefSparkleFootFlashColor"
         android:title="foot flash color"
         />
     
     <com.inappropirates.remotecontrol.ColorPickerPreference
-        android:key="sparklePrefFootSparkleColor"
+        android:key="prefSparkleFootSparkleColor"
         android:title="foot sparkle color"
         />
     
     <com.inappropirates.remotecontrol.ColorPickerPreference
-        android:key="sparklePrefLegSparkleColor"
+        android:key="prefSparkleLegSparkleColor"
         android:title="leg sparkle color"
         />    
 </PreferenceScreen>
