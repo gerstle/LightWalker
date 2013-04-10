@@ -173,10 +173,7 @@ void LW::equalizer_listen()
 //     Serial.print(config.equalizer.RMSThreshold); Serial.print("\t"); Serial.print(level); Serial.print("\t"); Serial.print(valueAvg);
 
     if (valueAvg <= 0)
-    {
-//         Serial.println();
         return;
-    }
     
     if (level < config.equalizer.RMSThreshold)
         level = 0;
