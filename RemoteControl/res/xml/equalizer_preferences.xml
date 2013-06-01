@@ -12,14 +12,6 @@
         robobunny:min="0"
         />
         
-        <com.robobunny.SeekBarPreference
-        android:key="prefEqualizerFrequencyThreshold"
-        android:title="Frequency Threshold"
-        android:defaultValue="20"
-        android:max="70"
-        robobunny:min="0"
-        />
-    
     <com.inappropirates.remotecontrol.ColorPickerPreference
         android:key="prefEqualizerColor"
         android:title="color"

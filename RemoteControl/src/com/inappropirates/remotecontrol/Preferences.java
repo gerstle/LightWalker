@@ -40,6 +40,5 @@ public enum Preferences {
 	prefEqualizerColor,
 	prefEqualizerLevel,
 	prefEqualizerRMSThreshold, // <cgerstle> NOT used by lightwalker, just for the remote
-	prefEqualizerFrequencyThreshold, // <cgerstle> NOT used by lightwalker, just for the remote
 	prefEqualizerAllLights
 }

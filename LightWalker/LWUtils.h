@@ -14,12 +14,12 @@
 
 // <gerstle> TX is the arduino's TX... attach to bluetooth RX
 // <gerstle> RX is the arduino's RX... attach to bluetooth TX
-#define TXPIN 10
-#define RXPIN 12
+#define TXPIN 9
+#define RXPIN 10
 
-#define AUDIO_LEFT_PIN 0   // read left channel from analog input 0
-#define AUDIO_STROBE_PIN 4 // strobe is attached to digital pin 2
-#define AUDIO_RESET_PIN 5  // reset is attached to digital pin 3
+#define AUDIO_PIN 1         // read right channel from analog input 1
+#define AUDIO_STROBE_PIN 4  // strobe is attached to digital pin 2
+#define AUDIO_RESET_PIN 5   // reset is attached to digital pin 3
 
 class LWUtilsClass
 {

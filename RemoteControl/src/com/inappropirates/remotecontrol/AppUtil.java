@@ -17,7 +17,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.inappropirates.util.BluetoothChatService;
-import com.inappropirates.util.RMSThread;
 
 public class AppUtil extends Application {
 	
@@ -53,7 +52,7 @@ public class AppUtil extends Application {
     public static TextView mBluetoothMessageTextView;
     public static String mBluetoothMessageLabel;
     
-    public static RMSThread mRMSThread = null;
+    //public static RMSThread mRMSThread = null;
     
 	public static final Handler mBluetoothHandler = new Handler() {
         @Override
@@ -113,6 +112,7 @@ public class AppUtil extends Application {
         }
     };
     
+    /*
     public static final Handler mRMSHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -124,6 +124,7 @@ public class AppUtil extends Application {
             }
         }
     };
+    */
     
     public static void setMode(LightWalkerModes mode, SharedPreferences prefs) {
     	AppUtil.setMode(mode, prefs, false);
@@ -132,6 +133,7 @@ public class AppUtil extends Application {
     public static void setMode(LightWalkerModes mode, SharedPreferences prefs, boolean override) {
     	if (((mode != LightWalkerModes.main) && (mode != AppUtil.mSelectedMode)) || override)
     	{
+    		/*
             if (mode == LightWalkerModes.equalizer)
             {
             	mRMSThread = new RMSThread(AppUtil.mRMSHandler);
@@ -150,6 +152,7 @@ public class AppUtil extends Application {
     				mRMSThread = null;
     			}
             }
+            */
             
     		AppUtil.mSelectedMode = mode;
     		AppUtil.sendModeSettings(mode, prefs);

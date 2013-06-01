@@ -8,8 +8,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
-import com.inappropirates.util.RMSThread;
-
 @SuppressLint("DefaultLocale")
 public class SettingsActivity extends PreferenceActivity {
 	private LightWalkerModes mMode;
@@ -69,11 +67,12 @@ public class SettingsActivity extends PreferenceActivity {
 			
 			if ((value != null) && (value.length() > 0))
 				AppUtil.sendMessage(AppUtil.ConstructMessage(key, value));
-			
+			/*
 			if (key.compareTo("prefEqualizerRMSThreshold") == 0)
 				AppUtil.mRMSThread.mRMSThreshold = sharedPrefs.getInt(key,  200);
 			else if (key.compareTo("prefEqualizerFrequencyThreshold") == 0)
 				AppUtil.mRMSThread.mFrequencyThreshold = sharedPrefs.getInt(key,  20);
+			*/
 		}
     };
 }

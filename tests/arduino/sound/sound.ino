@@ -8,7 +8,7 @@ int resetPin = 5;  // reset is attached to digital pin 3
 int spectrumValue[7]; // to hold a2d values
 #define noiseFilter 50           // Noise level to ignore on EQ reading (0-1023). 100 or less is typical
 
-const int valueCount = 100;
+const int valueCount = 50;
 int values[valueCount];
 int valueIndex = 0;
 double valueTotal = 0;
