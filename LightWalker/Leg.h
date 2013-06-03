@@ -11,8 +11,11 @@
 #define Leg_h
 
 #include <TCL.h>
+#include <ADXL345.h>
 #include "LWUtils.h"
 #include "LWConfigs.h"
+
+#define ADXL_VALUE_COUNT 60
 
 enum FootStatusEnum
 {
@@ -35,13 +38,15 @@ class Leg
     public:
         // <gerstle> Generic
         FootStatusEnum status;
-        int trigger_pin;
+        int channel;
         char name[10];
+        bool step;
 
         Leg();
-        void Init(LWConfigs *c, char n[], int trigger_pin, WalkingModeEnum mode);
+        void Init(LWConfigs *c, char n[], int i2c_channel, WalkingModeEnum mode, ADXL345 *adxl);
         void off();
         void setWalkingMode(WalkingModeEnum mode);
+        void detectStep(ADXL345 *adxl);
 
         // <gerstle> Sparkle
         bool sparkle_fade_on;
@@ -83,6 +88,34 @@ class Leg
         int _pulse_length;
         RGB _pulse_color;
 
+        // <cgerstle> steps
+        unsigned long lastSharpPeakTime;
+        int valueIndex;
+        int xValues[ADXL_VALUE_COUNT];
+        int yValues[ADXL_VALUE_COUNT];
+        int zValues[ADXL_VALUE_COUNT];
+
+        int xTotal;
+        int xAverage;
+        int xAverageOld;
+
+        int yTotal;
+        int yAverage;
+        int yAverageOld;
+
+        int zTotal;
+        int zAverage;
+        int zAverageOld;
+
+        int xStepDuration; // <cgerstle> a step lasts at least this long... ie, two steps can't occur within this time period
+        int yStepDuration;
+        int zStepDuration;
+        int xAvgDiffThreshold;
+        int yAvgDiffThreshold;
+        int zAvgDiffThreshold;
+
+        int zSignificantlyLowerThanAverageThreshold; 
+        bool readyForStep;
 };
 
 #endif

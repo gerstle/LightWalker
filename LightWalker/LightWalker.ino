@@ -3,16 +3,21 @@
 // sketch for the LightWalker costume
 // The main work is in the LW class
 
-#include <SoftwareSerial.h>
-#include <Wire.h>
 #include <ADXL345.h>
+#include <Wire.h>
 #include <SPI.h>
 #include <TCL.h>
 #include "LWUtils.h"
 #include "LW.h"
 
 LW lw;
-SoftwareSerial bluetooth(RXPIN, TXPIN);
+
+// <gerstle> bluetooth comms
+const int msgLength = 64;
+char msg[msgLength];
+int msgIndex = 0;
+char *pKey = NULL;
+char *pValue = NULL;
 
 void setup()
 {
@@ -22,9 +27,12 @@ void setup()
     randomSeed(long(millis()));
 
     // <gerstle> bluetooth setup
-    pinMode(RXPIN, INPUT);
-    pinMode(TXPIN, OUTPUT);
-    bluetooth.begin(57600);
+    Serial1.begin(57600);
+    while (!Serial1)
+    {
+        ; // <gerstle> wait for bluetooth
+    }
+    Serial1.print("SettingsPlease\r");
 
     // <gerstle> lights setup
     TCL.begin();
@@ -32,7 +40,7 @@ void setup()
     TCL.sendEmptyFrame();
 
     // <gerstle> audio setup
-    pinMode(AUDIO_LEFT_PIN, INPUT);
+    pinMode(AUDIO_PIN, INPUT);
     pinMode(AUDIO_STROBE_PIN, OUTPUT);
     pinMode(AUDIO_RESET_PIN, OUTPUT);
     analogReference(DEFAULT);
@@ -40,34 +48,27 @@ void setup()
     digitalWrite(AUDIO_RESET_PIN, LOW);
     digitalWrite(AUDIO_STROBE_PIN, HIGH);
 
-    lw.initLegs(masterOff);
+    // <cgerstle> ADXL setup
+    Wire.begin();
 
-    if (bluetooth.isListening())
-        bluetooth.print("SettingsPlease\r");
+    lw.initLegs(masterOff);
 
     Serial.println("Walking!");
 }
 
-const int msgLength = 128;
-char msg[msgLength];
-char *pKey = NULL;
-char *pValue = NULL;
 void loop()
 {
-    // <cgerstle> get commands from bluetooth
-    if (bluetooth.available())
-    {
-        int i = 0;
-        msg[i++] = (char)bluetooth.read();
-        
-        // <gerstle> seems like the \r gets horked sometimes and that the message
-        // sent has a funny y attached to the end. So, check that we're within
-        // valid ascii. If not, consider that the end of the message
-        while ((msg[i - 1] != '\r') && (msg[i - 1] > 0x0) && (msg[i - 1] <= 0x7F) && (i < msgLength))
-            msg[i++] = (char)bluetooth.read();
-        msg[i - 1] = '\0';
+    // <gerstle> perform LightWalker action
+    lw.walk();
+}
 
-        if (i > 1)
+void serialEvent1()
+{
+    if (Serial1.available())
+    {
+        msg[msgIndex++] = (char)Serial1.read();
+
+        if (msg[msgIndex - 1] == '\r')
         {
             pValue = strchr(msg, '=');
             if (pValue != NULL)
@@ -76,20 +77,17 @@ void loop()
                 *pValue = '\0';
                 pValue++;
 
-                ExecuteCommand(atoi(pKey), pValue, i - (pValue - pKey));
-//                 if (ExecuteCommand(atoi(pKey), pValue, i - (pValue - pKey) - 1))
-//                     bluetooth.print("OK\r");
+                if (executeCommand(atoi(pKey), pValue, msgIndex - (pValue - pKey) - 1))
+                    Serial1.print("OK\r");
             }
+
+            memset(msg, '\0', msgIndex - 1);
+            msgIndex = 0;
         }
-
-        memset(msg, '\0', i - 1);
     }
-
-    // <gerstle> perform LightWalker action
-    lw.walk();
 }
 
-bool ExecuteCommand(int key, char *value, int valueLen)
+bool executeCommand(int key, char *value, int valueLen)
 {
     Serial.print("key: "); Serial.print(key);
     Serial.print(" value: "); Serial.print(value); Serial.print("("); Serial.print(valueLen); Serial.println(")");
@@ -170,9 +168,15 @@ bool ExecuteCommand(int key, char *value, int valueLen)
             break;
         case prefPulseRandomColor:
             if (strncmp(value, "1", valueLen) == 0)
+            {
+                Serial.print("random = true");
                 lw.config.pulse.randomColor = true;
+            }
             else
+            {
+                Serial.print("random = false");
                 lw.config.pulse.randomColor = false;
+            }
             break;
 
         case prefPulseSyncLegs:
@@ -205,6 +209,25 @@ bool ExecuteCommand(int key, char *value, int valueLen)
                 lw.config.equalizer.allLights = true;
             else
                 lw.config.equalizer.allLights = false;
+            break;
+
+        // ------------------------------------------------------------------------
+        // Gravity
+        // ------------------------------------------------------------------------
+        case prefGravityXColor:
+            ParseColor(value, &(lw.config.gravity.xColor));
+            break;
+        case prefGravityYColor:
+            ParseColor(value, &(lw.config.gravity.yColor));
+            break;
+        case prefGravityZColor:
+            ParseColor(value, &(lw.config.gravity.zColor));
+            break;
+        case prefGravityRotate:
+            if (strncmp(value, "1", 1) == 0)
+                lw.config.gravity.rotate = true;
+            else
+                lw.config.gravity.rotate = false;
             break;
     }
 

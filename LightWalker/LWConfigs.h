@@ -24,6 +24,7 @@
 #include "PulseConfigs.h"
 #include "SparkleConfigs.h"
 #include "EqualizerConfigs.h"
+#include "GravityConfigs.h"
 
 #define LEG_COUNT 2
 #define PIXELS_PER_LEG 25
@@ -46,7 +47,7 @@ enum Preferences
 	prefMode,
 
 	//------------------------------------------------------------------------
-	//Pulse
+	// Pulse
 	//------------------------------------------------------------------------
 	prefPulseMinRate,
 	prefPulseMaxRate,
@@ -55,7 +56,7 @@ enum Preferences
 	prefPulseColor,
 
 	//------------------------------------------------------------------------
-	//Sparkle
+	// Sparkle
 	//------------------------------------------------------------------------
 	prefSparkleFootUpFadeRate,
 	prefSparkleFootDownFadeRate,
@@ -66,12 +67,20 @@ enum Preferences
 	prefSparkleLegSparkleColor,
 
 	//------------------------------------------------------------------------
-	//Equalizer
+	// Equalizer
 	//------------------------------------------------------------------------
 	prefEqualizerColor,
 	prefEqualizerLevel,
     prefEqualizerRMSThreshold,
-    prefEqualizerAllLights
+    prefEqualizerAllLights,
+
+	//------------------------------------------------------------------------
+	// Gravity
+	//------------------------------------------------------------------------
+    prefGravityXColor,
+    prefGravityYColor,
+    prefGravityZColor,
+    prefGravityRotate,
 };
 
 class LWConfigs
@@ -83,5 +92,6 @@ class LWConfigs
         PulseConfigs pulse;
         SparkleConfigs sparkle;
         EqualizerConfigs equalizer;
+        GravityConfigs gravity;
 };
 #endif

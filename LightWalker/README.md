@@ -7,18 +7,18 @@ POWER
 
 bluetooth
 ---------
-* vcc       -> 5v
+* vcc       -> 5v/3.3v
 * gnd       -> ground
-* cts-i     -> rts-o
-* tx-o      -> arduino digital 10
-* rx-i      -> arduino digital 9 
+* cts-i     -> rts-o (loop back)
+* tx-o      -> rx1 19
+* rx-i      -> tx1 18
 
 LED
 ---
 * LED red           -> battery +
 * LED black         -> battery -
-* LED green taped   -> 11
-* LED green         -> 13
+* LED green taped   -> duemilanove: 11 mega: 51
+* LED green         -> duemilanove: 13 mega: 52
 
 accelerometers
 --------------

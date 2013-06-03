@@ -13,6 +13,7 @@ class EqualizerConfigs
         int brightnessPercent;
         bool allLights;
         int RMSThreshold;
+        int peak;
 };
 
 #endif

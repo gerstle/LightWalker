@@ -10,7 +10,9 @@
 #ifndef LW_h
 #define LW_h
 
+#include <ADXL345.h>
 #include <TCL.h>
+
 #include "LWUtils.h"
 #include "LWConfigs.h"
 #include "Leg.h"
@@ -49,6 +51,8 @@ class LW
         // <gerstle> pulse
         int _pulse_length;
         bool _pulse_isDimming;
+
+        ADXL345 _adxl;
 };
 
 #endif
