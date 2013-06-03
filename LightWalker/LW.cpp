@@ -14,10 +14,8 @@
 
 void LW::initLegs(WalkingModeEnum m)
 {
-    _legs[0].Init(&config, "left leg", 2, mode);
-    Serial.println(_legs[0].name);
-    _legs[1].Init(&config, "right leg", 3, mode);
-    Serial.println(_legs[1].name);
+    _legs[0].Init(&config, "left leg", ADXL_ONE, mode, &_adxl);
+    _legs[1].Init(&config, "right leg", ADXL_TWO, mode, &_adxl);
 
     mode = m;
     setMode(mode);
@@ -45,7 +43,7 @@ void LW::setMode(WalkingModeEnum m)
                 {
                     digitalWrite(AUDIO_STROBE_PIN, LOW);
                     delayMicroseconds(30); // to allow the output to settle
-                    tmp = analogRead(AUDIO_LEFT_PIN);
+                    tmp = analogRead(AUDIO_PIN);
 
                     if (i == 0)
                         value = tmp;
@@ -82,8 +80,6 @@ void LW::walk()
     // <gerstle> foreach leg, check the sensor
     for (int i = 0; i < LEG_COUNT; i++)
     {
-        bool sensorState = digitalRead(_legs[i].trigger_pin);
-        
         if (displayStatus && DEBUG)
         {
 //             Serial.print("    leg "); Serial.println(_legs[i].name);
@@ -97,11 +93,13 @@ void LW::walk()
         {
             case sparkle:
 
-                //if ((sensorState == LOW) && (_legs[i].status != Down))
-                if ((sensorState == HIGH) && (_legs[i].status != Down))
+                if (i == 0)
+                    Serial.print("\t\t");
+                _legs[i].detectStep(&_adxl);
+
+                if (_legs[i].step && (_legs[i].status != Down))
                     _legs[i].sparkle_footdown();
-                //else if ((sensorState == HIGH) && (_legs[i].status != Up))
-                else if ((sensorState == LOW) && (_legs[i].status != Up))
+                else if (!_legs[i].step && (_legs[i].status != Up))
                     _legs[i].sparkle_footup();
                 else
                     _legs[i].sparkle_sameStatus();
@@ -155,9 +153,9 @@ void LW::equalizer_listen()
     for (int i = 0; i < 7; i++)
     {
         digitalWrite(AUDIO_STROBE_PIN, LOW);
-        delayMicroseconds(30); // to allow the output to settle
+        delayMicroseconds(20); // to allow the output to settle
 
-        tmp = analogRead(AUDIO_LEFT_PIN);
+        tmp = analogRead(AUDIO_PIN);
         if (i == 0)
             level = tmp;
         digitalWrite(AUDIO_STROBE_PIN, HIGH);
@@ -170,7 +168,6 @@ void LW::equalizer_listen()
     values[valueIndex] = level;
     valueAvg = valueTotal / VALUE_COUNT;
 
-//     Serial.print(config.equalizer.RMSThreshold); Serial.print("\t"); Serial.print(level); Serial.print("\t"); Serial.print(valueAvg);
 
     if (valueAvg <= 0)
         return;
@@ -178,8 +175,15 @@ void LW::equalizer_listen()
     if (level < config.equalizer.RMSThreshold)
         level = 0;
 
-    brightness = (float)level / ((float)valueAvg * 2);
-    //Serial.print("\t"); Serial.print(level); Serial.print("\t"); Serial.println(brightness); 
+    //brightness = (float)level / ((float)valueAvg * 1.8);
+    // scale to moving average
+    //brightness = (float) map(level, 0, 1024, valueAvg, 1024);
+    // scale again for percentage
+    brightness = ((float) map(level, valueAvg, min(valueAvg * 3, 1024), 0, 100)) / 100;
+
+    if (brightness < 0.0)
+        brightness = 0;
+    //Serial.print(valueAvg); Serial.print("\t"); Serial.print(level); Serial.print("\t"); Serial.println(brightness); 
     if (config.equalizer.allLights)
     {
         r = byte((float)config.equalizer.color.r * (brightness * brightness * brightness));

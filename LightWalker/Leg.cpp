@@ -16,12 +16,15 @@ Leg::Leg()
     name[0] = '\0';
 }
 
-void Leg::Init(LWConfigs *c, char n[], int pin, WalkingModeEnum mode)
+void Leg::Init(LWConfigs *c, char n[], int i2c_channel, WalkingModeEnum mode, ADXL345 *adxl)
 {
+    int x, y, z, half;
+
     config = c;
     strcpy(name, n);
-    trigger_pin = pin;
+    channel = i2c_channel;
     status = Initialized;
+    step = false;
     _lightMode = None;
     _lightModeChangeTime = millis();
 
@@ -29,13 +32,62 @@ void Leg::Init(LWConfigs *c, char n[], int pin, WalkingModeEnum mode)
 
     sparkle_fade_on = true;
 
-    int half = PIXELS_PER_LEG / 2;
+    half = PIXELS_PER_LEG / 2;
 
     if ((PIXELS_PER_LEG % 2) > 0)
         lower_foot_border = half - 2;
     else
         lower_foot_border = half - 3;
     upper_foot_border = half + 2;
+
+    LWUtils.selectI2CChannels(channel);
+    LWUtils.initADXL(*adxl);
+
+    valueIndex = 0;
+
+    xTotal = 0;
+    xAverage = 0;
+    xAverageOld = 0;
+
+    yTotal = 0;
+    yAverage = 0;
+    yAverageOld = 0;
+
+    zTotal = 0;
+    zAverage = 0;
+    zAverageOld = 0;
+
+    xStepDuration = 750; // <cgerstle> a step lasts at least this long... ie, two steps can't occur within this time period
+    yStepDuration = 750;
+    zStepDuration = 250;
+    xAvgDiffThreshold = 3;
+    yAvgDiffThreshold = 3;
+    zAvgDiffThreshold = 3;
+
+    zSignificantlyLowerThanAverageThreshold = 35; 
+    readyForStep = true;
+
+    for (valueIndex = 0; valueIndex < ADXL_VALUE_COUNT; valueIndex++)
+    {
+        adxl->readXYZ(&x, &y, &z); //read the accelerometer values and store them in variables  x,y,z
+
+        x = abs(x);
+        y = abs(y);
+        z = z;
+
+        xValues[valueIndex] = x;
+        yValues[valueIndex] = y;
+        zValues[valueIndex] = z;
+
+        xTotal += xValues[valueIndex];
+        yTotal += yValues[valueIndex];
+        zTotal += zValues[valueIndex];
+    }
+
+    xAverage = xTotal / ADXL_VALUE_COUNT;
+    yAverage = yTotal / ADXL_VALUE_COUNT;
+    zAverage = zTotal / ADXL_VALUE_COUNT;
+    lastSharpPeakTime = millis();
 }
 
 void Leg::sparkle_footdown()
@@ -329,10 +381,12 @@ void Leg::_setLightMode(LightModeEnum mode)
 
 void Leg::setWalkingMode(WalkingModeEnum mode)
 {
+    off();
+    _lightModeChangeTime = millis();
+
+    // <gerstle> sparkle stuff
     _walkingMode = mode;
     _lightMode = Off;
-
-    _lightModeChangeTime = millis();
 
     switch (_walkingMode)
     {
@@ -345,5 +399,75 @@ void Leg::setWalkingMode(WalkingModeEnum mode)
         case equalizer:
             // <gerstle> do nothing
             break;
+        case gravity:
+            // <gerstle> do nothing
+            break;
     }
+}
+
+int x, y, z;
+void Leg::detectStep(ADXL345 *adxl)
+{
+    unsigned long currentTime = millis();
+    bool stepDetected = false;
+
+    LWUtils.selectI2CChannels(channel);
+    adxl->readXYZ(&x, &y, &z); //read the accelerometer values and store them in variables  x,y,z
+    Serial.println(x);
+
+    x = abs(x);
+    y = abs(y);
+    z = z;
+
+    if (valueIndex >= ADXL_VALUE_COUNT)
+        valueIndex = 0;
+
+    xTotal = xTotal - xValues[valueIndex] + x;
+    xValues[valueIndex] = x;
+    xAverage = xTotal / ADXL_VALUE_COUNT;
+
+    yTotal = yTotal - yValues[valueIndex] + y;
+    yValues[valueIndex] = y;
+    yAverage = yTotal / ADXL_VALUE_COUNT;
+   
+    zTotal = zTotal - zValues[valueIndex] + z;
+    zValues[valueIndex] = z;
+    zAverage = zTotal / ADXL_VALUE_COUNT;
+
+    if (z < (zAverage - zSignificantlyLowerThanAverageThreshold))
+        readyForStep = true;
+
+//     Serial.print(x); Serial.print("\t"); Serial.print(y); Serial.print("\t"); Serial.print(z);
+//         Serial.print("\t"); Serial.print(xAverage); Serial.print("\t"); Serial.print(xAverageOld);
+//         Serial.print("\t"); Serial.print(yAverage); Serial.print("\t"); Serial.print(yAverageOld);
+//         Serial.print("\t"); Serial.print(zAverage); Serial.print("\t"); Serial.print(zAverageOld);
+//         Serial.print("\t"); Serial.print(readyForStep);
+
+    if (readyForStep && (currentTime > (lastSharpPeakTime + zStepDuration)))
+        if ((z > zAverage) && (zAverage >= (zAverageOld + zAvgDiffThreshold)))
+        {
+            stepDetected = true;
+            readyForStep = false;
+        }
+
+
+    if (readyForStep && (currentTime > (lastSharpPeakTime + xStepDuration)))
+        if (!stepDetected && (xAverage >= (xAverageOld + xAvgDiffThreshold)))
+            stepDetected = true;
+
+    if (readyForStep && (currentTime > (lastSharpPeakTime + yStepDuration)))
+        if (!stepDetected && (yAverage >= (yAverageOld + yAvgDiffThreshold)))
+            stepDetected = true;
+
+    if (stepDetected)
+    {
+        //Serial.println("\t\tSTEP!");
+        lastSharpPeakTime = millis();
+    }
+
+    xAverageOld = xAverage;
+    yAverageOld = yAverage;
+    zAverageOld = zAverage;
+
+    valueIndex++;
 }
