@@ -10,6 +10,7 @@
     </string-array>
 
     <string name="menu_bluetooth_settings">bluetooth</string>
+    <string name="menu_bluetooth_disconnect">bluetooth disconnect</string>
     
     <string name="modeLabel">Mode</string>
     <string name="modeSparkleLabel">sparkle</string>

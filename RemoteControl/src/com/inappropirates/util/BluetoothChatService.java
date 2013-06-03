@@ -186,12 +186,6 @@ public class BluetoothChatService {
             mConnectedThread = null;
         }
 
-        if (mConnectThread != null) {
-            mConnectThread.cancel();
-            mConnectThread = null;
-        }
-
-
         if (mSecureAcceptThread != null) {
             mSecureAcceptThread.cancel();
             mSecureAcceptThread = null;
@@ -399,9 +393,9 @@ public class BluetoothChatService {
      * It handles all incoming and outgoing transmissions.
      */
     private class ConnectedThread extends Thread {
-        private final BluetoothSocket mmSocket;
-        private final InputStream mmInStream;
-        private final OutputStream mmOutStream;
+        private BluetoothSocket mmSocket;
+        private InputStream mmInStream;
+        private OutputStream mmOutStream;
 
         public ConnectedThread(BluetoothSocket socket, String socketType) {
             Log.d(AppUtil.TAG, "create ConnectedThread: " + socketType);
@@ -474,13 +468,20 @@ public class BluetoothChatService {
         }
 
         public void cancel() {
-            try {
-            	mmInStream.close();
-            	mmOutStream.close();
-                mmSocket.close();
-            } catch (IOException e) {
-                Log.e(AppUtil.TAG, "close() of connect socket failed", e);
-            }
+			if (mmInStream != null) {
+	                try {mmInStream.close();} catch (Exception e) {Log.e(AppUtil.TAG, "close() of input stream failed", e);}
+	                mmInStream = null;
+	        }
+	
+	        if (mmOutStream != null) {
+	                try {mmOutStream.close();} catch (Exception e) {Log.e(AppUtil.TAG, "close() of output stream failed", e);}
+	                mmOutStream = null;
+	        }
+	
+	        if (mmSocket != null) {
+	                try {mmSocket.close();} catch (Exception e) {Log.e(AppUtil.TAG, "close() of connect socket failed", e);}
+	                mmSocket = null;
+	        }
         }
     }
 }

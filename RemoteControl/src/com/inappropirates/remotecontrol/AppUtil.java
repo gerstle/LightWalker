@@ -223,11 +223,7 @@ public class AppUtil extends Application {
     }
     
     public static boolean keyIsColor(String key) {
-    	if ((key.equals("prefPulseColor")) ||
-    	  	(key.equals("prefSparkleFootFlashColor")) ||
-    	  	(key.equals("prefSparkleFootSparkleColor")) ||
-    	  	(key.equals("prefSparkleLegSparkleColor")) ||
-    	  	(key.equals("prefEqualizerColor")))
+    	if (key.contains("Color"))
     		return true;
     	else
     		return false;
