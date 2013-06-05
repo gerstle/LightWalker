@@ -92,19 +92,7 @@ void LW::walk()
         switch (mode)
         {
             case sparkle:
-
-                if (i == 0)
-                    Serial.print("\t\t");
                 _legs[i].detectStep(&_adxl);
-
-                if (_legs[i].step && (_legs[i].status != Down))
-                    _legs[i].sparkle_footdown();
-                else if (!_legs[i].step && (_legs[i].status != Up))
-                    _legs[i].sparkle_footup();
-                else
-                    _legs[i].sparkle_sameStatus();
-
-                _legs[i].sparkle_fade_on = true;
                 break;
 
             case gravity:

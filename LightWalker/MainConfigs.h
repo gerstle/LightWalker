@@ -10,6 +10,8 @@ class MainConfigs
 
         int maxBrightness;
         WalkingModeEnum defaultMode;
+        int legCount;
+        int pixelsPerLeg;
 };
 
 #endif

@@ -13,6 +13,8 @@
 #ifndef LWConfigs_h
 #define LWConfigs_h
 
+#define DEBUG 1
+
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "Arduino.h"
 #else
@@ -28,60 +30,6 @@
 
 #define LEG_COUNT 2
 #define PIXELS_PER_LEG 25
-
-#define DEBUG 1
-
-enum Preferences
-{
-    // ------------------------------------------------------------------------
-    // Main
-    // ------------------------------------------------------------------------
-	prefMainLegCount,
-	prefMainPixelsPerLeg,
-	prefMainMaxBrightness,
-	prefMainDefaultMode,
-
-	//------------------------------------------------------------------------
-	//Mode
-	//------------------------------------------------------------------------
-	prefMode,
-
-	//------------------------------------------------------------------------
-	// Pulse
-	//------------------------------------------------------------------------
-	prefPulseMinRate,
-	prefPulseMaxRate,
-	prefPulseRandomColor,
-	prefPulseSyncLegs,
-	prefPulseColor,
-
-	//------------------------------------------------------------------------
-	// Sparkle
-	//------------------------------------------------------------------------
-	prefSparkleFootUpFadeRate,
-	prefSparkleFootDownFadeRate,
-	prefSparkleFlashLength,
-	prefSparkleSparkleLength,
-	prefSparkleFootFlashColor,
-	prefSparkleFootSparkleColor,
-	prefSparkleLegSparkleColor,
-
-	//------------------------------------------------------------------------
-	// Equalizer
-	//------------------------------------------------------------------------
-	prefEqualizerColor,
-	prefEqualizerLevel,
-    prefEqualizerRMSThreshold,
-    prefEqualizerAllLights,
-
-	//------------------------------------------------------------------------
-	// Gravity
-	//------------------------------------------------------------------------
-    prefGravityXColor,
-    prefGravityYColor,
-    prefGravityZColor,
-    prefGravityRotate,
-};
 
 class LWConfigs
 {

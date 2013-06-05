@@ -102,20 +102,6 @@ void Leg::sparkle_footdown()
     _sparkle_flash();
 }
 
-void Leg::sparkle_footup()
-{
-    if (DEBUG)
-    {
-        Serial.print(name); Serial.println(" -> up");
-    }
-
-    _sparkle_fade_rate = config->sparkle.footUpFadeRate;
-    if (_sparkle_fade_rate <= 0)
-        _sparkle_fade_rate = 2;
-    status = Up;
-    sparkle_sameStatus();
-}
-
 void Leg::sparkle_sameStatus()
 {
 //     Serial.print("leg "); Serial.print(name); Serial.println(" -> same");
@@ -145,7 +131,7 @@ void Leg::sparkle_sameStatus()
 
 void Leg::_sparkle_flash()
 {
-    //Serial.println("flashing " + name);
+    Serial.print("flashing "); Serial.println(name);
     for (int i = 0; i < PIXELS_PER_LEG; i++)
     {
         if ((i < lower_foot_border) || (i > upper_foot_border))
@@ -158,7 +144,7 @@ void Leg::_sparkle_flash()
 
 void Leg::_sparkle_sparkle()
 {
-    //Serial.println("sparkling " + name);
+    Serial.print("\tsparkling "); Serial.println(name);
     float brightness;
     int distance;
 
@@ -188,9 +174,9 @@ void Leg::_sparkle_sparkle()
 
 void Leg::_sparkle_fade()
 {
+    Serial.print("\t\tfading "); Serial.println(name);
     if (sparkle_fade_on)
     {
-//         Serial.println("fading " + name);
         bool still_fading = false;
 
         for (int i = 0; i < PIXELS_PER_LEG; i++)
@@ -413,7 +399,6 @@ void Leg::detectStep(ADXL345 *adxl)
 
     LWUtils.selectI2CChannels(channel);
     adxl->readXYZ(&x, &y, &z); //read the accelerometer values and store them in variables  x,y,z
-    Serial.println(x);
 
     x = abs(x);
     y = abs(y);
@@ -438,17 +423,20 @@ void Leg::detectStep(ADXL345 *adxl)
         readyForStep = true;
 
 //     Serial.print(x); Serial.print("\t"); Serial.print(y); Serial.print("\t"); Serial.print(z);
-//         Serial.print("\t"); Serial.print(xAverage); Serial.print("\t"); Serial.print(xAverageOld);
-//         Serial.print("\t"); Serial.print(yAverage); Serial.print("\t"); Serial.print(yAverageOld);
-//         Serial.print("\t"); Serial.print(zAverage); Serial.print("\t"); Serial.print(zAverageOld);
-//         Serial.print("\t"); Serial.print(readyForStep);
+//     Serial.print("\t"); Serial.print(xAverage); Serial.print("\t"); Serial.print(xAverageOld);
+//     Serial.print("\t"); Serial.print(yAverage); Serial.print("\t"); Serial.print(yAverageOld);
+//     Serial.print("\t"); Serial.print(zAverage); Serial.print("\t"); Serial.print(zAverageOld);
+//     Serial.print("\t"); Serial.print(readyForStep);
 
     if (readyForStep && (currentTime > (lastSharpPeakTime + zStepDuration)))
+    {
+        step = false;
         if ((z > zAverage) && (zAverage >= (zAverageOld + zAvgDiffThreshold)))
         {
             stepDetected = true;
             readyForStep = false;
         }
+    }
 
 
     if (readyForStep && (currentTime > (lastSharpPeakTime + xStepDuration)))
@@ -461,8 +449,16 @@ void Leg::detectStep(ADXL345 *adxl)
 
     if (stepDetected)
     {
-        //Serial.println("\t\tSTEP!");
+        Serial.print("\t\t"); Serial.print(name); Serial.println("\tSTEP!");
         lastSharpPeakTime = millis();
+        step = true;
+        sparkle_footdown();
+        sparkle_fade_on = true;
+    }
+    else
+    {
+        sparkle_sameStatus();
+//         Serial.println();
     }
 
     xAverageOld = xAverage;

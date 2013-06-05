@@ -7,6 +7,7 @@
 #include <Wire.h>
 #include <SPI.h>
 #include <TCL.h>
+#include <avr/pgmspace.h>
 #include "LWUtils.h"
 #include "LW.h"
 
@@ -18,6 +19,7 @@ char msg[msgLength];
 int msgIndex = 0;
 char *pKey = NULL;
 char *pValue = NULL;
+char one_str[] = "1";
 
 void setup()
 {
@@ -77,8 +79,7 @@ void serialEvent1()
                 *pValue = '\0';
                 pValue++;
 
-                if (executeCommand(atoi(pKey), pValue, msgIndex - (pValue - pKey) - 1))
-                    Serial1.print("OK\r");
+                executeCommand(pKey, (pValue - pKey - 1), pValue, msgIndex - (pValue - pKey) - 1);
             }
 
             memset(msg, '\0', msgIndex - 1);
@@ -87,151 +88,145 @@ void serialEvent1()
     }
 }
 
-bool executeCommand(int key, char *value, int valueLen)
+void executeCommand(char *key, int keyLen, char *value, int valueLen)
 {
-    Serial.print("key: "); Serial.print(key);
+    Serial.print("key: "); Serial.print(key); Serial.print("("); Serial.print(keyLen); Serial.print(")");
     Serial.print(" value: "); Serial.print(value); Serial.print("("); Serial.print(valueLen); Serial.println(")");
 
-    int valueInt;
+    int valueInt, offset;
 
-    switch (key)
+    // ------------------------------------------------------------------------
+    // Main 
+    // ------------------------------------------------------------------------
+    offset = 4; 
+    if (strncmp_P(key, PSTR("main"), offset) == 0)
     {
-        // ------------------------------------------------------------------------
-        // Main 
-        // ------------------------------------------------------------------------
-        case prefMainMaxBrightness:
+        if (strncmp_P(key + offset, PSTR("MaxBrightness"), keyLen - offset) == 0)
             lw.config.main.maxBrightness = atoi(value);
-            break;
+        else if (strncmp_P(key + offset, PSTR("LegCount"), keyLen - offset) == 0)
+            lw.config.main.legCount = atoi(value);
+        else if (strncmp_P(key + offset, PSTR("PixelsPerLeg"), keyLen - offset) == 0)
+            lw.config.main.pixelsPerLeg= atoi(value);
 
-        // ------------------------------------------------------------------------
-        // Mode 
-        // ------------------------------------------------------------------------
-        case prefMode:
-            valueInt = atoi(value);
-            WalkingModeEnum newMode;
+        return;
+    }
 
-            switch (valueInt)
-            {
-                case masterOff:
-                    newMode = masterOff;
-                    break;
-                case gravity:
-                    newMode = gravity;
-                    break;
-                case equalizer:
-                    newMode = equalizer;
-                    break;
-                case sparkle:
-                    newMode = sparkle;
-                    break;
-                case pulse:
-                    newMode = pulse;
-                    break;
-            }
 
-            lw.setMode(newMode);
-            break;
+    // ------------------------------------------------------------------------
+    // Mode 
+    // ------------------------------------------------------------------------
+    offset = 4;
+    if (strncmp_P(key, PSTR("mode"), offset) == 0)
+    {
+        WalkingModeEnum mode;
+        if (strncmp_P(value, PSTR("masterOff"), valueLen) == 0)
+            mode = masterOff;
+        else if (strncmp_P(value, PSTR("gravity"), valueLen) == 0)
+            mode = gravity;
+        else if (strncmp_P(value, PSTR("equalizer"), valueLen) == 0)
+            mode = equalizer;
+        else if (strncmp_P(value, PSTR("sparkle"), valueLen) == 0)
+            mode = sparkle;
+        else if (strncmp_P(value, PSTR("pulse"), valueLen) == 0)
+            mode = pulse;
+        
+        lw.setMode(mode);
+        return;
+    }
 
-        // ------------------------------------------------------------------------
-        // Sparkle
-        // ------------------------------------------------------------------------
-        case prefSparkleFootUpFadeRate:
+    // ------------------------------------------------------------------------
+    // Sparkle
+    // ------------------------------------------------------------------------
+    offset = 7;
+    if (strncmp_P(key, PSTR("sparkle"), offset) == 0)
+    {
+        if (strncmp_P(key + offset, PSTR("FootUpFadeRate"), keyLen - offset) == 0)
             lw.config.sparkle.footUpFadeRate = atoi(value);
-            break;  
-        case prefSparkleFootDownFadeRate:
+        else if (strncmp_P(key + offset, PSTR("FootDownFadeRate"), keyLen - offset) == 0)
             lw.config.sparkle.footDownFadeRate = atoi(value);
-            break;
-        case prefSparkleFlashLength:
-            lw.config.sparkle.flashLength = 200; //atoi(value);
-            break;
-        case prefSparkleSparkleLength:
+        else if (strncmp_P(key + offset, PSTR("FlashLength"), keyLen - offset) == 0)
+            lw.config.sparkle.flashLength = atoi(value);
+        else if (strncmp_P(key + offset, PSTR("SparkleLength"), keyLen - offset) == 0)
             lw.config.sparkle.sparkleLength = atoi(value);
-            break;
-        case prefSparkleFootFlashColor:
+        else if (strncmp_P(key + offset, PSTR("FlashColor"), keyLen - offset) == 0)
             ParseColor(value, &(lw.config.sparkle.footFlashColor));
-            break;
-        case prefSparkleFootSparkleColor:
+        else if (strncmp_P(key + offset, PSTR("FootSparkleColor"), keyLen - offset) == 0)
             ParseColor(value, &(lw.config.sparkle.footSparkleColor));
-            break;
-        case prefSparkleLegSparkleColor:
+        else if (strncmp_P(key + offset, PSTR("LegSparkleColor"), keyLen - offset) == 0)
             ParseColor(value, &(lw.config.sparkle.legSparkleColor));
-            break;
 
-        // ------------------------------------------------------------------------
-        // PULSE
-        // ------------------------------------------------------------------------
-        case prefPulseMinRate:
+        return;
+    }
+
+    // ------------------------------------------------------------------------
+    // PULSE
+    // ------------------------------------------------------------------------
+    offset = 5;
+    if (strncmp_P(key, PSTR("pulse"), offset) == 0)
+    {
+        if (strncmp_P(key + offset, PSTR("MinRate"), keyLen - offset) == 0)
             lw.config.pulse.minPulseTime = atoi(value);
-            break;
-        case prefPulseMaxRate:
+        else if (strncmp_P(key + offset, PSTR("MaxRate"), keyLen - offset) == 0)
             lw.config.pulse.maxPulseTime = atoi(value);
-            break;
-        case prefPulseRandomColor:
-            if (strncmp(value, "1", valueLen) == 0)
-            {
-                Serial.print("random = true");
+        else if (strncmp_P(key + offset, PSTR("Random"), keyLen - offset) == 0)
+            if (strncmp(value, one_str, valueLen) == 0)
                 lw.config.pulse.randomColor = true;
-            }
             else
-            {
-                Serial.print("random = false");
                 lw.config.pulse.randomColor = false;
-            }
-            break;
-
-        case prefPulseSyncLegs:
-            if (strncmp(value, "1", valueLen) == 0)
+        else if (strncmp_P((key + offset), PSTR("SyncLegs"), keyLen - offset) == 0)
+        {
+            if (strncmp(value, one_str, valueLen) == 0)
                 lw.config.pulse.syncLegs = true;
             else
                 lw.config.pulse.syncLegs  = false;
-            break;
-        case prefPulseColor:
-        Serial.print("color before:: "); Serial.print(lw.config.pulse.color.r); Serial.print(" - "); Serial.print(lw.config.pulse.color.g); Serial.print(" - "); Serial.println(lw.config.pulse.color.b);
+        }
+        else if (strncmp_P(key + offset, PSTR("Color"), keyLen - offset) == 0)
             ParseColor(value, &(lw.config.pulse.color));
-        Serial.print("color after:: "); Serial.print(lw.config.pulse.color.r); Serial.print(" - "); Serial.print(lw.config.pulse.color.g); Serial.print(" - "); Serial.println(lw.config.pulse.color.b);
-            break;
 
-        // ------------------------------------------------------------------------
-        // EQUALIZER
-        // ------------------------------------------------------------------------
-        case prefEqualizerColor:
+        return;
+    }
+
+    // ------------------------------------------------------------------------
+    // EQUALIZER
+    // ------------------------------------------------------------------------
+    offset = 2;
+    if (strncmp_P(key, PSTR("eq"), offset) == 0)
+    {
+        if (strncmp_P(key + offset, PSTR("Color"), keyLen - offset) == 0)
             ParseColor(value, &(lw.config.equalizer.color));
-            break;
-//         case prefEqualizerLevel:
-//             lw.config.equalizer.brightnessPercent = atoi(value);
-//             lw.equalizer_listen();
-//             break;
-        case prefEqualizerRMSThreshold:
+        else if (strncmp_P(key + offset, PSTR("RMSThreshold"), keyLen - offset) == 0)
             lw.config.equalizer.RMSThreshold = atoi(value);
-            break;
-        case prefEqualizerAllLights:
-            if (strncmp(value, "1", 1) == 0)
+        else if (strncmp_P(key + offset, PSTR("AllLights"), keyLen - offset) == 0)
+            if (strncmp(value, one_str, 1) == 0)
                 lw.config.equalizer.allLights = true;
             else
                 lw.config.equalizer.allLights = false;
-            break;
 
-        // ------------------------------------------------------------------------
-        // Gravity
-        // ------------------------------------------------------------------------
-        case prefGravityXColor:
+        return;
+    }
+
+    // ------------------------------------------------------------------------
+    // Gravity
+    // ------------------------------------------------------------------------
+    offset = 7;
+    if (strncmp_P(key, PSTR("gravity"), offset) == 0)
+    {
+        if (strncmp_P(key + offset, PSTR("XColor"), keyLen - offset) == 0)
             ParseColor(value, &(lw.config.gravity.xColor));
-            break;
-        case prefGravityYColor:
+        else if (strncmp_P(key + offset, PSTR("YColor"), keyLen - offset) == 0)
             ParseColor(value, &(lw.config.gravity.yColor));
-            break;
-        case prefGravityZColor:
+        else if (strncmp_P(key + offset, PSTR("ZColor"), keyLen - offset) == 0)
             ParseColor(value, &(lw.config.gravity.zColor));
-            break;
-        case prefGravityRotate:
-            if (strncmp(value, "1", 1) == 0)
+        else if (strncmp_P(key + offset, PSTR("Rotate"), keyLen - offset) == 0)
+            if (strncmp(value, one_str, 1) == 0)
                 lw.config.gravity.rotate = true;
             else
                 lw.config.gravity.rotate = false;
-            break;
+        return;
     }
 
-    return true;
+    Serial.println("\t???!");
+    Serial1.print("???\r");
 }
 
 void ParseColor(char *colorString, RGB *color)
