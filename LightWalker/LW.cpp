@@ -89,6 +89,8 @@ void LW::walk()
             _laststatus = millis();
         }
 
+        // <gerstle> init leg for this run
+        _legs[i].currentTime = currentTime;
         switch (mode)
         {
             case sparkle:
@@ -96,6 +98,7 @@ void LW::walk()
                 break;
 
             case gravity:
+                _legs[i].gravity2Lights(&_adxl);
                 break;
 
             case equalizer:
@@ -120,7 +123,7 @@ void LW::walk()
                     else
                         value = currentTime - _lightModeChangeTime;
 
-                _legs[i].pulse_pulse(currentTime, _lightModeChangeTime, _pulse_length, value, pulseChangeColor);
+                _legs[i].pulse_pulse(_lightModeChangeTime, _pulse_length, value, pulseChangeColor);
                 break;
         }
     }

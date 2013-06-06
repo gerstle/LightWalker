@@ -14,7 +14,7 @@
 LW lw;
 
 // <gerstle> bluetooth comms
-const int msgLength = 64;
+const int msgLength = 128;
 char msg[msgLength];
 int msgIndex = 0;
 char *pKey = NULL;
@@ -62,16 +62,15 @@ void loop()
 {
     // <gerstle> perform LightWalker action
     lw.walk();
-}
 
-void serialEvent1()
-{
+    // <gerstle> check for bluetooth data
     if (Serial1.available())
     {
         msg[msgIndex++] = (char)Serial1.read();
 
         if (msg[msgIndex - 1] == '\r')
         {
+            //Serial.println(msg);
             pValue = strchr(msg, '=');
             if (pValue != NULL)
             {
@@ -88,7 +87,7 @@ void serialEvent1()
     }
 }
 
-void executeCommand(char *key, int keyLen, char *value, int valueLen)
+bool executeCommand(char *key, int keyLen, char *value, int valueLen)
 {
     Serial.print("key: "); Serial.print(key); Serial.print("("); Serial.print(keyLen); Serial.print(")");
     Serial.print(" value: "); Serial.print(value); Serial.print("("); Serial.print(valueLen); Serial.println(")");
@@ -108,7 +107,7 @@ void executeCommand(char *key, int keyLen, char *value, int valueLen)
         else if (strncmp_P(key + offset, PSTR("PixelsPerLeg"), keyLen - offset) == 0)
             lw.config.main.pixelsPerLeg= atoi(value);
 
-        return;
+        return true;
     }
 
 
@@ -131,7 +130,7 @@ void executeCommand(char *key, int keyLen, char *value, int valueLen)
             mode = pulse;
         
         lw.setMode(mode);
-        return;
+        return true;
     }
 
     // ------------------------------------------------------------------------
@@ -148,14 +147,14 @@ void executeCommand(char *key, int keyLen, char *value, int valueLen)
             lw.config.sparkle.flashLength = atoi(value);
         else if (strncmp_P(key + offset, PSTR("SparkleLength"), keyLen - offset) == 0)
             lw.config.sparkle.sparkleLength = atoi(value);
-        else if (strncmp_P(key + offset, PSTR("FlashColor"), keyLen - offset) == 0)
+        else if (strncmp_P(key + offset, PSTR("FootFlashColor"), keyLen - offset) == 0)
             ParseColor(value, &(lw.config.sparkle.footFlashColor));
         else if (strncmp_P(key + offset, PSTR("FootSparkleColor"), keyLen - offset) == 0)
             ParseColor(value, &(lw.config.sparkle.footSparkleColor));
         else if (strncmp_P(key + offset, PSTR("LegSparkleColor"), keyLen - offset) == 0)
             ParseColor(value, &(lw.config.sparkle.legSparkleColor));
 
-        return;
+        return true;
     }
 
     // ------------------------------------------------------------------------
@@ -183,7 +182,7 @@ void executeCommand(char *key, int keyLen, char *value, int valueLen)
         else if (strncmp_P(key + offset, PSTR("Color"), keyLen - offset) == 0)
             ParseColor(value, &(lw.config.pulse.color));
 
-        return;
+        return true;
     }
 
     // ------------------------------------------------------------------------
@@ -202,7 +201,7 @@ void executeCommand(char *key, int keyLen, char *value, int valueLen)
             else
                 lw.config.equalizer.allLights = false;
 
-        return;
+        return true;
     }
 
     // ------------------------------------------------------------------------
@@ -211,22 +210,21 @@ void executeCommand(char *key, int keyLen, char *value, int valueLen)
     offset = 7;
     if (strncmp_P(key, PSTR("gravity"), offset) == 0)
     {
-        if (strncmp_P(key + offset, PSTR("XColor"), keyLen - offset) == 0)
-            ParseColor(value, &(lw.config.gravity.xColor));
-        else if (strncmp_P(key + offset, PSTR("YColor"), keyLen - offset) == 0)
-            ParseColor(value, &(lw.config.gravity.yColor));
-        else if (strncmp_P(key + offset, PSTR("ZColor"), keyLen - offset) == 0)
-            ParseColor(value, &(lw.config.gravity.zColor));
+        if (strncmp_P(key + offset, PSTR("ColorOne"), keyLen - offset) == 0)
+            ParseColor(value, &(lw.config.gravity.colorOne));
+        else if (strncmp_P(key + offset, PSTR("ColorTwo"), keyLen - offset) == 0)
+            ParseColor(value, &(lw.config.gravity.colorTwo));
+        else if (strncmp_P(key + offset, PSTR("ColorThree"), keyLen - offset) == 0)
+            ParseColor(value, &(lw.config.gravity.colorThree));
         else if (strncmp_P(key + offset, PSTR("Rotate"), keyLen - offset) == 0)
             if (strncmp(value, one_str, 1) == 0)
                 lw.config.gravity.rotate = true;
             else
                 lw.config.gravity.rotate = false;
-        return;
+        return true;
     }
 
-    Serial.println("\t???!");
-    Serial1.print("???\r");
+    return false;
 }
 
 void ParseColor(char *colorString, RGB *color)

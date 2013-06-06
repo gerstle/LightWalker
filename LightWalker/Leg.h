@@ -41,6 +41,7 @@ class Leg
         int channel;
         char name[10];
         bool step;
+        unsigned long currentTime;
 
         Leg();
         void Init(LWConfigs *c, char n[], int i2c_channel, WalkingModeEnum mode, ADXL345 *adxl);
@@ -56,10 +57,13 @@ class Leg
         void sparkle_sameStatus();
 
         // <gerstle> pulse
-        void pulse_pulse(unsigned long syncCurrentTime, unsigned long syncTime, int syncLength, int syncValue, bool changeColor);
+        void pulse_pulse(unsigned long syncTime, int syncLength, int syncValue, bool changeColor);
 
-        // <gerstle>
+        // <gerstle> eq
         void equalizer_listen(float level_percent, byte r, byte g, byte b);
+
+        // <gerstle> gravity
+        void gravity2Lights(ADXL345 *adxl);
 
     private:
         LWConfigs *config;
@@ -87,6 +91,15 @@ class Leg
         bool _pulse_isDimming;
         int _pulse_length;
         RGB _pulse_color;
+
+        // <gerstle> gravity stuff
+        byte _indexOne;
+        byte _indexTwo;
+        byte _indexThree;
+        unsigned long _lastXSwitch;
+        unsigned long _lastYSwitch;
+        bool _canXSwitch;
+        bool _canYSwitch;
 
         // <cgerstle> steps
         unsigned long lastSharpPeakTime;

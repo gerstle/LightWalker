@@ -10,9 +10,9 @@ class GravityConfigs
     public:
         GravityConfigs();
 
-        RGB xColor;
-        RGB yColor;
-        RGB zColor;
+        RGB colorOne;
+        RGB colorTwo;
+        RGB colorThree;
         bool rotate;
 };
 

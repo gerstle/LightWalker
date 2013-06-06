@@ -88,6 +88,13 @@ void Leg::Init(LWConfigs *c, char n[], int i2c_channel, WalkingModeEnum mode, AD
     yAverage = yTotal / ADXL_VALUE_COUNT;
     zAverage = zTotal / ADXL_VALUE_COUNT;
     lastSharpPeakTime = millis();
+
+    // <gerstle> gravity
+    _indexOne = 0;
+    _indexTwo = 1;
+    _indexThree = 2;
+    _lastXSwitch = millis();
+    _lastYSwitch = millis();
 }
 
 void Leg::sparkle_footdown()
@@ -131,23 +138,36 @@ void Leg::sparkle_sameStatus()
 
 void Leg::_sparkle_flash()
 {
-    Serial.print("flashing "); Serial.println(name);
+    //Serial.print("flashing "); Serial.println(name);
+    bool display = true;
     for (int i = 0; i < PIXELS_PER_LEG; i++)
     {
         if ((i < lower_foot_border) || (i > upper_foot_border))
             _setPixel(i, COLORS[BLACK], 0x00);
         else
+        {
+            if (display)
+            {
+                Serial.print("\t\ti: ");
+                Serial.println(i);
+                Serial.println(config->sparkle.footFlashColor.r);
+                Serial.println(config->sparkle.footFlashColor.g);
+                Serial.println(config->sparkle.footFlashColor.b);
+                display = false;
+            }
             _setPixel(i, config->sparkle.footFlashColor, 0x00);
+        }
     }
     _setLightMode(Flash);
 }
 
 void Leg::_sparkle_sparkle()
 {
-    Serial.print("\tsparkling "); Serial.println(name);
+    //Serial.print("\tsparkling "); Serial.println(name);
     float brightness;
     int distance;
 
+    // leading leg
     for (int i = 0; i < lower_foot_border; i++)
     {
         distance = lower_foot_border - i;
@@ -158,6 +178,16 @@ void Leg::_sparkle_sparkle()
         _pixels[i].b = byte((float)config->sparkle.legSparkleColor.b * brightness);
     }
 
+    //leg
+    if (currentTime > (_lightModeChangeTime + config->sparkle.flashLength))
+        for (int i = lower_foot_border; i <= upper_foot_border; i++)
+        {
+            _pixels[i].r = config->sparkle.footSparkleColor.r;
+            _pixels[i].g = config->sparkle.footSparkleColor.g;
+            _pixels[i].b = config->sparkle.footSparkleColor.b;
+        }
+
+    // trailing leg
     for (int i = upper_foot_border + 1; i < PIXELS_PER_LEG; i++)
     {
         // <gerstle> white sparkle
@@ -174,7 +204,7 @@ void Leg::_sparkle_sparkle()
 
 void Leg::_sparkle_fade()
 {
-    Serial.print("\t\tfading "); Serial.println(name);
+    //Serial.print("\t\tfading "); Serial.println(name);
     if (sparkle_fade_on)
     {
         bool still_fading = false;
@@ -199,7 +229,7 @@ void Leg::_sparkle_fade()
         off();
 }
 
-void Leg::pulse_pulse(unsigned long currentTime, unsigned long syncTime, int syncLength, int syncValue, bool changeColor)
+void Leg::pulse_pulse(unsigned long syncTime, int syncLength, int syncValue, bool changeColor)
 {
     if (config->pulse.syncLegs)
     {
@@ -466,4 +496,123 @@ void Leg::detectStep(ADXL345 *adxl)
     zAverageOld = zAverage;
 
     valueIndex++;
+}
+
+void Leg::gravity2Lights(ADXL345 *adxl)
+{
+    bool print = false;
+	double xyz[3];
+
+    LWUtils.selectI2CChannels(channel);
+    adxl->getAccelemeter(xyz);
+
+    currentTime = millis();
+
+    if (print)
+    {
+        Serial.print(xyz[0]); Serial.print(","); Serial.print(xyz[1]); Serial.print(","); Serial.print(xyz[2]);
+    }
+
+    if (_indexOne == 2)
+    {
+        if (xyz[_indexOne] > 0)
+            _pixels[0].r = map(abs(xyz[_indexOne]) * 100, 0, 192, 0, 255);
+        else
+            _pixels[0].r = 0x0;
+    }
+    else
+        _pixels[0].r = map(abs(xyz[_indexOne]) * 100, 0, 192, 0, 255);
+
+    if (_indexTwo == 2)
+    {
+        if (xyz[_indexTwo] > 0)
+            _pixels[0].g = map(abs(xyz[_indexTwo]) * 100, 0, 192, 0, 255);
+        else
+            _pixels[0].g = 0x0;
+    }
+    else
+        _pixels[0].g = map(abs(xyz[_indexTwo]) * 100, 0, 192, 0, 255);
+
+    if (_indexThree == 2)
+    {
+        if (xyz[_indexThree] > 0)
+            _pixels[0].b = map(abs(xyz[_indexThree]) * 100, 0, 192, 0, 255);
+        else
+            _pixels[0].b = 0x0;
+        if (print)
+        {
+            Serial.print("\tb: "); Serial.print(_pixels[0].b);
+        }
+    }
+    else
+        _pixels[0].b = map(abs(xyz[_indexThree]) * 100, 0, 192, 0, 255);
+
+
+    if (config->gravity.rotate)
+    {
+        if ((abs(xyz[0]) > 0.9) && _canXSwitch)
+        {
+            if (_indexOne == 0)
+            {
+                    _indexOne = 2;
+                    _indexThree = 0;
+                    _indexTwo = 1;
+            }
+            else if (_indexTwo == 0)
+            {
+                    _indexOne = 0;
+                    _indexThree = 1;
+                    _indexTwo = 2;
+            }
+            else if (_indexThree == 0)
+            {
+                    _indexOne = 1;
+                    _indexThree = 2;
+                    _indexTwo = 0;
+            }
+            _canXSwitch = false;
+            _lastXSwitch = millis();
+        }
+
+        if ((abs(xyz[1]) > 0.97) && _canYSwitch)
+        {
+            if (_indexOne == 1)
+            {
+                    _indexOne = 2;
+                    _indexThree = 0;
+                    _indexTwo = 1;
+            }
+            else if (_indexTwo == 1)
+            {
+                    _indexOne = 0;
+                    _indexThree = 1;
+                    _indexTwo = 2;
+            }
+            else if (_indexThree == 1)
+            {
+                    _indexOne = 1;
+                    _indexThree = 2;
+                    _indexTwo = 0;
+            }
+            _canYSwitch = false;
+            _lastYSwitch = millis();
+        }
+
+        if ((abs(xyz[0]) < 0.3) && (currentTime > (_lastXSwitch + 600)))
+            _canXSwitch = true;
+
+        if ((abs(xyz[1]) < 0.3) && (currentTime > (_lastYSwitch + 600)))
+            _canYSwitch = true;
+    }
+
+    LWUtils.sendColor(_pixels[0]);
+    for (int i = 1; i < PIXELS_PER_LEG; i++)
+    {
+        _pixels[i].r = _pixels[0].r;
+        _pixels[i].g = _pixels[0].g;
+        _pixels[i].b = _pixels[0].b;
+        LWUtils.sendColor(_pixels[i]);
+    }
+    if (print)
+        Serial.println("");
 }
