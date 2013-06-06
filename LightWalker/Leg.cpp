@@ -112,7 +112,6 @@ void Leg::sparkle_footdown()
 void Leg::sparkle_sameStatus()
 {
 //     Serial.print("leg "); Serial.print(name); Serial.println(" -> same");
-    unsigned long currentTime = millis();
     switch (_lightMode)
     {
         case Flash:
@@ -424,7 +423,6 @@ void Leg::setWalkingMode(WalkingModeEnum mode)
 int x, y, z;
 void Leg::detectStep(ADXL345 *adxl)
 {
-    unsigned long currentTime = millis();
     bool stepDetected = false;
 
     LWUtils.selectI2CChannels(channel);
