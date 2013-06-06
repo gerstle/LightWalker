@@ -5,53 +5,53 @@
        android:key="sparkle_preferences">
        
 	<com.robobunny.SeekBarPreference
-        android:key="prefSparkleFootUpFadeRate"
+        android:key="sparkleFootUpFadeRate"
         android:title="foot down fade rate"
-        android:defaultValue="3"
+        android:defaultValue="1"
         robobunny:min="1"
         android:max="50"
         robobunny:unitsLeft=""
         robobunny:unitsRight="" />
     
     <com.robobunny.SeekBarPreference
-        android:key="preSparkleFootUpFadeRate"
+        android:key="sparkleFootUpFadeRate"
         android:title="foot up fade rate"
-        android:defaultValue="2"
+        android:defaultValue="1"
         robobunny:min="1"
         android:max="50"
         robobunny:unitsLeft=""
         robobunny:unitsRight="" />
     
     <com.robobunny.SeekBarPreference
-        android:key="prefSparkleFlashLength"
+        android:key="sparkleFlashLength"
         android:title="length of flash time (ms)"
         android:defaultValue="200"
-        android:max="3000"
+        android:max="2000"
         robobunny:min="0"
         robobunny:unitsLeft=""
 		robobunny:unitsRight="" />
         
     <com.robobunny.SeekBarPreference
-        android:key="prefSparkleSparkleLength"
+        android:key="sparkleSparkleLength"
         android:title="length of sparkle time (ms)"
-        android:defaultValue="5000"
-        android:max="100000"
+        android:defaultValue="600"
+        android:max="10000"
         robobunny:min="0"
         robobunny:unitsLeft=""
 		robobunny:unitsRight="" />
     
     <com.inappropirates.remotecontrol.ColorPickerPreference
-        android:key="prefSparkleFootFlashColor"
+        android:key="sparkleFootFlashColor"
         android:title="foot flash color"
         />
     
     <com.inappropirates.remotecontrol.ColorPickerPreference
-        android:key="prefSparkleFootSparkleColor"
+        android:key="sparkleFootSparkleColor"
         android:title="foot sparkle color"
         />
     
     <com.inappropirates.remotecontrol.ColorPickerPreference
-        android:key="prefSparkleLegSparkleColor"
+        android:key="sparkleLegSparkleColor"
         android:title="leg sparkle color"
         />    
 </PreferenceScreen>

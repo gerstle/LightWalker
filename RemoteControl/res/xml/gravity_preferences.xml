@@ -5,23 +5,23 @@
        android:key="equalizer_preferences">
        
     <com.inappropirates.remotecontrol.ColorPickerPreference
-        android:key="prefGravityXColor"
-        android:title="x color"
+        android:key="gravityColorOne"
+        android:title="color one (down)"
         />
     
     <com.inappropirates.remotecontrol.ColorPickerPreference
-        android:key="prefGravityYColor"
-        android:title="y color"
+        android:key="gravityColorTwo"
+        android:title="color two (left)"
         />
     
     <com.inappropirates.remotecontrol.ColorPickerPreference
-        android:key="prefGravityZColor"
-        android:title="z color"
+        android:key="gravityColorThree"
+        android:title="color three (right)"
         />
     
     <CheckBoxPreference
 		android:defaultValue="false"
-        android:key="prefGravityRotate"
+        android:key="gravityRotate"
         android:title="rotate?" />
     
 </PreferenceScreen>

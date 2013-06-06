@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
-
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
@@ -157,7 +156,8 @@ public class BluetoothChatService {
 
         // Cancel the accept thread because we only want to connect to one device
         if (mSecureAcceptThread != null) {
-            mSecureAcceptThread.cancel();
+        	mSecureAcceptThread.cancel();
+            mSecureAcceptThread.interrupt();
             mSecureAcceptThread = null;
         }
 
@@ -181,8 +181,14 @@ public class BluetoothChatService {
     public synchronized void stop() {
         if (AppUtil.DEBUG) Log.d(AppUtil.TAG, "stop");
         
+        if (mConnectThread != null) {
+        	mConnectThread.interrupt();
+        	mConnectThread.cancel();
+        	mConnectThread = null;
+        }
+        
         if (mConnectedThread != null) {
-            mConnectedThread.cancel();
+        	mConnectedThread.cancel();
             mConnectedThread = null;
         }
 
@@ -229,7 +235,7 @@ public class BluetoothChatService {
     /**
      * Indicate that the connection was lost and notify the UI Activity.
      */
-    private void connectionLost() {
+    public void connectionLost() {
         // Send a failure message back to the Activity
         Message msg = mHandler.obtainMessage(AppUtil.MESSAGE_TOAST);
         Bundle bundle = new Bundle();
@@ -278,7 +284,7 @@ public class BluetoothChatService {
                 	if (mmServerSocket != null)
                 		socket = mmServerSocket.accept();
                 } catch (IOException e) {
-                    Log.e(AppUtil.TAG, "Socket Type: " + mSocketType + "accept() failed", e);
+                    Log.e(AppUtil.TAG, "Socket Type: " + mSocketType + " accept() failed", e);
                     break;
                 }
 
@@ -320,7 +326,6 @@ public class BluetoothChatService {
             
         }
     }
-
 
     /**
      * This thread runs while attempting to make an outgoing connection
@@ -420,31 +425,33 @@ public class BluetoothChatService {
             byte[] buffer = new byte[1024];
             int bytes, byteIndex = 0;
             Message m = null;
-
+            
             // Keep listening to the InputStream while connected
             while (true) {
-                try {
-                	boolean eom = false;
-                	while (!eom)
-                	{
-	                    // Read from bluetooth
-                		bytes = mmInStream.read(buffer, byteIndex, 1024 - byteIndex);
-                		
-                		byteIndex += bytes;
-  
-                		if (buffer[byteIndex - 1] == '\r')
-                			eom = true;
-                	}
-                	
-                	if (AppUtil.DEBUG) Log.e(AppUtil.TAG, "Received: " + new String(buffer, 0, (byteIndex - 1)));
-                	m = mHandler.obtainMessage(AppUtil.MESSAGE_READ, byteIndex - 1, -1, buffer);
+            	try {
+            		boolean eom = false;
+    	        	while (!eom && (mmInStream != null))
+    	        	{
+    	                // Read from bluetooth
+    	        		bytes = mmInStream.read(buffer, byteIndex, 1024 - byteIndex);
+    	        		
+    	        		byteIndex += bytes;
+    	
+    	        		if (buffer[byteIndex - 1] == '\r')
+    	        			eom = true;
+    	        	}
+    	        	
+    	        	if (AppUtil.DEBUG) Log.e(AppUtil.TAG, "Received: " + new String(buffer, 0, (byteIndex - 1)));
+    	        	m = mHandler.obtainMessage(AppUtil.MESSAGE_READ, byteIndex - 1, -1, buffer);
                 	m.sendToTarget();
                 	byteIndex = 0;
-                } catch (IOException e) {
-                    Log.e(AppUtil.TAG, "disconnected", e);
-                    connectionLost();
-                    break;
-                }
+    	        } catch (IOException e) {
+    	            Log.e(AppUtil.TAG, "disconnected", e);
+    	            connectionLost();
+    	        }
+                		
+                	
+
             }
         }
 
@@ -455,15 +462,17 @@ public class BluetoothChatService {
         public void write(byte[] buffer) {
             try {
             	if (AppUtil.DEBUG) Log.e(AppUtil.TAG, "Sending: " + new String(buffer));
+
             	// write to bluetooth
                 mmOutStream.write(buffer);
                 mmOutStream.write("\r".getBytes("US-ASCII"));
+                mmOutStream.flush();
 
-                // also write to UI
-                mHandler.obtainMessage(AppUtil.MESSAGE_WRITE, -1, -1, buffer)
-                        .sendToTarget();
+	            // also write to UI
+	            mHandler.obtainMessage(AppUtil.MESSAGE_WRITE, -1, -1, buffer).sendToTarget();
             } catch (IOException e) {
                 Log.e(AppUtil.TAG, "Exception during write", e);
+
             }
         }
 

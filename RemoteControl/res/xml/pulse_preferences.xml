@@ -5,7 +5,7 @@
        android:key="pulse_preferences">
        
     <com.robobunny.SeekBarPreference
-        android:key="prefPulseMinRate"
+        android:key="pulseMinRate"
         android:title="min pulse rate (ms)"
         android:defaultValue="1000"
         android:max="10000"
@@ -14,7 +14,7 @@
         robobunny:unitsRight="" />
     
     <com.robobunny.SeekBarPreference
-        android:key="prefPulseMaxRate"
+        android:key="pulseMaxRate"
         android:title="max pulse rate (ms)"
         android:defaultValue="5000"
         android:max="15000"
@@ -24,16 +24,16 @@
     
     <CheckBoxPreference
 		android:defaultValue="false"
-        android:key="prefPulseRandom"
+        android:key="pulseRandom"
         android:title="random color" />
         
     <CheckBoxPreference
         android:defaultValue="false"
-        android:key="prefPulseSyncLegs"
+        android:key="pulseSyncLegs"
         android:title="synchronize legs" />
     
     <com.inappropirates.remotecontrol.ColorPickerPreference
-        android:key="prefPulseColor"
+        android:key="pulseColor"
         android:title="color"
         />
     
