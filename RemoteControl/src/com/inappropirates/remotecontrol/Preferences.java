@@ -10,7 +10,7 @@ public enum Preferences {
 	prefMainDefaultMode,
 
 	//------------------------------------------------------------------------
-	//Mode
+	// Mode
 	//------------------------------------------------------------------------
 	prefMode,
 
@@ -19,12 +19,12 @@ public enum Preferences {
 	//------------------------------------------------------------------------
 	prefPulseMinRate,
 	prefPulseMaxRate,
-	prefPulseRandomColor,
+	prefPulseRandom,
 	prefPulseSyncLegs,
 	prefPulseColor,
 
 	//------------------------------------------------------------------------
-	//Sparkle
+	// Sparkle
 	//------------------------------------------------------------------------
 	prefSparkleFootUpFadeRate,
 	prefSparkleFootDownFadeRate,
@@ -35,10 +35,18 @@ public enum Preferences {
 	prefSparkleLegSparkleColor,
 
 	//------------------------------------------------------------------------
-	//Equalizer
+	// Equalizer
 	//------------------------------------------------------------------------
 	prefEqualizerColor,
 	prefEqualizerLevel,
-	prefEqualizerRMSThreshold, // <cgerstle> NOT used by lightwalker, just for the remote
-	prefEqualizerAllLights
+	prefEqualizerRMSThreshold,
+	prefEqualizerAllLights,
+	
+	//------------------------------------------------------------------------
+	// Gravity
+	//------------------------------------------------------------------------
+	prefGravityXColor,
+	prefGravityYColor,
+	prefGravityZColor,
+	prefGravityRotate,
 }

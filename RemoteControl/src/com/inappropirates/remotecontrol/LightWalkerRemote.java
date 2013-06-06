@@ -147,6 +147,9 @@ public class LightWalkerRemote extends Activity {
 	        	intent = new Intent(this, DeviceListActivity.class);
 	            startActivityForResult(intent, REQUEST_CONNECT_DEVICE_SECURE);
 	            return true;
+	        case R.id.menu_bluetooth_disconnect:
+	        	AppUtil.mChatService.stop();
+	            return true;
 /*	        case R.id.menu_settings:
 	        	intent = new Intent(this, SettingsActivity.class);
 				intent.putExtra(EXTRA_MODE_NAME, "Main");
