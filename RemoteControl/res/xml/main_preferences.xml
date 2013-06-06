@@ -4,7 +4,7 @@
     android:key="main_preferences" >
  	
 	<com.robobunny.SeekBarPreference
-        android:key="prefMainLegCount"
+        android:key="mainLegCount"
         android:title="@string/main_pref_leg_count"
         android:summary="adjust leg count"
         android:defaultValue="2"
@@ -14,7 +14,7 @@
         robobunny:unitsRight="" />
 
 	<com.robobunny.SeekBarPreference
-        android:key="prefMainPixelsPerLeg"
+        android:key="mainPixelsPerLeg"
         android:title="@string/main_pref_pixels_per_leg"
         android:summary="adjust pixels per leg"
         android:defaultValue="25"
@@ -24,7 +24,7 @@
         robobunny:unitsRight="" />
 	
 	<com.robobunny.SeekBarPreference
-        android:key="prefMainMaxBrightness"
+        android:key="mainMaxBrightness"
         android:title="@string/main_pref_max_brightness"
         android:summary="adjust the max brightness of an led"
         android:defaultValue="200"
@@ -34,7 +34,7 @@
         robobunny:unitsRight="" />
 	
 	<ListPreference 
-        android:key="prefMainDefaultMode"
+        android:key="mainDefaultMode"
         android:title="default mode"
         android:summary="default mode"
         android:defaultValue="LightWalkerModes.Pulse" 

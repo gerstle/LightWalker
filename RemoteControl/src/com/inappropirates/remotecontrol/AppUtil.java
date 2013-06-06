@@ -133,30 +133,19 @@ public class AppUtil extends Application {
     public static void setMode(LightWalkerModes mode, SharedPreferences prefs, boolean override) {
     	if (((mode != LightWalkerModes.main) && (mode != AppUtil.mSelectedMode)) || override)
     	{
-    		/*
-            if (mode == LightWalkerModes.equalizer)
-            {
-            	mRMSThread = new RMSThread(AppUtil.mRMSHandler);
-            	mRMSThread.mRMSThreshold = prefs.getInt("prefEqualizerRMSThreshold", 200);
-            	mRMSThread.mFrequencyThreshold = prefs.getInt("prefEqualizerFrequencyThreshold", 20);
-            	mRMSThread.mRecording = true;
-            	mRMSThread.start();
-            }
-            else if (mRMSThread != null)
-            {
-            	mRMSThread.mRecording = false;
-        		try {
-    				mRMSThread.join();
-    			} catch (InterruptedException e) {
-    			} finally {
-    				mRMSThread = null;
-    			}
-            }
-            */
-            
+    		//<cgerstle> quit processing things while we send commands
+    		// give it it a second to chill.
+    		AppUtil.sendMessage(AppUtil.ConstructMessage("mode", "masterOff"));
+
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
     		AppUtil.mSelectedMode = mode;
     		AppUtil.sendModeSettings(mode, prefs);
-    		AppUtil.sendMessage(AppUtil.ConstructMessage("prefMode", String.valueOf(mode.ordinal())));
+    		AppUtil.sendMessage(AppUtil.ConstructMessage("mode", mode.toString()));
     	}
     }
     
@@ -178,19 +167,9 @@ public class AppUtil extends Application {
 				e.printStackTrace();
 			}
             AppUtil.mChatService.write(send);
-            //AppUtil.mBluetoothMessageTextView.setText(AppUtil.mBluetoothMessageLabel);
 
             // Reset out string buffer to zero and clear the edit text field
             mOutStringBuffer.setLength(0);
-            /*
-            mCommandText.setText(mOutStringBuffer);
-            try {
-				Thread.sleep(10);
-			} catch (InterruptedException e) {
-				Log.d(AppUtil.TAG, "sleep interrupted");
-				e.printStackTrace();
-			}
-			*/
         }
 	}
 	
@@ -214,12 +193,23 @@ public class AppUtil extends Application {
 			}
 			
 			if ((value != null) && (value.length() > 0))
+			{
 				sendMessage(AppUtil.ConstructMessage(entry.getKey(), value));
+                
+				// <cgerstle> when you're sending a bunch of data, you've
+				// gotta give the other some time to pull it off
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
     }
     
     public static String ConstructMessage(String key, String value) {
-    	return String.valueOf(Preferences.valueOf(key).ordinal()) + mKeyDelimiter + value;
+    	return key + mKeyDelimiter + value;
     }
     
     public static boolean keyIsColor(String key) {

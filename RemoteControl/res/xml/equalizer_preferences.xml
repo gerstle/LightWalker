@@ -5,7 +5,7 @@
        android:key="equalizer_preferences">
        
         <com.robobunny.SeekBarPreference
-        android:key="prefEqualizerRMSThreshold"
+        android:key="eqRMSThreshold"
         android:title="RMS Threshold"
         android:defaultValue="200"
         android:max="2000"
@@ -13,13 +13,13 @@
         />
         
     <com.inappropirates.remotecontrol.ColorPickerPreference
-        android:key="prefEqualizerColor"
+        android:key="eqColor"
         android:title="color"
         />
     
     <CheckBoxPreference
 		android:defaultValue="false"
-        android:key="prefEqualizerAllLights"
+        android:key="eqAllLights"
         android:title="all lights" />
     
 </PreferenceScreen>
