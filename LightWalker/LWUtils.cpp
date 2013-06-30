@@ -50,21 +50,21 @@ void LWUtilsClass::selectI2CChannels(int channels)
     Wire.endTransmission();  
 }
 
-void LWUtilsClass::initADXL(ADXL345 adxl)
+void LWUtilsClass::initADXL(ADXL345 *adxl)
 {
-    adxl.powerOn();
+    adxl->powerOn();
 
     //set activity/ inactivity thresholds (0-255)
-    adxl.setActivityThreshold(75); //62.5mg per increment
-    adxl.setInactivityThreshold(75); //62.5mg per increment
-    adxl.setTimeInactivity(10); // how many seconds of no activity is inactive?
+    adxl->setActivityThreshold(75); //62.5mg per increment
+    adxl->setInactivityThreshold(75); //62.5mg per increment
+    adxl->setTimeInactivity(10); // how many seconds of no activity is inactive?
 
     //look of activity movement on this axes - 1 == on; 0 == off 
-    adxl.setActivityX(1);
-    adxl.setActivityY(1);
-    adxl.setActivityZ(1);
+    adxl->setActivityX(1);
+    adxl->setActivityY(1);
+    adxl->setActivityZ(1);
 
     //set values for what is considered freefall (0-255)
-    adxl.setFreeFallThreshold(7); //(5 - 9) recommended - 62.5mg per increment
-    adxl.setFreeFallDuration(45); //(20 - 70) recommended - 5ms per increment
+    adxl->setFreeFallThreshold(7); //(5 - 9) recommended - 62.5mg per increment
+    adxl->setFreeFallDuration(45); //(20 - 70) recommended - 5ms per increment
 }

@@ -2,8 +2,9 @@
 
 MainConfigs::MainConfigs()
 {
+    minBrightness = 5;
     maxBrightness = 200;
     defaultMode = pulse;
-    legCount = 2;
-    pixelsPerLeg = 25;
+    legsOn = true;
+    armsOn = false;
 }

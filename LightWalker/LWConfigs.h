@@ -29,7 +29,7 @@
 #include "GravityConfigs.h"
 
 #define LEG_COUNT 2
-#define PIXELS_PER_LEG 25
+#define PIXELS_PER_LEG 50
 
 class LWConfigs
 {

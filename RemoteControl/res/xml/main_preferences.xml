@@ -3,30 +3,30 @@
     xmlns:robobunny="http://robobunny.com"
     android:key="main_preferences" >
  	
-	<com.robobunny.SeekBarPreference
-        android:key="mainLegCount"
-        android:title="@string/main_pref_leg_count"
-        android:summary="adjust leg count"
-        android:defaultValue="2"
-        android:max="4"
-        robobunny:min="1"
+    <CheckBoxPreference
+		android:defaultValue="true"
+        android:key="mainLegsOn"
+        android:title="@string/mainLegsOn" />
+    
+    <CheckBoxPreference
+		android:defaultValue="false"
+        android:key="mainArmsOn"
+        android:title="@string/mainArmsOn" />
+    
+    <com.robobunny.SeekBarPreference
+        android:key="mainMinBrightness"
+        android:title="@string/mainMinBrightness"
+        android:summary="adjust the minimum brightness"
+        android:defaultValue="5"
+        android:max="25"
+        robobunny:min="0"
         robobunny:unitsLeft=""
         robobunny:unitsRight="" />
 
 	<com.robobunny.SeekBarPreference
-        android:key="mainPixelsPerLeg"
-        android:title="@string/main_pref_pixels_per_leg"
-        android:summary="adjust pixels per leg"
-        android:defaultValue="25"
-        android:max="200"
-        robobunny:min="1"
-        robobunny:unitsLeft=""
-        robobunny:unitsRight="" />
-	
-	<com.robobunny.SeekBarPreference
         android:key="mainMaxBrightness"
-        android:title="@string/main_pref_max_brightness"
-        android:summary="adjust the max brightness of an led"
+        android:title="@string/mainMaxBrightness"
+        android:summary="adjust the max brightness"
         android:defaultValue="200"
         android:max="255"
         robobunny:min="50"

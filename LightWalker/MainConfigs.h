@@ -8,10 +8,11 @@ class MainConfigs
     public:
         MainConfigs();
 
+        int minBrightness;
         int maxBrightness;
         WalkingModeEnum defaultMode;
-        int legCount;
-        int pixelsPerLeg;
+        bool legsOn;
+        bool armsOn;
 };
 
 #endif

@@ -50,7 +50,7 @@ void setup()
     digitalWrite(AUDIO_RESET_PIN, LOW);
     digitalWrite(AUDIO_STROBE_PIN, HIGH);
 
-    // <cgerstle> ADXL setup
+    // <cgerstle> Join i2c bus as master
     Wire.begin();
 
     lw.initLegs(masterOff);
@@ -100,12 +100,20 @@ bool executeCommand(char *key, int keyLen, char *value, int valueLen)
     offset = 4; 
     if (strncmp_P(key, PSTR("main"), offset) == 0)
     {
+        if (strncmp_P(key + offset, PSTR("MinBrightness"), keyLen - offset) == 0)
+            lw.config.main.minBrightness = atoi(value);
         if (strncmp_P(key + offset, PSTR("MaxBrightness"), keyLen - offset) == 0)
             lw.config.main.maxBrightness = atoi(value);
-        else if (strncmp_P(key + offset, PSTR("LegCount"), keyLen - offset) == 0)
-            lw.config.main.legCount = atoi(value);
-        else if (strncmp_P(key + offset, PSTR("PixelsPerLeg"), keyLen - offset) == 0)
-            lw.config.main.pixelsPerLeg= atoi(value);
+        else if (strncmp_P(key + offset, PSTR("LegsOn"), keyLen - offset) == 0)
+            if (strncmp(value, one_str, valueLen) == 0)
+                lw.config.main.legsOn = true;
+            else
+                lw.config.main.legsOn = false;
+        else if (strncmp_P(key + offset, PSTR("ArmsOn"), keyLen - offset) == 0)
+            if (strncmp(value, one_str, valueLen) == 0)
+                lw.config.main.armsOn = true;
+            else
+                lw.config.main.armsOn = false;
 
         return true;
     }

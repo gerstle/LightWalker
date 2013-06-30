@@ -199,7 +199,7 @@ public class AppUtil extends Application {
 				// <cgerstle> when you're sending a bunch of data, you've
 				// gotta give the other some time to pull it off
 				try {
-					Thread.sleep(100);
+					Thread.sleep(150);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

@@ -16,9 +16,9 @@ Leg::Leg()
     name[0] = '\0';
 }
 
-void Leg::Init(LWConfigs *c, char n[], int i2c_channel, WalkingModeEnum mode, ADXL345 *adxl)
+void Leg::Init(LWConfigs *c, char n[], int i2c_channel, WalkingModeEnum mode, ADXL345 *adxl, byte half)
 {
-    int x, y, z, half;
+    int x, y, z;
 
     config = c;
     strcpy(name, n);
@@ -27,21 +27,20 @@ void Leg::Init(LWConfigs *c, char n[], int i2c_channel, WalkingModeEnum mode, AD
     step = false;
     _lightMode = None;
     _lightModeChangeTime = millis();
+    _half = half;
 
     _sparkle_fade_rate = config->sparkle.footDownFadeRate;
 
     sparkle_fade_on = true;
 
-    half = PIXELS_PER_LEG / 2;
-
     if ((PIXELS_PER_LEG % 2) > 0)
-        lower_foot_border = half - 2;
+        lower_foot_border = _half - 2;
     else
-        lower_foot_border = half - 3;
-    upper_foot_border = half + 2;
+        lower_foot_border = _half - 3;
+    upper_foot_border = _half + 2;
 
     LWUtils.selectI2CChannels(channel);
-    LWUtils.initADXL(*adxl);
+    LWUtils.initADXL(adxl);
 
     valueIndex = 0;
 
@@ -57,14 +56,14 @@ void Leg::Init(LWConfigs *c, char n[], int i2c_channel, WalkingModeEnum mode, AD
     zAverage = 0;
     zAverageOld = 0;
 
-    xStepDuration = 750; // <cgerstle> a step lasts at least this long... ie, two steps can't occur within this time period
+    xStepDuration = 250; // <cgerstle> a step lasts at least this long... ie, two steps can't occur within this time period
     yStepDuration = 750;
-    zStepDuration = 250;
-    xAvgDiffThreshold = 3;
+    zStepDuration = 750;
+    xAvgDiffThreshold = 4;
     yAvgDiffThreshold = 3;
     zAvgDiffThreshold = 3;
 
-    zSignificantlyLowerThanAverageThreshold = 35; 
+    xSignificantlyLowerThanAverageThreshold = 37; 
     readyForStep = true;
 
     for (valueIndex = 0; valueIndex < ADXL_VALUE_COUNT; valueIndex++)
@@ -138,24 +137,12 @@ void Leg::sparkle_sameStatus()
 void Leg::_sparkle_flash()
 {
     //Serial.print("flashing "); Serial.println(name);
-    bool display = true;
     for (int i = 0; i < PIXELS_PER_LEG; i++)
     {
         if ((i < lower_foot_border) || (i > upper_foot_border))
             _setPixel(i, COLORS[BLACK], 0x00);
         else
-        {
-            if (display)
-            {
-                Serial.print("\t\ti: ");
-                Serial.println(i);
-                Serial.println(config->sparkle.footFlashColor.r);
-                Serial.println(config->sparkle.footFlashColor.g);
-                Serial.println(config->sparkle.footFlashColor.b);
-                display = false;
-            }
             _setPixel(i, config->sparkle.footFlashColor, 0x00);
-        }
     }
     _setLightMode(Flash);
 }
@@ -281,9 +268,10 @@ void Leg::pulse_pulse(unsigned long syncTime, int syncLength, int syncValue, boo
             value = currentTime - _lightModeChangeTime;
 
     float brightness = ((float)map(value, 0, _pulse_length, 0, 100) / 100);
-    byte r = byte((float)_pulse_color.r * (brightness * brightness * brightness));
-    byte g = byte((float)_pulse_color.g * (brightness * brightness * brightness));
-    byte b = byte((float)_pulse_color.b * (brightness * brightness * brightness));
+    brightness = brightness * brightness * brightness;
+    byte r = byte((float)_pulse_color.r * brightness);
+    byte g = byte((float)_pulse_color.g * brightness);
+    byte b = byte((float)_pulse_color.b * brightness);
 
     for (int i = 0; i < PIXELS_PER_LEG; i++)
     {
@@ -292,7 +280,6 @@ void Leg::pulse_pulse(unsigned long syncTime, int syncLength, int syncValue, boo
         _pixels[i].g = g;
         _setPixel(i, _pixels[i], 0);
     }
-
 }
 
 void Leg::equalizer_listen(float level_percent, byte r, byte g, byte b)
@@ -310,14 +297,13 @@ void Leg::equalizer_listen(float level_percent, byte r, byte g, byte b)
     else
     {
         int i = 0;
-        int half = PIXELS_PER_LEG / 2;
-        int lower_threshold = half - (level_percent * half);
-        int upper_threshold = (level_percent * half) + half;
+        int lower_threshold = _half - (level_percent * _half);
+        int upper_threshold = (level_percent * _half) + _half;
 
         for (i = 0; i < PIXELS_PER_LEG; i++)
         {
-            if (((i < half) && (i < lower_threshold)) ||
-                ((i > half) && (i > upper_threshold)))
+            if (((i < _half) && (i < lower_threshold)) ||
+                ((i > _half) && (i > upper_threshold)))
             {
                 _pixels[i].r = 0;
                 _pixels[i].g = 0;
@@ -343,11 +329,6 @@ void Leg::_displayPixels()
 
 void Leg::_setPixel(int i, RGB color, byte dimmer)
 {
-//     if ((i == 0) && false)
-//     {
-//         Serial.print("_setPixel before:: "); Serial.print(color.r); Serial.print(" - "); Serial.print(color.g); Serial.print(" - "); Serial.print(color.b); Serial.print(" dim: "); Serial.println(dimmer);
-//     }
-
     if (color.r > dimmer)
         _pixels[i].r = color.r - dimmer;
     else
@@ -394,10 +375,11 @@ void Leg::_setLightMode(LightModeEnum mode)
     _lightMode = mode;
 }
 
-void Leg::setWalkingMode(WalkingModeEnum mode)
+void Leg::setWalkingMode(WalkingModeEnum mode, ADXL345 *adxl)
 {
     off();
     _lightModeChangeTime = millis();
+    currentTime = millis();
 
     // <gerstle> sparkle stuff
     _walkingMode = mode;
@@ -410,12 +392,6 @@ void Leg::setWalkingMode(WalkingModeEnum mode)
         case pulse:
             _pulse_isDimming = false;
             _pulse_length = random(config->pulse.minPulseTime, config->pulse.maxPulseTime);
-            break;
-        case equalizer:
-            // <gerstle> do nothing
-            break;
-        case gravity:
-            // <gerstle> do nothing
             break;
     }
 }
@@ -447,7 +423,7 @@ void Leg::detectStep(ADXL345 *adxl)
     zValues[valueIndex] = z;
     zAverage = zTotal / ADXL_VALUE_COUNT;
 
-    if (z < (zAverage - zSignificantlyLowerThanAverageThreshold))
+    if (x < (xAverage - xSignificantlyLowerThanAverageThreshold))
         readyForStep = true;
 
 //     Serial.print(x); Serial.print("\t"); Serial.print(y); Serial.print("\t"); Serial.print(z);
@@ -456,10 +432,10 @@ void Leg::detectStep(ADXL345 *adxl)
 //     Serial.print("\t"); Serial.print(zAverage); Serial.print("\t"); Serial.print(zAverageOld);
 //     Serial.print("\t"); Serial.print(readyForStep);
 
-    if (readyForStep && (currentTime > (lastSharpPeakTime + zStepDuration)))
+    if (readyForStep && (currentTime > (lastSharpPeakTime + xStepDuration)))
     {
         step = false;
-        if ((z > zAverage) && (zAverage >= (zAverageOld + zAvgDiffThreshold)))
+        if ((x > xAverage) && (xAverage >= (xAverageOld + xAvgDiffThreshold)))
         {
             stepDetected = true;
             readyForStep = false;
@@ -467,8 +443,8 @@ void Leg::detectStep(ADXL345 *adxl)
     }
 
 
-    if (readyForStep && (currentTime > (lastSharpPeakTime + xStepDuration)))
-        if (!stepDetected && (xAverage >= (xAverageOld + xAvgDiffThreshold)))
+    if (readyForStep && (currentTime > (lastSharpPeakTime + zStepDuration)))
+        if (!stepDetected && (zAverage >= (zAverageOld + zAvgDiffThreshold)))
             stepDetected = true;
 
     if (readyForStep && (currentTime > (lastSharpPeakTime + yStepDuration)))

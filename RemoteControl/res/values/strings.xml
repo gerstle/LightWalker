@@ -51,9 +51,10 @@
 	<string name="pulse_max_pulse_rate">3000</string>
 	<string name="pulse_random_color">random color</string>
 	
-	<string name="main_pref_leg_count">number o\' legs</string>
-	<string name="main_pref_pixels_per_leg">pixels per leg</string>
-	<string name="main_pref_max_brightness">max brightness</string>
+	<string name="mainLegsOn">got your legs on?</string>
+	<string name="mainArmsOn">got your legs on?</string>
+	<string name="mainMinBrightness">min brightness</string>
+	<string name="mainMaxBrightness">max brightness</string>
 	
 	
     <string name="pref_send_report">Send crash reports</string>

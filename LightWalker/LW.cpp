@@ -14,8 +14,28 @@
 
 void LW::initLegs(WalkingModeEnum m)
 {
-    _legs[0].Init(&config, "left leg", ADXL_ONE, mode, &_adxl);
-    _legs[1].Init(&config, "right leg", ADXL_TWO, mode, &_adxl);
+    _legs[0].Init(&config, "left leg", ADXL_ONE, mode, &_adxl, 22);
+    _legs[1].Init(&config, "right leg", ADXL_TWO, mode, &_adxl, 22);
+
+//     for (int i = 0; i < LEG_COUNT; i++)
+//     {
+//         LWUtils.selectI2CChannels(_legs[i].channel);
+//         _adxl.writeTo(ADXL345_POWER_CTL, 0);      
+//         _adxl.writeTo(ADXL345_POWER_CTL, 16);
+//         _adxl.writeTo(ADXL345_POWER_CTL, 8); 
+//         _adxl.setActivityThreshold(75); //62.5mg per increment
+//         _adxl.setInactivityThreshold(75); //62.5mg per increment
+//         _adxl.setTimeInactivity(10); // how many seconds of no activity is inactive?
+// 
+//         //look of activity movement on this axes - 1 == on; 0 == off 
+//         _adxl.setActivityX(1);
+//         _adxl.setActivityY(1);
+//         _adxl.setActivityZ(1);
+// 
+//         //set values for what is considered freefall (0-255)
+//         _adxl.setFreeFallThreshold(7); //(5 - 9) recommended - 62.5mg per increment
+//         _adxl.setFreeFallDuration(45); //(20 - 70) recommended - 5ms per increment
+//     }
 
     mode = m;
     setMode(mode);
@@ -26,7 +46,7 @@ void LW::setMode(WalkingModeEnum m)
     mode = m;
     _lightModeChangeTime = millis();
     for (int i = 0; i < LEG_COUNT; i++)
-        _legs[i].setWalkingMode(mode);
+        _legs[i].setWalkingMode(mode, &_adxl);
 
     switch (mode)
     {

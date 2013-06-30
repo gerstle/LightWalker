@@ -39,7 +39,7 @@ class LWUtilsClass
         static void sendColor(RGB color, byte dimmer);
         static void sendColor(RGB color);
         static void selectI2CChannels(int channels);
-        static void initADXL(ADXL345 adxl);
+        static void initADXL(ADXL345 *adxl);
 };
 
 extern LWUtilsClass LWUtils;
