@@ -94,8 +94,8 @@ public class AppUtil extends Application {
                 if (readMessage.equals("SettingsPlease"))
                 {
                 	String modeName = mSelectedMode.toString().toLowerCase(Locale.ENGLISH);
-                    SharedPreferences pref = mContext.getSharedPreferences(modeName  + "_preferences", MODE_PRIVATE);
-                    AppUtil.setMode(mSelectedMode, pref, true);
+                    AppUtil.sendModeSettings(LightWalkerModes.main, mContext.getSharedPreferences("main_preferences", MODE_PRIVATE));
+                    AppUtil.setMode(mSelectedMode, mContext.getSharedPreferences(modeName  + "_preferences", MODE_PRIVATE), true);
                 }
                 break;
             case MESSAGE_DEVICE_NAME:
@@ -221,10 +221,25 @@ public class AppUtil extends Application {
     
     public static String Color2String(int color) {
     	String rv = "";
-    	rv += "" + Color.red(color) + mColorDelimiter +
-    			Color.green(color) + mColorDelimiter +
-    			Color.blue(color);
+    	rv += "" + RoundColor(Color.red(color)) + mColorDelimiter +
+    			RoundColor(Color.green(color)) + mColorDelimiter +
+    					RoundColor(Color.blue(color));
     	
+    	Log.i(AppUtil.TAG, "setting color to: " + rv);
     	return rv;
+    }
+    
+    final static int roundValue = 17;
+    private static int RoundColor(int color)
+    {
+    	int modValue = color % roundValue;
+      	if (modValue == 0)
+    		return color;
+    	
+      	int half = roundValue / 2;
+      	if (modValue <= half)
+      		return color - modValue;
+      	else
+      		return color + (roundValue - modValue);
     }
 }

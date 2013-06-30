@@ -441,7 +441,7 @@ public class BluetoothChatService {
     	        			eom = true;
     	        	}
     	        	
-    	        	if (AppUtil.DEBUG) Log.e(AppUtil.TAG, "Received: " + new String(buffer, 0, (byteIndex - 1)));
+    	        	Log.i(AppUtil.TAG, "Received: " + new String(buffer, 0, (byteIndex - 1)));
     	        	m = mHandler.obtainMessage(AppUtil.MESSAGE_READ, byteIndex - 1, -1, buffer);
                 	m.sendToTarget();
                 	byteIndex = 0;
@@ -461,7 +461,7 @@ public class BluetoothChatService {
          */
         public void write(byte[] buffer) {
             try {
-            	if (AppUtil.DEBUG) Log.e(AppUtil.TAG, "Sending: " + new String(buffer));
+            	if (AppUtil.DEBUG) Log.i(AppUtil.TAG, "Sending: " + new String(buffer));
 
             	// write to bluetooth
                 mmOutStream.write(buffer);

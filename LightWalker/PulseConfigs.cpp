@@ -8,4 +8,7 @@ PulseConfigs::PulseConfigs()
     maxPulseTime = 5000;
     randomColor = false;
     syncLegs = false;
+    color.r = 0;
+    color.g = 0;
+    color.b = 255;
 }

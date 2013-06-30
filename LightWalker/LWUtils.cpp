@@ -68,3 +68,16 @@ void LWUtilsClass::initADXL(ADXL345 *adxl)
     adxl->setFreeFallThreshold(7); //(5 - 9) recommended - 62.5mg per increment
     adxl->setFreeFallDuration(45); //(20 - 70) recommended - 5ms per increment
 }
+
+void LWUtilsClass::printRGB(RGB color, bool newLine)
+{
+    printRGB(color.r, color.g, color.b, newLine);
+}
+
+void LWUtilsClass::printRGB(byte r, byte g, byte b, bool newLine)
+{
+    Serial.print(r); Serial.print(", "); Serial.print(g); Serial.print(", "); Serial.print(b);
+
+    if (newLine)
+        Serial.println();
+}

@@ -40,6 +40,8 @@ class LWUtilsClass
         static void sendColor(RGB color);
         static void selectI2CChannels(int channels);
         static void initADXL(ADXL345 *adxl);
+        static void printRGB(RGB color, bool newLine);
+        static void printRGB(byte r, byte g, byte b, bool newLine);
 };
 
 extern LWUtilsClass LWUtils;

@@ -250,7 +250,6 @@ void Leg::pulse_pulse(unsigned long syncTime, int syncLength, int syncValue, boo
         }
         else
         {
-//         Serial.print("color to:: "); Serial.print(config->pulse.color.r); Serial.print(" - "); Serial.print(config->pulse.color.g); Serial.print(" - "); Serial.println(config->pulse.color.b);
             _pulse_color.r = config->pulse.color.r;
             _pulse_color.g = config->pulse.color.g;
             _pulse_color.b = config->pulse.color.b;
@@ -269,17 +268,54 @@ void Leg::pulse_pulse(unsigned long syncTime, int syncLength, int syncValue, boo
 
     float brightness = ((float)map(value, 0, _pulse_length, 0, 100) / 100);
     brightness = brightness * brightness * brightness;
+
+    byte min = 0;
+    bool setMin = false;
+
     byte r = byte((float)_pulse_color.r * brightness);
+    //byte g = map(byte((float)_pulse_color.g * brightness), 0, 255, min, 255);
     byte g = byte((float)_pulse_color.g * brightness);
     byte b = byte((float)_pulse_color.b * brightness);
 
+    if ((r < config->main.minBrightness) && 
+        (g < config->main.minBrightness) &&
+        (b < config->main.minBrightness))
+        setMin = true;
+
+    if (setMin && (_pulse_color.r > 0))
+        r = map(r, 0, 255, config->main.minBrightness, 255);
+    if (setMin && (_pulse_color.g > 0))
+        g = map(g, 0, 255, config->main.minBrightness, 255);
+    if (setMin && (_pulse_color.b > 0))
+        b = map(b, 0, 255, config->main.minBrightness, 255);
+
     for (int i = 0; i < PIXELS_PER_LEG; i++)
     {
-        _pixels[i].r = r;
-        _pixels[i].b = b;
-        _pixels[i].g = g;
-        _setPixel(i, _pixels[i], 0);
+        RGB newColor;
+
+        // <gerstle> don't change from non-zero to zero!
+        if ((_pixels[i].r != 0) && (r == 0))
+            newColor.r = _pixels[i].r;
+        else
+            newColor.r = r;
+
+        if ((_pixels[i].g != 0) && (g == 0))
+            newColor.g = _pixels[i].g;
+        else
+            newColor.g = g;
+
+        if ((_pixels[i].b != 0) && (b == 0))
+            newColor.b = _pixels[i].b;
+        else
+            newColor.b = b;
+    
+        _setPixel(i, newColor, 0);
     }
+
+//     if (channel == 1)
+//     {
+//         Serial.print("\t\t"); LWUtils.printRGB(_pixels[0], true);
+//     }
 }
 
 void Leg::equalizer_listen(float level_percent, byte r, byte g, byte b)
@@ -330,35 +366,100 @@ void Leg::_displayPixels()
 void Leg::_setPixel(int i, RGB color, byte dimmer)
 {
     if (color.r > dimmer)
-        _pixels[i].r = color.r - dimmer;
+        color.r = color.r - dimmer;
+    else
+        color.r = 0;
+
+    if (color.g > dimmer)
+        color.g = color.g - dimmer;
+    else
+        color.g = 0;
+
+    if (color.b > dimmer)
+        color.b = color.b - dimmer;
+    else
+        color.b = 0;
+
+    if ((channel == 1) && (i == 0) && false)
+    {
+        Serial.print("_setPixel:: "); Serial.print(color.r); Serial.print(" - "); Serial.print(color.g); Serial.print(" - "); Serial.print(color.b); Serial.print(" dim: "); Serial.println(dimmer);
+    }
+
+    if (color.r > 0)
+        _pixels[i].r = map(color.r, config->main.minBrightness, 255, config->main.minBrightness, config->main.maxBrightness);
     else
         _pixels[i].r = 0;
 
-    if (color.g > dimmer)
-        _pixels[i].g = color.g - dimmer;
+    if (color.g > 0)
+        _pixels[i].g = map(color.g, config->main.minBrightness, 255, config->main.minBrightness, config->main.maxBrightness);
     else
         _pixels[i].g = 0;
 
-    if (color.b > dimmer)
-        _pixels[i].b = color.b - dimmer;
+    if (color.b > 0)
+        _pixels[i].b = map(color.b, config->main.minBrightness, 255, config->main.minBrightness, config->main.maxBrightness);
     else
         _pixels[i].b = 0;
 
-    if ((i == 0) && false)
+    if ((channel == 1) && (i == 0) && false)
     {
-        Serial.print("_setPixel:: "); Serial.print(_pixels[i].r); Serial.print(" - "); Serial.print(_pixels[i].g); Serial.print(" - "); Serial.print(_pixels[i].b); Serial.print(" dim: "); Serial.println(dimmer);
-    }
-
-    _pixels[i].r = map(_pixels[i].r, 0, 255, 0, config->main.maxBrightness);
-    _pixels[i].g = map(_pixels[i].g, 0, 255, 0, config->main.maxBrightness);
-    _pixels[i].b = map(_pixels[i].b, 0, 255, 0, config->main.maxBrightness);
-
-    if ((i == 0) && false)
-    {
-        Serial.print("_setPixel:: "); Serial.print(_pixels[i].r); Serial.print(" - "); Serial.print(_pixels[i].g); Serial.print(" - "); Serial.print(_pixels[i].b); Serial.print(" dim: "); Serial.println(dimmer);
+        Serial.print("\t\t-> "); Serial.print(_pixels[i].r); Serial.print(" - "); Serial.print(_pixels[i].g); Serial.print(" - "); Serial.print(_pixels[i].b); Serial.print(" dim: "); Serial.println(dimmer);
     }
 
     LWUtils.sendColor(_pixels[i]);
+}
+
+// <cgerstle> takes in an rgb and checks that it's
+// above the minimum. If it's not and some have value, scale up to min
+// if all zero... scale default to min
+void Leg::upToMin(byte *r, byte *g, byte *b, RGB defaultColor)
+{
+    if (channel == 1)
+    {
+        Serial.print("got "); LWUtils.printRGB(*r, *g, *b, false);
+    }
+
+    if ((*r < config->main.minBrightness) && 
+        (*g < config->main.minBrightness) &&
+        (*b < config->main.minBrightness))
+    {
+        byte _r, _g, _b;
+
+        if ((*r > 0) ||
+            (*g > 0) ||
+            (*b > 0))
+        {
+            _r = *r;
+            _g = *g;
+            _b = *b;
+        }
+        else
+        {
+            _r = defaultColor.r;
+            _g = defaultColor.g;
+            _b = defaultColor.b;
+        }
+        
+        // <cgerstle> scale min
+        int minimum = 255;
+        if (defaultColor.r > 0)
+            minimum = min(minimum, defaultColor.r);
+        if (defaultColor.g > 0)
+            minimum = min(minimum, defaultColor.g);
+        if (defaultColor.b > 0)
+            minimum = min(minimum, defaultColor.b);
+
+        float scale = ((float)config->main.minBrightness)/((float)minimum);
+        *r = (byte)(scale * (float)defaultColor.r);
+        *g = (byte)(scale * (float)defaultColor.g);
+        *b = (byte)(scale * (float)defaultColor.b);
+
+        if (channel == 1)
+        {
+            Serial.print("scale -> "); LWUtils.printRGB(*r, *g, *b, false);
+        }
+    }
+    else if (channel == 1)
+        Serial.print(".");
 }
 
 void Leg::off()
@@ -378,8 +479,7 @@ void Leg::_setLightMode(LightModeEnum mode)
 void Leg::setWalkingMode(WalkingModeEnum mode, ADXL345 *adxl)
 {
     off();
-    _lightModeChangeTime = millis();
-    currentTime = millis();
+    currentTime = _lightModeChangeTime = millis();
 
     // <gerstle> sparkle stuff
     _walkingMode = mode;
@@ -390,6 +490,9 @@ void Leg::setWalkingMode(WalkingModeEnum mode, ADXL345 *adxl)
         case masterOff:
             off();
         case pulse:
+            _pulse_color.r = config->pulse.color.r;
+            _pulse_color.g = config->pulse.color.g;
+            _pulse_color.b = config->pulse.color.b;
             _pulse_isDimming = false;
             _pulse_length = random(config->pulse.minPulseTime, config->pulse.maxPulseTime);
             break;

@@ -48,6 +48,7 @@ class Leg
         void off();
         void setWalkingMode(WalkingModeEnum mode, ADXL345 *adxl);
         void detectStep(ADXL345 *adxl);
+        void upToMin(byte *r, byte *g, byte *b, RGB defaultColor);
 
         // <gerstle> Sparkle
         bool sparkle_fade_on;
