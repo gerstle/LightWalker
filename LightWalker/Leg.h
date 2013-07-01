@@ -85,6 +85,7 @@ class Leg
 
         // <gerstle> Sparkle stuff        
         void _sparkle_flash();
+        void _sparkle_shimmer();
         void _sparkle_sparkle();
         void _sparkle_fade();
         int _sparkle_fade_rate;

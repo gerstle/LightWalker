@@ -10,8 +10,10 @@ class EqualizerConfigs
         EqualizerConfigs();
 
         RGB color;
+        RGB minColor;
         int brightnessPercent;
         bool allLights;
+        bool allBands;
         int RMSThreshold;
         int peak;
 };

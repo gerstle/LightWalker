@@ -22,25 +22,27 @@
 #include "SparkleConfigs.h"
 #include "EqualizerConfigs.h"
 
-#define VALUE_COUNT 50
+#define EQ_EMA_N 200
+#define EQ_EMA_PEAK_N 5 
 
 class LW
 {
     public:
-        LW() : config(), _laststatus(millis()), mode(masterOff), _lightModeChangeTime(millis()), _pulse_length(0), _pulse_isDimming(0), valueIndex(0), valueTotal(0), valueAvg(0) {}
+        LW() : config(), _laststatus(millis()), mode(masterOff), _lightModeChangeTime(millis()), _pulse_length(0), _pulse_isDimming(0) {}
         void initLegs(WalkingModeEnum m);
         void off();
         void walk();
         void equalizer_listen();
+        void equalizer_baseline();
         void setMode(WalkingModeEnum m);
 
         LWConfigs config;
         WalkingModeEnum mode;
 
-        int values[VALUE_COUNT];
-        int valueIndex;
-        double valueTotal;
-        int valueAvg;
+//         int eqValues[VALUE_COUNT];
+//         int eqValueIndex;
+//         double eqValueTotal;
+//         int eqValueAvg;
 
     private:
         Leg _legs[LEG_COUNT];
@@ -53,6 +55,10 @@ class LW
         bool _pulse_isDimming;
 
         ADXL345 _adxl;
+        float eqEMA;
+        float eqEMAPeak;
+        int eqNminus2;
+        int eqNminus1;
 };
 
 #endif

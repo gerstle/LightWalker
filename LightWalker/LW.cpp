@@ -51,30 +51,7 @@ void LW::setMode(WalkingModeEnum m)
     switch (mode)
     {
         case equalizer:
-            int tmp, value;
-
-            valueTotal = 0;
-
-            digitalWrite(AUDIO_RESET_PIN, HIGH);
-            digitalWrite(AUDIO_RESET_PIN, LOW);
-            for (valueIndex = 0; valueIndex < VALUE_COUNT; valueIndex++)
-            {
-                for (int i = 0; i < 7; i++)
-                {
-                    digitalWrite(AUDIO_STROBE_PIN, LOW);
-                    delayMicroseconds(30); // to allow the output to settle
-                    tmp = analogRead(AUDIO_PIN);
-
-                    if (i == 0)
-                        value = tmp;
-
-                    digitalWrite(AUDIO_STROBE_PIN, HIGH);
-                }
-                values[valueIndex] = value;
-                valueTotal += values[valueIndex];
-            }
-            
-            valueAvg = valueTotal / VALUE_COUNT;
+            equalizer_baseline();
             break;
     }
 }
@@ -150,9 +127,41 @@ void LW::walk()
     TCL.sendEmptyFrame();
 }
 
+void LW::equalizer_baseline()
+{
+    int tmp, value;
+    int eqValueTotal = 0;
+    int eqValueIndex = 0;
+    int peak = 0;
+
+    digitalWrite(AUDIO_RESET_PIN, HIGH);
+    digitalWrite(AUDIO_RESET_PIN, LOW);
+    for (eqValueIndex = 0; eqValueIndex < EQ_EMA_N; eqValueIndex++)
+    {
+        for (int i = 0; i < 7; i++)
+        {
+            digitalWrite(AUDIO_STROBE_PIN, LOW);
+            delayMicroseconds(30); // to allow the output to settle
+            tmp = analogRead(AUDIO_PIN);
+
+            if (config.equalizer.allBands)
+                value = max(value, tmp);
+            else if (i == 0)
+                value = tmp;
+
+            digitalWrite(AUDIO_STROBE_PIN, HIGH);
+        }
+        eqValueTotal += value;
+        peak = max(peak, value);
+    }
+    
+    eqEMA = eqValueTotal / EQ_EMA_N;
+    eqEMAPeak = peak;
+}
+
 void LW::equalizer_listen()
 {
-    int level;
+    int level = 0;
     int tmp;
     byte r, g, b = 0;
     float brightness;
@@ -167,43 +176,46 @@ void LW::equalizer_listen()
         delayMicroseconds(20); // to allow the output to settle
 
         tmp = analogRead(AUDIO_PIN);
-        if (i == 0)
+        if (config.equalizer.allBands)
+            level = max(level, tmp);
+        else if (i == 0)
             level = tmp;
         digitalWrite(AUDIO_STROBE_PIN, HIGH);
     }
 
-    if (valueIndex >= VALUE_COUNT)
-        valueIndex = 0;
+    if ((level < eqNminus1) && (eqNminus1 > eqNminus2) && (level > eqEMA))
+        eqEMAPeak = (float)(level - eqEMAPeak) * ((float)2 / (float)(EQ_EMA_PEAK_N + 1)) + eqEMAPeak;
 
-    valueTotal = valueTotal - values[valueIndex] + level;
-    values[valueIndex] = level;
-    valueAvg = valueTotal / VALUE_COUNT;
+    if (random(0,1) == 0)
+        eqEMA = (float)(level - eqEMA) * ((float)2 / (float)(EQ_EMA_N + 1)) + eqEMA;
+//     Serial.print(level);
+//     Serial.print("\t"); Serial.print(eqEMA);
+//     Serial.print("\t"); Serial.println(eqEMAPeak);
 
-
-    if (valueAvg <= 0)
-        return;
+    eqNminus2 = eqNminus1;
+    eqNminus1 = level;
     
     if (level < config.equalizer.RMSThreshold)
         level = 0;
 
-    //brightness = (float)level / ((float)valueAvg * 1.8);
-    // scale to moving average
-    //brightness = (float) map(level, 0, 1024, valueAvg, 1024);
-    // scale again for percentage
-    brightness = ((float) map(level, valueAvg, min(valueAvg * 3, 1024), 0, 100)) / 100;
-
+    brightness = map(level, eqEMA, eqEMAPeak, 0, 100) / 100;
     if (brightness < 0.0)
         brightness = 0;
-    //Serial.print(valueAvg); Serial.print("\t"); Serial.print(level); Serial.print("\t"); Serial.println(brightness); 
+
     if (config.equalizer.allLights)
     {
-        r = byte((float)config.equalizer.color.r * (brightness * brightness * brightness));
-        g = byte((float)config.equalizer.color.g * (brightness * brightness * brightness));
-        b = byte((float)config.equalizer.color.b * (brightness * brightness * brightness));
+        r = byte((float)config.equalizer.color.r * brightness);
+        g = byte((float)config.equalizer.color.g * brightness);
+        b = byte((float)config.equalizer.color.b * brightness);
+
+        if ((r == 0) && (g == 0) && (b == 0))
+        {
+            r = config.equalizer.minColor.r;
+            g = config.equalizer.minColor.g;
+            b = config.equalizer.minColor.b;
+        }
     }
 
     for (int i = 0; i < LEG_COUNT; i++)
         _legs[i].equalizer_listen(brightness, r, g, b);
-
-    valueIndex++;
 }

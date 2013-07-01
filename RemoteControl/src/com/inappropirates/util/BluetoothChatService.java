@@ -428,30 +428,31 @@ public class BluetoothChatService {
             
             // Keep listening to the InputStream while connected
             while (true) {
-            	try {
+            	
             		boolean eom = false;
-    	        	while (!eom && (mmInStream != null))
-    	        	{
-    	                // Read from bluetooth
-    	        		bytes = mmInStream.read(buffer, byteIndex, 1024 - byteIndex);
-    	        		
-    	        		byteIndex += bytes;
-    	
-    	        		if (buffer[byteIndex - 1] == '\r')
-    	        			eom = true;
-    	        	}
+	        		try {
+	    	        	while (!eom && (mmInStream != null)) {
+	    	                // Read from bluetooth
+	    	        		if (mmInStream.available() > 0)
+	    	        		{
+	    	        			bytes = mmInStream.read(buffer, byteIndex, 1024 - byteIndex);
+	    	        			byteIndex += bytes;
+	    	        			if (buffer[byteIndex - 1] == '\r')
+	    	        				eom = true;
+	    	        		}
+	    	        	}
+	    	        } catch (IOException e) {
+	    	            Log.e(AppUtil.TAG, "io exception disconnected", e);
+	    	            connectionLost();
+	    	        } catch (Exception e) {
+	    	        	Log.e(AppUtil.TAG, "disconnected", e);
+	    	            connectionLost();
+	    	        }
     	        	
     	        	Log.i(AppUtil.TAG, "Received: " + new String(buffer, 0, (byteIndex - 1)));
     	        	m = mHandler.obtainMessage(AppUtil.MESSAGE_READ, byteIndex - 1, -1, buffer);
                 	m.sendToTarget();
                 	byteIndex = 0;
-    	        } catch (IOException e) {
-    	            Log.e(AppUtil.TAG, "disconnected", e);
-    	            connectionLost();
-    	        }
-                		
-                	
-
             }
         }
 

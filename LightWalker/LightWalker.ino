@@ -101,7 +101,10 @@ bool executeCommand(char *key, int keyLen, char *value, int valueLen)
     if (strncmp_P(key, PSTR("main"), offset) == 0)
     {
         if (strncmp_P(key + offset, PSTR("MinBrightness"), keyLen - offset) == 0)
+        {
             lw.config.main.minBrightness = atoi(value);
+            ResetMinValues();
+        }
         if (strncmp_P(key + offset, PSTR("MaxBrightness"), keyLen - offset) == 0)
             lw.config.main.maxBrightness = atoi(value);
         else if (strncmp_P(key + offset, PSTR("LegsOn"), keyLen - offset) == 0)
@@ -200,7 +203,10 @@ bool executeCommand(char *key, int keyLen, char *value, int valueLen)
     if (strncmp_P(key, PSTR("eq"), offset) == 0)
     {
         if (strncmp_P(key + offset, PSTR("Color"), keyLen - offset) == 0)
+        {
             ParseColor(value, &(lw.config.equalizer.color));
+            ResetMinValues();
+        }
         else if (strncmp_P(key + offset, PSTR("RMSThreshold"), keyLen - offset) == 0)
             lw.config.equalizer.RMSThreshold = atoi(value);
         else if (strncmp_P(key + offset, PSTR("AllLights"), keyLen - offset) == 0)
@@ -208,6 +214,11 @@ bool executeCommand(char *key, int keyLen, char *value, int valueLen)
                 lw.config.equalizer.allLights = true;
             else
                 lw.config.equalizer.allLights = false;
+        else if (strncmp_P(key + offset, PSTR("AllBands"), keyLen - offset) == 0)
+            if (strncmp(value, one_str, 1) == 0)
+                lw.config.equalizer.allBands = true;
+            else
+                lw.config.equalizer.allBands = false;
 
         return true;
     }
@@ -249,4 +260,22 @@ void ParseColor(char *colorString, RGB *color)
 
     (*color).g = byte(atoi(value));
     (*color).b = byte(atoi(pComma + 1));
+}
+
+void ResetMinValues()
+{
+    // <cgerstle> equalizer min
+    int minimum = 255;
+    if (lw.config.equalizer.color.r > 0)
+        minimum = min(minimum, lw.config.equalizer.color.r);
+    if (lw.config.equalizer.color.g > 0)
+        minimum = min(minimum, lw.config.equalizer.color.g);
+    if (lw.config.equalizer.color.b > 0)
+        minimum = min(minimum, lw.config.equalizer.color.b);
+
+    float scale = ((float)lw.config.main.minBrightness)/((float)minimum);
+    lw.config.equalizer.minColor.r = (byte)(scale * (float)lw.config.equalizer.color.r);
+    lw.config.equalizer.minColor.g = (byte)(scale * (float)lw.config.equalizer.color.g);
+    lw.config.equalizer.minColor.b = (byte)(scale * (float)lw.config.equalizer.color.b);
+
 }

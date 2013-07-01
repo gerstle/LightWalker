@@ -99,11 +99,6 @@ void Leg::Init(LWConfigs *c, char n[], int i2c_channel, WalkingModeEnum mode, AD
 void Leg::sparkle_footdown()
 {
     status = Down;
-    if (DEBUG)
-    {
-        Serial.print(name); Serial.println(" -> down");
-    }
-
     _sparkle_fade_rate = config->sparkle.footDownFadeRate;
     _sparkle_flash();
 }
@@ -129,7 +124,8 @@ void Leg::sparkle_sameStatus()
             break;
 
         case Off:
-            off();
+            //off();
+            _sparkle_shimmer();
             break;
     }
 }
@@ -145,6 +141,39 @@ void Leg::_sparkle_flash()
             _setPixel(i, config->sparkle.footFlashColor, 0x00);
     }
     _setLightMode(Flash);
+}
+
+void Leg::_sparkle_shimmer()
+{
+    if (config->main.minBrightness == 0)
+    {
+        off();
+        return;
+    }
+
+    float brightness;
+
+    // leading leg
+    for (int i = 0; i < PIXELS_PER_LEG; i++)
+    {
+        if ((i <= (_half + 1)) && (i >= (_half - 1)))
+        {
+            brightness = ((float)config->main.maxBrightness / 20) / 100;  // <cgerstle> somewheres between 0 and 5% of max
+            _pixels[i].r = byte((float)config->sparkle.footSparkleColor.r * brightness);
+            _pixels[i].g = byte((float)config->sparkle.footSparkleColor.g * brightness);
+            _pixels[i].b = byte((float)config->sparkle.footSparkleColor.b * brightness);
+        }
+        else if (random(0, 50) == 0)
+        {
+            brightness = ((float)random(0, config->main.maxBrightness / 20)) / 100;  // <cgerstle> somewheres between 0 and 5% of max
+            _pixels[i].r = byte((float)config->sparkle.legSparkleColor.r * brightness);
+            _pixels[i].g = byte((float)config->sparkle.legSparkleColor.g * brightness);
+            _pixels[i].b = byte((float)config->sparkle.legSparkleColor.b * brightness);
+        }
+        LWUtils.sendColor(_pixels[i]);
+    }
+
+    _setLightMode(Off);
 }
 
 void Leg::_sparkle_sparkle()
@@ -209,10 +238,10 @@ void Leg::_sparkle_fade()
             if (still_fading)
                 _setLightMode(Fade);
             else
-                off();
+                _sparkle_shimmer();
     }
     else
-        off();
+        _sparkle_shimmer();
 }
 
 void Leg::pulse_pulse(unsigned long syncTime, int syncLength, int syncValue, bool changeColor)
@@ -341,9 +370,18 @@ void Leg::equalizer_listen(float level_percent, byte r, byte g, byte b)
             if (((i < _half) && (i < lower_threshold)) ||
                 ((i > _half) && (i > upper_threshold)))
             {
-                _pixels[i].r = 0;
-                _pixels[i].g = 0;
-                _pixels[i].b = 0;
+                if (config->main.minBrightness > 0)
+                {
+                    _pixels[i].r = config->equalizer.minColor.r;
+                    _pixels[i].g = config->equalizer.minColor.g;
+                    _pixels[i].b = config->equalizer.minColor.b;
+                }
+                else
+                {
+                    _pixels[i].r = 0;
+                    _pixels[i].g = 0;
+                    _pixels[i].b = 0;
+                }
             }
             else
             {
