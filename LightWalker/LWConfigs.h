@@ -28,9 +28,6 @@
 #include "EqualizerConfigs.h"
 #include "GravityConfigs.h"
 
-#define LEG_COUNT 2
-#define PIXELS_PER_LEG 50
-
 class LWConfigs
 {
     public:

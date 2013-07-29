@@ -44,7 +44,7 @@ class Leg
         unsigned long currentTime;
 
         Leg();
-        void Init(LWConfigs *c, char n[], int i2c_channel, WalkingModeEnum mode, ADXL345 *adxl, byte half);
+        void Init(LWConfigs *c, char *n, int i2c_channel, WalkingModeEnum mode, ADXL345 *adxl, byte count, byte half, RGB *p);
         void off();
         void setWalkingMode(WalkingModeEnum mode, ADXL345 *adxl);
         void detectStep(ADXL345 *adxl);
@@ -75,12 +75,14 @@ class Leg
         LightModeEnum _lightMode;
         unsigned long _lightModeChangeTime;
         WalkingModeEnum _walkingMode;
+        //RGB _pixels[PIXELS_PER_LEG];
+        RGB *_pixels;
+        byte _pixelCount;
         byte _half;
 
         void _setPixel(int i, RGB color, byte dimmer);
         void _displayPixels();
         void _setLightMode(LightModeEnum mode);
-        RGB _pixels[PIXELS_PER_LEG];
         void _applyMaxBrightness(byte *pixel, float value, int i);
 
         // <gerstle> Sparkle stuff        
