@@ -25,6 +25,12 @@
 #define EQ_EMA_N 200
 #define EQ_EMA_PEAK_N 5 
 
+#define LEG_COUNT 4
+#define LEFT_LEG_PIXEL_COUNT 50
+#define RIGHT_LEG_PIXEL_COUNT 50
+#define LEFT_ARM_PIXEL_COUNT 100
+#define RIGHT_ARM_PIXEL_COUNT 100
+
 class LW
 {
     public:
@@ -46,6 +52,11 @@ class LW
 
     private:
         Leg _legs[LEG_COUNT];
+        RGB _leftLegPixels[LEFT_LEG_PIXEL_COUNT];
+        RGB _rightLegPixels[RIGHT_LEG_PIXEL_COUNT];
+        RGB _leftArmPixels[LEFT_ARM_PIXEL_COUNT];
+        RGB _rightArmPixels[RIGHT_ARM_PIXEL_COUNT];
+
         unsigned long _laststatus;
 
         unsigned long _lightModeChangeTime;

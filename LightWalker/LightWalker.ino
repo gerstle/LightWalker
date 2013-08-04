@@ -1,7 +1,7 @@
-// <gerstle> pogo.ino
+// <gerstle> lightwalker.ino
 //
 // sketch for the LightWalker costume
-// The main work is in the LW class
+// The main work is in the LW & Leg classes
 
 #include <ADXL345.h>
 #include <Wire.h>

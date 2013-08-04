@@ -14,8 +14,10 @@
 
 void LW::initLegs(WalkingModeEnum m)
 {
-    _legs[0].Init(&config, "left leg", ADXL_ONE, mode, &_adxl, 22);
-    _legs[1].Init(&config, "right leg", ADXL_TWO, mode, &_adxl, 22);
+    _legs[0].Init(&config, "left leg", ADXL_ONE, mode, &_adxl, LEFT_LEG_PIXEL_COUNT, 2, _leftLegPixels);
+    _legs[1].Init(&config, "right leg", ADXL_TWO, mode, &_adxl, RIGHT_LEG_PIXEL_COUNT, 10, _rightLegPixels);
+    _legs[2].Init(&config, "left arm", ADXL_THREE, mode, &_adxl, LEFT_ARM_PIXEL_COUNT, 2, _leftArmPixels);
+    _legs[3].Init(&config, "right arm", ADXL_FOUR, mode, &_adxl, RIGHT_ARM_PIXEL_COUNT, 10, _rightArmPixels);
 
 //     for (int i = 0; i < LEG_COUNT; i++)
 //     {
