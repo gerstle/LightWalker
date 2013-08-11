@@ -5,7 +5,7 @@
        android:key="sparkle_preferences">
        
 	<com.robobunny.SeekBarPreference
-        android:key="sparkleFootUpFadeRate"
+        android:key="sparkleFootDownFadeRate"
         android:title="foot down fade rate"
         android:defaultValue="1"
         robobunny:min="1"

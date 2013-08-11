@@ -145,7 +145,8 @@ public class AppUtil extends Application {
 			}
     		AppUtil.mSelectedMode = mode;
     		AppUtil.sendModeSettings(mode, prefs);
-    		AppUtil.sendMessage(AppUtil.ConstructMessage("mode", mode.toString()));
+    		//AppUtil.sendMessage(AppUtil.ConstructMessage("mode", mode.toString()));
+    		AppUtil.sendMessage(AppUtil.ConstructMessage("mode", String.valueOf(mode.ordinal())));
     	}
     }
     
@@ -199,7 +200,7 @@ public class AppUtil extends Application {
 				// <cgerstle> when you're sending a bunch of data, you've
 				// gotta give the other some time to pull it off
 				try {
-					Thread.sleep(150);
+					Thread.sleep(100);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -209,7 +210,8 @@ public class AppUtil extends Application {
     }
     
     public static String ConstructMessage(String key, String value) {
-    	return key + mKeyDelimiter + value;
+    	return String.valueOf(Preferences.valueOf(key).ordinal()) + mKeyDelimiter + value;
+    	// return key + mKeyDelimiter + value;
     }
     
     public static boolean keyIsColor(String key) {

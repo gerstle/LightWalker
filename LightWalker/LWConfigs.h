@@ -28,6 +28,59 @@
 #include "EqualizerConfigs.h"
 #include "GravityConfigs.h"
 
+enum Preferences
+{
+    // ------------------------------------------------------------------------
+    // Main
+    // ------------------------------------------------------------------------
+    mainMinBrightness,
+    mainMaxBrightness,
+    mainLegsOn,
+    mainArmsOn,
+    mainDefaultMode,
+
+    //------------------------------------------------------------------------
+    //Mode
+    //------------------------------------------------------------------------
+    mode,
+
+    //------------------------------------------------------------------------
+    // Pulse
+    //------------------------------------------------------------------------
+    pulseMinRate,
+    pulseMaxRate,
+    pulseRandomColor,
+    pulseSyncLegs,
+    pulseColor,
+
+    //------------------------------------------------------------------------
+    // Sparkle
+    //------------------------------------------------------------------------
+    sparkleFootUpFadeRate,
+    sparkleFootDownFadeRate,
+    sparkleFlashLength,
+    sparkleSparkleLength,
+    sparkleFootFlashColor,
+    sparkleFootSparkleColor,
+    sparkleLegSparkleColor,
+
+    //------------------------------------------------------------------------
+    // Equalizer
+    //------------------------------------------------------------------------
+    eqRMSThreshold,
+    eqColor,
+    eqAllLights,
+    eqAllBands,
+
+    //------------------------------------------------------------------------
+    // Gravity
+    //------------------------------------------------------------------------
+    gravityColorOne,
+    gravityColorTwo,
+    gravityColorThree,
+    gravityRotate,
+};
+
 class LWConfigs
 {
     public:
