@@ -11,6 +11,7 @@ class EqualizerConfigs
 
         RGB color;
         RGB minColor;
+        RGB maxColor;
         int brightnessPercent;
         bool allLights;
         bool allBands;

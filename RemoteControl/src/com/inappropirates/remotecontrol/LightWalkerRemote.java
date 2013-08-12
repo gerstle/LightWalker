@@ -1,5 +1,6 @@
 package com.inappropirates.remotecontrol;
 
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -7,15 +8,12 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -26,6 +24,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.inappropirates.remotecontrol.R;
 import com.inappropirates.util.BluetoothChatService;
 import com.inappropirates.util.DeviceListActivity;
 
@@ -50,14 +49,10 @@ public class LightWalkerRemote extends Activity {
 		
 		if(AppUtil.DEBUG) Log.e(AppUtil.TAG, "--Create--");
 		
-		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		setContentView(R.layout.activity_light_walker_remote);
-		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.custom_title);
 		
         AppUtil.mContext = getApplicationContext();
-		AppUtil.mTitle = (TextView) findViewById(R.id.title_left_text);
-		AppUtil.mTitle.setText(R.string.app_name);
-		AppUtil.mTitle = (TextView) findViewById(R.id.title_right_text);
+		AppUtil.mTitle = (TextView) findViewById(R.id.Status);
         
         AppUtil.mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         AppUtil.mLightWalker = this;
@@ -141,11 +136,28 @@ public class LightWalkerRemote extends Activity {
     
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		Intent intent = null;
+		//Intent intent = null;
 	    switch (item.getItemId()) {
 	        case R.id.menu_bluetooth:
-	        	intent = new Intent(this, DeviceListActivity.class);
-	            startActivityForResult(intent, REQUEST_CONNECT_DEVICE_SECURE);
+	        	//intent = new Intent(this, DeviceListActivity.class);
+	            //startActivityForResult(intent, REQUEST_CONNECT_DEVICE_SECURE);
+	            String address = "00:06:66:48:59:FB";
+
+	            BluetoothDevice device = AppUtil.mBluetoothAdapter.getRemoteDevice(address);
+                // Attempt to connect to the device
+                AppUtil.mChatService.connect(device);
+                
+                // Initialize the send button with a listener that for click events
+                mSendButton = (Button) findViewById(R.id.buttonSend);
+                mSendButton.setOnClickListener(new OnClickListener() {
+                    public void onClick(View v) {
+                        // Send a message using content of the edit text widget
+                        TextView view = (TextView) findViewById(R.id.commandText);
+                        String message = view.getText().toString();
+                        AppUtil.sendMessage(message);
+                    }
+                });
+
 	            return true;
 	        case R.id.menu_bluetooth_disconnect:
 	        	AppUtil.mChatService.stop();

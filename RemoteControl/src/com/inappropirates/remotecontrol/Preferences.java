@@ -27,13 +27,11 @@ public enum Preferences {
 	//------------------------------------------------------------------------
 	// Sparkle
 	//------------------------------------------------------------------------
-	sparkleFootUpFadeRate,
-	sparkleFootDownFadeRate,
+	sparkleFadeRate,
 	sparkleFlashLength,
 	sparkleSparkleLength,
 	sparkleFootFlashColor,
-	sparkleFootSparkleColor,
-	sparkleLegSparkleColor,
+	sparkleSparkleColor,
 
 	//------------------------------------------------------------------------
 	// Equalizer

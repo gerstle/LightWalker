@@ -14,30 +14,10 @@
 
 void LW::initLegs(WalkingModeEnum m)
 {
-    _legs[0].Init(&config, "left leg", ADXL_ONE, mode, &_adxl, LEFT_LEG_PIXEL_COUNT, 37, _leftLegPixels);
-    _legs[1].Init(&config, "right leg", ADXL_TWO, mode, &_adxl, RIGHT_LEG_PIXEL_COUNT, 37, _rightLegPixels);
+    _legs[0].Init(&config, "left leg", ADXL_ONE, mode, &_adxl, LEFT_LEG_PIXEL_COUNT, 35, _leftLegPixels);
+    _legs[1].Init(&config, "right leg", ADXL_TWO, mode, &_adxl, RIGHT_LEG_PIXEL_COUNT, 35, _rightLegPixels);
     _legs[2].Init(&config, "left arm", ADXL_THREE, mode, &_adxl, LEFT_ARM_PIXEL_COUNT, 50, _leftArmPixels);
     _legs[3].Init(&config, "right arm", ADXL_FOUR, mode, &_adxl, RIGHT_ARM_PIXEL_COUNT, 50, _rightArmPixels);
-
-//     for (int i = 0; i < LEG_COUNT; i++)
-//     {
-//         LWUtils.selectI2CChannels(_legs[i].channel);
-//         _adxl.writeTo(ADXL345_POWER_CTL, 0);      
-//         _adxl.writeTo(ADXL345_POWER_CTL, 16);
-//         _adxl.writeTo(ADXL345_POWER_CTL, 8); 
-//         _adxl.setActivityThreshold(75); //62.5mg per increment
-//         _adxl.setInactivityThreshold(75); //62.5mg per increment
-//         _adxl.setTimeInactivity(10); // how many seconds of no activity is inactive?
-// 
-//         //look of activity movement on this axes - 1 == on; 0 == off 
-//         _adxl.setActivityX(1);
-//         _adxl.setActivityY(1);
-//         _adxl.setActivityZ(1);
-// 
-//         //set values for what is considered freefall (0-255)
-//         _adxl.setFreeFallThreshold(7); //(5 - 9) recommended - 62.5mg per increment
-//         _adxl.setFreeFallDuration(45); //(20 - 70) recommended - 5ms per increment
-//     }
 
     mode = m;
     setMode(mode);
@@ -101,7 +81,7 @@ void LW::walk()
                 break;
 
             case equalizer:
-                equalizer_listen();
+                equalizer_listen(currentTime);
                 break;
 
             case pulse:
@@ -143,7 +123,7 @@ void LW::equalizer_baseline()
         for (int i = 0; i < 7; i++)
         {
             digitalWrite(AUDIO_STROBE_PIN, LOW);
-            delayMicroseconds(30); // to allow the output to settle
+            delayMicroseconds(5); // to allow the output to settle
             tmp = analogRead(AUDIO_PIN);
 
             if (config.equalizer.allBands)
@@ -159,14 +139,19 @@ void LW::equalizer_baseline()
     
     eqEMA = eqValueTotal / EQ_EMA_N;
     eqEMAPeak = peak;
+    _lastEQReading = millis();
 }
 
-void LW::equalizer_listen()
+void LW::equalizer_listen(unsigned long currentTime)
 {
     int level = 0;
     int tmp;
     byte r, g, b = 0;
     float brightness;
+
+    if (currentTime <= (_lastEQReading + 3))
+        return;
+    _lastEQReading = currentTime;
 
     // <gerstle> get the value
     digitalWrite(AUDIO_RESET_PIN, HIGH);
@@ -175,7 +160,7 @@ void LW::equalizer_listen()
     for (int i = 0; i < 7; i++)
     {
         digitalWrite(AUDIO_STROBE_PIN, LOW);
-        delayMicroseconds(20); // to allow the output to settle
+        delayMicroseconds(3); // to allow the output to settle
 
         tmp = analogRead(AUDIO_PIN);
         if (config.equalizer.allBands)
@@ -190,9 +175,6 @@ void LW::equalizer_listen()
 
     if (random(0,1) == 0)
         eqEMA = (float)(level - eqEMA) * ((float)2 / (float)(EQ_EMA_N + 1)) + eqEMA;
-//     Serial.print(level);
-//     Serial.print("\t"); Serial.print(eqEMA);
-//     Serial.print("\t"); Serial.println(eqEMAPeak);
 
     eqNminus2 = eqNminus1;
     eqNminus1 = level;
@@ -206,9 +188,9 @@ void LW::equalizer_listen()
 
     if (config.equalizer.allLights)
     {
-        r = byte((float)config.equalizer.color.r * brightness);
-        g = byte((float)config.equalizer.color.g * brightness);
-        b = byte((float)config.equalizer.color.b * brightness);
+        r = byte((float)config.equalizer.maxColor.r * brightness);
+        g = byte((float)config.equalizer.maxColor.g * brightness);
+        b = byte((float)config.equalizer.maxColor.b * brightness);
 
         if ((r == 0) && (g == 0) && (b == 0))
         {

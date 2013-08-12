@@ -38,7 +38,7 @@ class LW
         void initLegs(WalkingModeEnum m);
         void off();
         void walk();
-        void equalizer_listen();
+        void equalizer_listen(unsigned long currentTime);
         void equalizer_baseline();
         void setMode(WalkingModeEnum m);
 
@@ -70,6 +70,7 @@ class LW
         float eqEMAPeak;
         int eqNminus2;
         int eqNminus1;
+        unsigned long _lastEQReading;
 };
 
 #endif

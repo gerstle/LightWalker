@@ -3,22 +3,13 @@
        xmlns:android="http://schemas.android.com/apk/res/android"
        xmlns:robobunny="http://robobunny.com"
        android:key="sparkle_preferences">
-       
-	<com.robobunny.SeekBarPreference
-        android:key="sparkleFootDownFadeRate"
-        android:title="foot down fade rate"
-        android:defaultValue="1"
-        robobunny:min="1"
-        android:max="50"
-        robobunny:unitsLeft=""
-        robobunny:unitsRight="" />
-    
+
     <com.robobunny.SeekBarPreference
-        android:key="sparkleFootUpFadeRate"
-        android:title="foot up fade rate"
-        android:defaultValue="1"
+        android:key="sparkleFadeRate"
+        android:title="fade rate"
+        android:defaultValue="2"
         robobunny:min="1"
-        android:max="50"
+        android:max="20"
         robobunny:unitsLeft=""
         robobunny:unitsRight="" />
     
@@ -26,7 +17,7 @@
         android:key="sparkleFlashLength"
         android:title="length of flash time (ms)"
         android:defaultValue="200"
-        android:max="2000"
+        android:max="1000"
         robobunny:min="0"
         robobunny:unitsLeft=""
 		robobunny:unitsRight="" />
@@ -34,9 +25,9 @@
     <com.robobunny.SeekBarPreference
         android:key="sparkleSparkleLength"
         android:title="length of sparkle time (ms)"
-        android:defaultValue="600"
-        android:max="10000"
-        robobunny:min="0"
+        android:defaultValue="400"
+        android:max="5000"
+        robobunny:min="100"
         robobunny:unitsLeft=""
 		robobunny:unitsRight="" />
     
@@ -46,12 +37,8 @@
         />
     
     <com.inappropirates.remotecontrol.ColorPickerPreference
-        android:key="sparkleFootSparkleColor"
-        android:title="foot sparkle color"
+        android:key="sparkleSparkleColor"
+        android:title="sparkle color"
         />
-    
-    <com.inappropirates.remotecontrol.ColorPickerPreference
-        android:key="sparkleLegSparkleColor"
-        android:title="leg sparkle color"
-        />    
+
 </PreferenceScreen>

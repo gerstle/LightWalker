@@ -51,6 +51,7 @@
 	></TextView>
 	
 	<LinearLayout android:id="@+id/seekBarPrefBarContainer"
+	    	android:orientation="vertical"
 			android:layout_alignParentLeft="true"
 	        android:layout_alignParentBottom="true"
 	        android:layout_width="fill_parent"

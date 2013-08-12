@@ -15,7 +15,7 @@
 #include "LWUtils.h"
 #include "LWConfigs.h"
 
-#define ADXL_VALUE_COUNT 60
+#define ADXL_VALUE_COUNT 100
 
 enum FootStatusEnum
 {
@@ -51,8 +51,6 @@ class Leg
         void upToMin(byte *r, byte *g, byte *b, RGB defaultColor);
 
         // <gerstle> Sparkle
-        bool sparkle_fade_on;
-
         void sparkle_footdown();
         void sparkle_footup();
         void sparkle_sameStatus();
@@ -81,7 +79,6 @@ class Leg
         byte _half;
 
         void _setPixel(int i, RGB color, byte dimmer);
-        void _displayPixels();
         void _setLightMode(LightModeEnum mode);
         void _applyMaxBrightness(byte *pixel, float value, int i);
 
@@ -108,6 +105,7 @@ class Leg
 
         // <cgerstle> steps
         unsigned long lastSharpPeakTime;
+        /*
         int valueIndex;
         int xValues[ADXL_VALUE_COUNT];
         int yValues[ADXL_VALUE_COUNT];
@@ -124,6 +122,19 @@ class Leg
         int zTotal;
         int zAverage;
         int zAverageOld;
+        */
+        float xEMA;
+        float yEMA;
+        float zEMA;
+
+        int xNMinus1;
+        int xNMinus2;
+
+        int yNMinus1;
+        int yNMinus2;
+
+        int zNMinus1;
+        int zNMinus2;
 
         int xStepDuration; // <cgerstle> a step lasts at least this long... ie, two steps can't occur within this time period
         int yStepDuration;

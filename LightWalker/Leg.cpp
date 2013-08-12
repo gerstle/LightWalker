@@ -18,8 +18,6 @@ Leg::Leg()
 
 void Leg::Init(LWConfigs *c, char *n, int i2c_channel, WalkingModeEnum mode, ADXL345 *adxl, byte count, byte half, RGB *p)
 {
-    int x, y, z;
-
     config = c;
     strcpy(name, n);
     channel = i2c_channel;
@@ -31,19 +29,27 @@ void Leg::Init(LWConfigs *c, char *n, int i2c_channel, WalkingModeEnum mode, ADX
     _pixels = p;
     _pixelCount = count;
 
-    _sparkle_fade_rate = config->sparkle.footDownFadeRate;
-
-    sparkle_fade_on = true;
-
     if ((_pixelCount % 2) > 0)
-        lower_foot_border = _half - 2;
+        lower_foot_border = _half - 4;
     else
-        lower_foot_border = _half - 3;
-    upper_foot_border = _half + 2;
+        lower_foot_border = _half - 5;
+    upper_foot_border = _half + 4;
 
     LWUtils.selectI2CChannels(channel);
     LWUtils.initADXL(adxl);
 
+    // <gerstle> init ADXL EMA's
+    int x, y, z;
+    xStepDuration = 250; // <cgerstle> a step lasts at least this long... ie, two steps can't occur within this time period
+    yStepDuration = 750;
+    zStepDuration = 750;
+    xAvgDiffThreshold = 160;
+    yAvgDiffThreshold = 80;
+    zAvgDiffThreshold = 80;
+    xSignificantlyLowerThanAverageThreshold = 45; 
+    readyForStep = false;
+    lastSharpPeakTime = millis();
+    /*
     valueIndex = 0;
 
     xTotal = 0;
@@ -57,16 +63,6 @@ void Leg::Init(LWConfigs *c, char *n, int i2c_channel, WalkingModeEnum mode, ADX
     zTotal = 0;
     zAverage = 0;
     zAverageOld = 0;
-
-    xStepDuration = 250; // <cgerstle> a step lasts at least this long... ie, two steps can't occur within this time period
-    yStepDuration = 750;
-    zStepDuration = 750;
-    xAvgDiffThreshold = 4;
-    yAvgDiffThreshold = 3;
-    zAvgDiffThreshold = 3;
-
-    xSignificantlyLowerThanAverageThreshold = 37; 
-    readyForStep = true;
 
     for (valueIndex = 0; valueIndex < ADXL_VALUE_COUNT; valueIndex++)
     {
@@ -88,7 +84,34 @@ void Leg::Init(LWConfigs *c, char *n, int i2c_channel, WalkingModeEnum mode, ADX
     xAverage = xTotal / ADXL_VALUE_COUNT;
     yAverage = yTotal / ADXL_VALUE_COUNT;
     zAverage = zTotal / ADXL_VALUE_COUNT;
-    lastSharpPeakTime = millis();
+    */
+    int valueIndex = 0;
+    int xValueTotal, yValueTotal, zValueTotal  = 0;
+    for (valueIndex = 0; valueIndex < ADXL_VALUE_COUNT; valueIndex++)
+    {
+        adxl->readXYZ(&x, &y, &z); //read the accelerometer values and store them in variables  x,y,z
+
+        x = x;
+        y = abs(y);
+        z = abs(z);
+
+        xValueTotal += x;
+        yValueTotal += y;
+        zValueTotal += z;
+
+        xNMinus2 = xNMinus1;
+        xNMinus1 = x;
+
+        yNMinus2 = yNMinus1;
+        yNMinus1 = y;
+
+        zNMinus2 = zNMinus1;
+        zNMinus1 = z;
+    }
+
+    xEMA = xValueTotal / ADXL_VALUE_COUNT;
+    yEMA = yValueTotal / ADXL_VALUE_COUNT;
+    zEMA = zValueTotal / ADXL_VALUE_COUNT;
 
     // <gerstle> gravity
     _indexOne = 0;
@@ -101,13 +124,12 @@ void Leg::Init(LWConfigs *c, char *n, int i2c_channel, WalkingModeEnum mode, ADX
 void Leg::sparkle_footdown()
 {
     status = Down;
-    _sparkle_fade_rate = config->sparkle.footDownFadeRate;
     _sparkle_flash();
 }
 
 void Leg::sparkle_sameStatus()
 {
-//     Serial.print("leg "); Serial.print(name); Serial.println(" -> same");
+    // Serial.print("leg "); Serial.print(name); Serial.println(" -> same");
     switch (_lightMode)
     {
         case Flash:
@@ -115,10 +137,7 @@ void Leg::sparkle_sameStatus()
             break;
 
         case SparkleSparkle:
-            if (currentTime <= (_lightModeChangeTime + config->sparkle.sparkleLength))
                 _sparkle_sparkle();
-            else
-                _sparkle_fade();
             break;
 
         case Fade:
@@ -126,7 +145,6 @@ void Leg::sparkle_sameStatus()
             break;
 
         case Off:
-            //off();
             _sparkle_shimmer();
             break;
     }
@@ -134,45 +152,48 @@ void Leg::sparkle_sameStatus()
 
 void Leg::_sparkle_flash()
 {
-    //Serial.print("flashing "); Serial.println(name);
+    Serial.print("flashing "); Serial.println(name);
     for (int i = 0; i < _pixelCount; i++)
     {
         if ((i < lower_foot_border) || (i > upper_foot_border))
-            _setPixel(i, COLORS[BLACK], 0x00);
+            _setPixel(i, COLORS[BLACK], 0);
         else
-            _setPixel(i, config->sparkle.footFlashColor, 0x00);
+            _setPixel(i, config->sparkle.footFlashColor, 0);
     }
     _setLightMode(Flash);
 }
 
 void Leg::_sparkle_shimmer()
 {
-    if (config->main.minBrightness == 0)
-    {
-        off();
-        return;
-    }
-
-    float brightness;
+    Serial.print("shimmering "); Serial.println(name);
+    float max = ((float) min(40, config->main.maxBrightness)) / 100;
+    float brightness = 0;
+    int dice = 0;
 
     // leading leg
     for (int i = 0; i < _pixelCount; i++)
     {
+        dice = random(0, 100);
         if ((i <= (_half + 1)) && (i >= (_half - 1)))
         {
-            brightness = ((float)config->main.maxBrightness / 20) / 100;  // <cgerstle> somewheres between 0 and 5% of max
-            _pixels[i].r = byte((float)config->sparkle.footSparkleColor.r * brightness);
-            _pixels[i].g = byte((float)config->sparkle.footSparkleColor.g * brightness);
-            _pixels[i].b = byte((float)config->sparkle.footSparkleColor.b * brightness);
+            _pixels[i].r = byte((float)config->sparkle.sparkleColor.r * max);
+            _pixels[i].g = byte((float)config->sparkle.sparkleColor.g * max);
+            _pixels[i].b = byte((float)config->sparkle.sparkleColor.b * max);
         }
-        else if (random(0, 50) == 0)
+        else if ((config->main.minBrightness > 0) && (dice == 0))
         {
-            brightness = ((float)random(0, config->main.maxBrightness / 20)) / 100;  // <cgerstle> somewheres between 0 and 5% of max
-            _pixels[i].r = byte((float)config->sparkle.legSparkleColor.r * brightness);
-            _pixels[i].g = byte((float)config->sparkle.legSparkleColor.g * brightness);
-            _pixels[i].b = byte((float)config->sparkle.legSparkleColor.b * brightness);
+            brightness = ((float) random(0, 20)) / 100 * max;
+            _pixels[i].r = byte((float)config->sparkle.sparkleColor.r * brightness);
+            _pixels[i].g = byte((float)config->sparkle.sparkleColor.g * brightness);
+            _pixels[i].b = byte((float)config->sparkle.sparkleColor.b * brightness);
         }
-        LWUtils.sendColor(_pixels[i]);
+        else if (config->main.minBrightness == 0)
+        {
+            _pixels[i].r = 0;
+            _pixels[i].g = 0;
+            _pixels[i].b = 0;
+        }
+        _setPixel(i, _pixels[i], 0);
     }
 
     _setLightMode(Off);
@@ -180,70 +201,86 @@ void Leg::_sparkle_shimmer()
 
 void Leg::_sparkle_sparkle()
 {
-    //Serial.print("\tsparkling "); Serial.println(name);
+    Serial.print("\tsparkling "); Serial.println(name);
     float brightness;
-    int distance;
+    float rand;
 
     // leading leg
     for (int i = 0; i < lower_foot_border; i++)
     {
-        distance = lower_foot_border - i;
-        int limit = (config->main.maxBrightness/(lower_foot_border * 3)) * (i + 1);
-        brightness = ((float)map(random(0, limit), 0, limit, 0, 100)) / 100;
-        _pixels[i].r = byte((float)config->sparkle.legSparkleColor.r * brightness);
-        _pixels[i].g = byte((float)config->sparkle.legSparkleColor.g * brightness);
-        _pixels[i].b = byte((float)config->sparkle.legSparkleColor.b * brightness);
+        brightness = ((float) i / (float) lower_foot_border);
+        rand = (float)random(0, min(20, brightness * 100)) / 100;
+        brightness = brightness - rand;
+        //Serial.print(i); Serial.print("\t"); Serial.print(brightness); Serial.print("\t"); Serial.println(rand);
+        _pixels[i].r = byte((float)config->sparkle.sparkleColor.r * brightness);
+        _pixels[i].g = byte((float)config->sparkle.sparkleColor.g * brightness);
+        _pixels[i].b = byte((float)config->sparkle.sparkleColor.b * brightness);
+        _setPixel(i, _pixels[i], 0);
     }
 
-    //leg
+    //foot
+    RGB *footColor = &config->sparkle.footFlashColor;
     if (currentTime > (_lightModeChangeTime + config->sparkle.flashLength))
-        for (int i = lower_foot_border; i <= upper_foot_border; i++)
-        {
-            _pixels[i].r = config->sparkle.footSparkleColor.r;
-            _pixels[i].g = config->sparkle.footSparkleColor.g;
-            _pixels[i].b = config->sparkle.footSparkleColor.b;
-        }
+        footColor = &config->sparkle.sparkleColor;
+
+    for (int i = lower_foot_border; i <= upper_foot_border; i++)
+    {
+        _pixels[i].r = (*footColor).r;
+        _pixels[i].g = (*footColor).g;
+        _pixels[i].b = (*footColor).b;
+        _setPixel(i, _pixels[i], 0);
+    }
 
     // trailing leg
     for (int i = upper_foot_border + 1; i < _pixelCount; i++)
     {
-        // <gerstle> white sparkle
-        int limit = (config->main.maxBrightness/(lower_foot_border * 3)) * (lower_foot_border - (i - upper_foot_border) + 1);
-        brightness = ((float)map(random(0, limit), 0, limit, 0, 100)) / 100;
-        _pixels[i].r = byte((float)config->sparkle.legSparkleColor.r * brightness);
-        _pixels[i].g = byte((float)config->sparkle.legSparkleColor.g * brightness);
-        _pixels[i].b = byte((float)config->sparkle.legSparkleColor.b * brightness);
+        brightness = ((float) (_pixelCount - 1 - i) / (float) lower_foot_border);
+        rand = (float)random(0, min(20, brightness * 100)) / 100;
+        brightness = brightness - rand;
+        //Serial.print(i); Serial.print("\t"); Serial.print(brightness); Serial.print("\t"); Serial.println(rand);
+        _pixels[i].r = byte((float)config->sparkle.sparkleColor.r * brightness);
+        _pixels[i].g = byte((float)config->sparkle.sparkleColor.g * brightness);
+        _pixels[i].b = byte((float)config->sparkle.sparkleColor.b * brightness);
+        _setPixel(i, _pixels[i], 0);
     }
 
-    _displayPixels();
-    _setLightMode(SparkleSparkle);
+    if (currentTime <= (_lightModeChangeTime + config->sparkle.sparkleLength))
+        _setLightMode(SparkleSparkle);
+    else
+    {
+        for (int i = 0; i < _pixelCount; i++)
+            if ((i >= lower_foot_border) && (i <= upper_foot_border))
+            {
+                _pixels[i].r = byte((float)config->sparkle.sparkleColor.r);
+                _pixels[i].g = byte((float)config->sparkle.sparkleColor.g);
+                _pixels[i].b = byte((float)config->sparkle.sparkleColor.b);
+            }
+        _setLightMode(Fade);
+    }
 }
 
 void Leg::_sparkle_fade()
 {
-    //Serial.print("\t\tfading "); Serial.println(name);
-    if (sparkle_fade_on)
-    {
-        bool still_fading = false;
+    Serial.print("\t\tfading "); Serial.println(name);
+    int still_fading = 0;
 
-        for (int i = 0; i < _pixelCount; i++)
-            if (((_pixels[i].r - _sparkle_fade_rate) > 0x00) ||
-                ((_pixels[i].g - _sparkle_fade_rate) > 0x00) ||
-                ((_pixels[i].b - _sparkle_fade_rate) > 0x00))
-            {
-                _setPixel(i, _pixels[i], _sparkle_fade_rate);
-                still_fading = true;
-            }
-            else
-                _setPixel(i, COLORS[BLACK], 0x00);
+    for (int i = 0; i < _pixelCount; i++)
+        if (((_pixels[i].r - config->sparkle.fadeRate) > 0) ||
+            ((_pixels[i].g - config->sparkle.fadeRate) > 0) ||
+            ((_pixels[i].b - config->sparkle.fadeRate) > 0))
+        {
+            _setPixel(i, _pixels[i], config->sparkle.fadeRate);
+            still_fading++;
+        }
+        else
+            _setPixel(i, _pixels[i], 0);
 
-            if (still_fading)
-                _setLightMode(Fade);
-            else
-                _sparkle_shimmer();
-    }
-    else
-        _sparkle_shimmer();
+        if ((config->main.minBrightness > 0) && (still_fading > (_pixelCount / 2)))
+            _setLightMode(Fade);
+        else if ((config->main.minBrightness == 0) && (still_fading))
+            _setLightMode(Fade);
+        else
+            _setLightMode(Off);
 }
 
 void Leg::pulse_pulse(unsigned long syncTime, int syncLength, int syncValue, bool changeColor)
@@ -274,7 +311,7 @@ void Leg::pulse_pulse(unsigned long syncTime, int syncLength, int syncValue, boo
     {
         if (config->pulse.randomColor)
         {
-            int color = random(WHITE, COLOR_COUNT);
+            int color = random(1, COLOR_COUNT);
             _pulse_color.r = COLORS[color].r;
             _pulse_color.g = COLORS[color].g;
             _pulse_color.b = COLORS[color].b;
@@ -304,38 +341,29 @@ void Leg::pulse_pulse(unsigned long syncTime, int syncLength, int syncValue, boo
     bool setMin = false;
 
     byte r = byte((float)_pulse_color.r * brightness);
-    //byte g = map(byte((float)_pulse_color.g * brightness), 0, 255, min, 255);
     byte g = byte((float)_pulse_color.g * brightness);
     byte b = byte((float)_pulse_color.b * brightness);
 
-    if ((r < config->main.minBrightness) && 
-        (g < config->main.minBrightness) &&
-        (b < config->main.minBrightness))
-        setMin = true;
-
-    if (setMin && (_pulse_color.r > 0))
-        r = map(r, 0, 255, config->main.minBrightness, 255);
-    if (setMin && (_pulse_color.g > 0))
-        g = map(g, 0, 255, config->main.minBrightness, 255);
-    if (setMin && (_pulse_color.b > 0))
-        b = map(b, 0, 255, config->main.minBrightness, 255);
+    r = map(r, 0, 255, config->main.minBrightness, config->main.maxBrightness);
+    g = map(g, 0, 255, config->main.minBrightness, config->main.maxBrightness);
+    b = map(b, 0, 255, config->main.minBrightness, config->main.maxBrightness);
 
     for (int i = 0; i < _pixelCount; i++)
     {
         RGB newColor;
 
         // <gerstle> don't change from non-zero to zero!
-        if ((_pixels[i].r != 0) && (r == 0))
+        if ((_pixels[i].r != 0) && (r == 0) && (config->main.minBrightness > 0))
             newColor.r = _pixels[i].r;
         else
             newColor.r = r;
 
-        if ((_pixels[i].g != 0) && (g == 0))
+        if ((_pixels[i].g != 0) && (g == 0) && (config->main.minBrightness > 0))
             newColor.g = _pixels[i].g;
         else
             newColor.g = g;
 
-        if ((_pixels[i].b != 0) && (b == 0))
+        if ((_pixels[i].b != 0) && (b == 0) && (config->main.minBrightness > 0))
             newColor.b = _pixels[i].b;
         else
             newColor.b = b;
@@ -356,8 +384,8 @@ void Leg::equalizer_listen(float level_percent, byte r, byte g, byte b)
         for (int i = 0; i < _pixelCount; i++)
         {
             _pixels[i].r = r;
-            _pixels[i].b = b;
             _pixels[i].g = g;
+            _pixels[i].b = b;
             _setPixel(i, _pixels[i], 0);
         }
     }
@@ -387,9 +415,9 @@ void Leg::equalizer_listen(float level_percent, byte r, byte g, byte b)
             }
             else
             {
-                _pixels[i].r = config->equalizer.color.r;
-                _pixels[i].g = config->equalizer.color.g;
-                _pixels[i].b = config->equalizer.color.b;
+                _pixels[i].r = config->equalizer.maxColor.r;
+                _pixels[i].g = config->equalizer.maxColor.g;
+                _pixels[i].b = config->equalizer.maxColor.b;
             }
 
             _setPixel(i, _pixels[i], 0);
@@ -397,53 +425,24 @@ void Leg::equalizer_listen(float level_percent, byte r, byte g, byte b)
     }
 }
 
-void Leg::_displayPixels()
-{
-    for (int i = 0; i < _pixelCount; i++)
-        LWUtils.sendColor(_pixels[i]);
-}
-
 void Leg::_setPixel(int i, RGB color, byte dimmer)
 {
+    if (i == 0)
+        Serial.println(i);
     if (color.r > dimmer)
-        color.r = color.r - dimmer;
-    else
-        color.r = 0;
-
-    if (color.g > dimmer)
-        color.g = color.g - dimmer;
-    else
-        color.g = 0;
-
-    if (color.b > dimmer)
-        color.b = color.b - dimmer;
-    else
-        color.b = 0;
-
-    if ((channel == 1) && (i == 0) && false)
-    {
-        Serial.print("_setPixel:: "); Serial.print(color.r); Serial.print(" - "); Serial.print(color.g); Serial.print(" - "); Serial.print(color.b); Serial.print(" dim: "); Serial.println(dimmer);
-    }
-
-    if (color.r > 0)
-        _pixels[i].r = map(color.r, config->main.minBrightness, 255, config->main.minBrightness, config->main.maxBrightness);
+        _pixels[i].r = color.r - dimmer;
     else
         _pixels[i].r = 0;
 
-    if (color.g > 0)
-        _pixels[i].g = map(color.g, config->main.minBrightness, 255, config->main.minBrightness, config->main.maxBrightness);
+    if (color.g > dimmer)
+        _pixels[i].g = color.g - dimmer;
     else
         _pixels[i].g = 0;
 
-    if (color.b > 0)
-        _pixels[i].b = map(color.b, config->main.minBrightness, 255, config->main.minBrightness, config->main.maxBrightness);
+    if (color.b > dimmer)
+        _pixels[i].b = color.b - dimmer;
     else
         _pixels[i].b = 0;
-
-    if ((channel == 1) && (i == 0) && false)
-    {
-        Serial.print("\t\t-> "); Serial.print(_pixels[i].r); Serial.print(" - "); Serial.print(_pixels[i].g); Serial.print(" - "); Serial.print(_pixels[i].b); Serial.print(" dim: "); Serial.println(dimmer);
-    }
 
     LWUtils.sendColor(_pixels[i]);
 }
@@ -505,14 +504,16 @@ void Leg::upToMin(byte *r, byte *g, byte *b, RGB defaultColor)
 void Leg::off()
 {
     for (int i = 0; i < _pixelCount; i++)
-        _setPixel(i, COLORS[BLACK], 0x00);
+        _setPixel(i, COLORS[BLACK], 0);
     _setLightMode(Off);
 }
 
 void Leg::_setLightMode(LightModeEnum mode)
 {
     if (_lightMode != mode)
+    {
         _lightModeChangeTime = millis();
+    }
     _lightMode = mode;
 }
 
@@ -547,72 +548,69 @@ void Leg::detectStep(ADXL345 *adxl)
     LWUtils.selectI2CChannels(channel);
     adxl->readXYZ(&x, &y, &z); //read the accelerometer values and store them in variables  x,y,z
 
-    x = abs(x);
+    x = x;
     y = abs(y);
-    z = z;
+    z = abs(z);
 
-    if (valueIndex >= ADXL_VALUE_COUNT)
-        valueIndex = 0;
+    xEMA = (float)(x- xEMA) * ((float)2 / (float)(ADXL_VALUE_COUNT + 1)) + xEMA;
+    yEMA = (float)(y- yEMA) * ((float)2 / (float)(ADXL_VALUE_COUNT + 1)) + yEMA;
+    zEMA = (float)(z- zEMA) * ((float)2 / (float)(ADXL_VALUE_COUNT + 1)) + zEMA;
 
-    xTotal = xTotal - xValues[valueIndex] + x;
-    xValues[valueIndex] = x;
-    xAverage = xTotal / ADXL_VALUE_COUNT;
+    xNMinus2 = xNMinus1;
+    xNMinus1 = x;
 
-    yTotal = yTotal - yValues[valueIndex] + y;
-    yValues[valueIndex] = y;
-    yAverage = yTotal / ADXL_VALUE_COUNT;
-   
-    zTotal = zTotal - zValues[valueIndex] + z;
-    zValues[valueIndex] = z;
-    zAverage = zTotal / ADXL_VALUE_COUNT;
+    yNMinus2 = yNMinus1;
+    yNMinus1 = y;
 
-    if (x < (xAverage - xSignificantlyLowerThanAverageThreshold))
+    zNMinus2 = zNMinus1;
+    zNMinus1 = z;
+
+/*
+    Serial.print(x); Serial.print("\t"); Serial.print(y); Serial.print("\t"); Serial.print(z);
+    Serial.print("\t"); Serial.print(xEMA);
+    Serial.print("\t"); Serial.print(yEMA);
+    Serial.print("\t"); Serial.print(zEMA);
+    Serial.print("\t"); Serial.println(readyForStep);
+*/
+
+    if (x < (xEMA - xSignificantlyLowerThanAverageThreshold))
         readyForStep = true;
-
-//     Serial.print(name); Serial.print("\t"); Serial.print(x); Serial.print("\t"); Serial.print(y); Serial.print("\t"); Serial.println(z);
-//     Serial.print("\t"); Serial.print(xAverage); Serial.print("\t"); Serial.print(xAverageOld);
-//     Serial.print("\t"); Serial.print(yAverage); Serial.print("\t"); Serial.print(yAverageOld);
-//     Serial.print("\t"); Serial.print(zAverage); Serial.print("\t"); Serial.print(zAverageOld);
-//     Serial.print("\t"); Serial.print(readyForStep);
 
     if (readyForStep && (currentTime > (lastSharpPeakTime + xStepDuration)))
     {
         step = false;
-        if ((x > xAverage) && (xAverage >= (xAverageOld + xAvgDiffThreshold)))
+        if (x > (xEMA + xAvgDiffThreshold))
         {
             stepDetected = true;
             readyForStep = false;
+            Serial.print("X\t\t");
         }
     }
 
+    if (readyForStep && (currentTime > (lastSharpPeakTime + yStepDuration)))
+        if (!stepDetected && (y >= (yEMA + yAvgDiffThreshold)))
+        {
+            stepDetected = true;
+            Serial.print("y\t\t");
+        }
+
 
     if (readyForStep && (currentTime > (lastSharpPeakTime + zStepDuration)))
-        if (!stepDetected && (zAverage >= (zAverageOld + zAvgDiffThreshold)))
+        if (!stepDetected && (z >= (zEMA + zAvgDiffThreshold)))
+        {
             stepDetected = true;
-
-    if (readyForStep && (currentTime > (lastSharpPeakTime + yStepDuration)))
-        if (!stepDetected && (yAverage >= (yAverageOld + yAvgDiffThreshold)))
-            stepDetected = true;
+            Serial.print("Z\t\t");
+        }
 
     if (stepDetected)
     {
-        Serial.print("\t\t"); Serial.print(name); Serial.println("\tSTEP!");
+        Serial.print(name); Serial.println("\tSTEP!");
         lastSharpPeakTime = millis();
         step = true;
         sparkle_footdown();
-        sparkle_fade_on = true;
     }
     else
-    {
         sparkle_sameStatus();
-//         Serial.println();
-    }
-
-    xAverageOld = xAverage;
-    yAverageOld = yAverage;
-    zAverageOld = zAverage;
-
-    valueIndex++;
 }
 
 void Leg::gravity2Lights(ADXL345 *adxl)
@@ -621,7 +619,7 @@ void Leg::gravity2Lights(ADXL345 *adxl)
 	double xyz[3];
 
     LWUtils.selectI2CChannels(channel);
-    adxl->getAccelemeter(xyz);
+    adxl->getAcceleration(xyz);
 
     currentTime = millis();
 
@@ -633,36 +631,36 @@ void Leg::gravity2Lights(ADXL345 *adxl)
     if (_indexOne == 2)
     {
         if (xyz[_indexOne] > 0)
-            _pixels[0].r = map(abs(xyz[_indexOne]) * 100, 0, 192, 0, 255);
+            _pixels[0].r = map(abs(xyz[_indexOne]) * 100, 0, 192, config->main.minBrightness, config->main.maxBrightness);
         else
-            _pixels[0].r = 0x0;
+            _pixels[0].r = 0;
     }
     else
-        _pixels[0].r = map(abs(xyz[_indexOne]) * 100, 0, 192, 0, 255);
+        _pixels[0].r = map(abs(xyz[_indexOne]) * 100, 0, 192, config->main.minBrightness, config->main.maxBrightness);
 
     if (_indexTwo == 2)
     {
         if (xyz[_indexTwo] > 0)
-            _pixels[0].g = map(abs(xyz[_indexTwo]) * 100, 0, 192, 0, 255);
+            _pixels[0].g = map(abs(xyz[_indexTwo]) * 100, 0, 192, config->main.minBrightness, config->main.maxBrightness);
         else
-            _pixels[0].g = 0x0;
+            _pixels[0].g = 0;
     }
     else
-        _pixels[0].g = map(abs(xyz[_indexTwo]) * 100, 0, 192, 0, 255);
+        _pixels[0].g = map(abs(xyz[_indexTwo]) * 100, 0, 192, config->main.minBrightness, config->main.maxBrightness);
 
     if (_indexThree == 2)
     {
         if (xyz[_indexThree] > 0)
-            _pixels[0].b = map(abs(xyz[_indexThree]) * 100, 0, 192, 0, 255);
+            _pixels[0].b = map(abs(xyz[_indexThree]) * 100, 0, 192, config->main.minBrightness, config->main.maxBrightness);
         else
-            _pixels[0].b = 0x0;
+            _pixels[0].b = 0;
         if (print)
         {
             Serial.print("\tb: "); Serial.print(_pixels[0].b);
         }
     }
     else
-        _pixels[0].b = map(abs(xyz[_indexThree]) * 100, 0, 192, 0, 255);
+        _pixels[0].b = map(abs(xyz[_indexThree]) * 100, 0, 192, config->main.minBrightness, config->main.maxBrightness);
 
 
     if (config->gravity.rotate)

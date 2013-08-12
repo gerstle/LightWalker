@@ -4,6 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".LightWalkerRemote" >
 
     <LinearLayout
@@ -20,14 +24,14 @@
             android:ems="10"
             android:hint="@string/commandHint"
             android:inputType="text" />
-	
-	    <Button
-	        android:id="@+id/buttonSend"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/commandSend" />
-	</LinearLayout>
-	
+
+        <Button
+            android:id="@+id/buttonSend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/commandSend" />
+    </LinearLayout>
+
     <TextView
         android:id="@+id/bluetoothMessageView"
         android:layout_width="wrap_content"
@@ -43,7 +47,15 @@
     <ListView
         android:id="@+id/modeList"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="0dip"
+        android:layout_weight="0.46"
+        android:entries="@array/modeList" >
     </ListView>
+
+    <TextView
+        android:id="@+id/Status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
 </LinearLayout>

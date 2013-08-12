@@ -105,7 +105,7 @@ bool executeCommand(int key, char *value, int valueLen)
 //         if (strncmp_P(key + offset, PSTR("MinBrightness"), keyLen - offset) == 0)
 //         {
 //             lw.config.main.minBrightness = atoi(value);
-//             ResetMinValues();
+//             ResetEQColor();
 //         }
 //         if (strncmp_P(key + offset, PSTR("MaxBrightness"), keyLen - offset) == 0)
 //             lw.config.main.maxBrightness = atoi(value);
@@ -207,7 +207,7 @@ bool executeCommand(int key, char *value, int valueLen)
 //         if (strncmp_P(key + offset, PSTR("Color"), keyLen - offset) == 0)
 //         {
 //             ParseColor(value, &(lw.config.equalizer.color));
-//             ResetMinValues();
+//             ResetEQColor();
 //         }
 //         else if (strncmp_P(key + offset, PSTR("RMSThreshold"), keyLen - offset) == 0)
 //             lw.config.equalizer.RMSThreshold = atoi(value);
@@ -258,8 +258,25 @@ bool executeCommand(int key, char *value, int valueLen)
         // ------------------------------------------------------------------------
         // Main 
         // ------------------------------------------------------------------------
+        case mainMinBrightness:
+            lw.config.main.minBrightness = atoi(value);
+            ResetEQColor();
+            break;
         case mainMaxBrightness:
             lw.config.main.maxBrightness = atoi(value);
+            ResetEQColor();
+            break;
+        case mainLegsOn:
+            if (strncmp(value, one_str, valueLen) == 0)
+                lw.config.main.legsOn = true;
+            else
+                lw.config.main.legsOn = false;
+            break;
+        case mainArmsOn:
+            if (strncmp(value, one_str, valueLen) == 0)
+                lw.config.main.armsOn = true;
+            else
+                lw.config.main.armsOn = false;
             break;
 
         // ------------------------------------------------------------------------
@@ -268,6 +285,7 @@ bool executeCommand(int key, char *value, int valueLen)
         case mode:
             valueInt = atoi(value);
             WalkingModeEnum newMode;
+            ResetEQColor();
 
             switch (valueInt)
             {
@@ -294,12 +312,9 @@ bool executeCommand(int key, char *value, int valueLen)
         // ------------------------------------------------------------------------
         // Sparkle
         // ------------------------------------------------------------------------
-        case sparkleFootUpFadeRate:
-            lw.config.sparkle.footUpFadeRate = atoi(value);
+        case sparkleFadeRate:
+            lw.config.sparkle.fadeRate = atoi(value);
             break;  
-        case sparkleFootDownFadeRate:
-            lw.config.sparkle.footDownFadeRate = atoi(value);
-            break;
         case sparkleFlashLength:
             lw.config.sparkle.flashLength = atoi(value);
             break;
@@ -309,11 +324,8 @@ bool executeCommand(int key, char *value, int valueLen)
         case sparkleFootFlashColor:
             ParseColor(value, &(lw.config.sparkle.footFlashColor));
             break;
-        case sparkleFootSparkleColor:
-            ParseColor(value, &(lw.config.sparkle.footSparkleColor));
-            break;
-        case sparkleLegSparkleColor:
-            ParseColor(value, &(lw.config.sparkle.legSparkleColor));
+        case sparkleSparkleColor:
+            ParseColor(value, &(lw.config.sparkle.sparkleColor));
             break;
 
         // ------------------------------------------------------------------------
@@ -326,20 +338,21 @@ bool executeCommand(int key, char *value, int valueLen)
             lw.config.pulse.maxPulseTime = atoi(value);
             break;
         case pulseRandomColor:
-            if (strncmp(value, "1", valueLen) == 0)
+            if (strncmp(value, one_str, valueLen) == 0)
                 lw.config.pulse.randomColor = true;
             else
                 lw.config.pulse.randomColor = false;
             break;
 
         case pulseSyncLegs:
-            if (strncmp(value, "1", valueLen) == 0)
+            if (strncmp(value, one_str, valueLen) == 0)
                 lw.config.pulse.syncLegs = true;
             else
                 lw.config.pulse.syncLegs  = false;
             break;
         case pulseColor:
             ParseColor(value, &(lw.config.pulse.color));
+            LWUtils.printRGB(lw.config.pulse.color, true);
             break;
 
         // ------------------------------------------------------------------------
@@ -352,13 +365,13 @@ bool executeCommand(int key, char *value, int valueLen)
             lw.config.equalizer.RMSThreshold = atoi(value);
             break;
         case eqAllLights:
-            if (strncmp(value, "1", 1) == 0)
+            if (strncmp(value, one_str, 1) == 0)
                 lw.config.equalizer.allLights = true;
             else
                 lw.config.equalizer.allLights = false;
             break;
         case eqAllBands:
-            if (strncmp(value, "1", 1) == 0)
+            if (strncmp(value, one_str, 1) == 0)
                 lw.config.equalizer.allBands = true;
             else
                 lw.config.equalizer.allBands = false;
@@ -377,7 +390,7 @@ bool executeCommand(int key, char *value, int valueLen)
             ParseColor(value, &(lw.config.gravity.colorThree));
             break;
         case gravityRotate:
-            if (strncmp(value, "1", 1) == 0)
+            if (strncmp(value, one_str, 1) == 0)
                 lw.config.gravity.rotate = true;
             else
                 lw.config.gravity.rotate = false;
@@ -405,22 +418,42 @@ void ParseColor(char *colorString, RGB *color)
 
     (*color).g = byte(atoi(value));
     (*color).b = byte(atoi(pComma + 1));
+
+    //LWUtils.printRGB(*color, false); Serial.print(" -> ");
+    //(*color).r = map((*color).r, 0, 255, 0, lw.config.main.maxBrightness);
+    //(*color).g = map((*color).g, 0, 255, 0, lw.config.main.maxBrightness);
+    //(*color).b = map((*color).b, 0, 255, 0, lw.config.main.maxBrightness);
+    //LWUtils.printRGB(*color, true);
 }
 
-void ResetMinValues()
+void ResetEQColor()
 {
+    lw.config.equalizer.maxColor.r = map(lw.config.equalizer.color.r, 0, 255, 0, lw.config.main.maxBrightness);
+    lw.config.equalizer.maxColor.g = map(lw.config.equalizer.color.g, 0, 255, 0, lw.config.main.maxBrightness);
+    lw.config.equalizer.maxColor.b = map(lw.config.equalizer.color.b, 0, 255, 0, lw.config.main.maxBrightness);
+
     // <cgerstle> equalizer min
-    int minimum = 255;
+    int maximum = 0;
+
     if (lw.config.equalizer.color.r > 0)
-        minimum = min(minimum, lw.config.equalizer.color.r);
+        maximum = max(maximum, lw.config.equalizer.color.r);
     if (lw.config.equalizer.color.g > 0)
-        minimum = min(minimum, lw.config.equalizer.color.g);
+        maximum = max(maximum, lw.config.equalizer.color.g);
     if (lw.config.equalizer.color.b > 0)
-        minimum = min(minimum, lw.config.equalizer.color.b);
+        maximum = max(maximum, lw.config.equalizer.color.b);
 
-    float scale = ((float)lw.config.main.minBrightness)/((float)minimum);
-    lw.config.equalizer.minColor.r = (byte)(scale * (float)lw.config.equalizer.color.r);
-    lw.config.equalizer.minColor.g = (byte)(scale * (float)lw.config.equalizer.color.g);
-    lw.config.equalizer.minColor.b = (byte)(scale * (float)lw.config.equalizer.color.b);
+    if (lw.config.equalizer.color.r == maximum)
+        lw.config.equalizer.minColor.r = lw.config.main.minBrightness;
+    else
+        lw.config.equalizer.minColor.r = 0;
 
+    if (lw.config.equalizer.color.g == maximum)
+        lw.config.equalizer.minColor.g = lw.config.main.minBrightness;
+    else
+        lw.config.equalizer.minColor.g = 0;
+
+    if (lw.config.equalizer.color.b == maximum)
+        lw.config.equalizer.minColor.b = lw.config.main.minBrightness;
+    else
+        lw.config.equalizer.minColor.b = 0;
 }

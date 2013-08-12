@@ -8,9 +8,11 @@
     <string-array name="btStatusValues">
         <item>-</item>
     </string-array>
+    
+    <string name="action_settings">settings</string>
 
-    <string name="menu_bluetooth_settings">bluetooth</string>
-    <string name="menu_bluetooth_disconnect">bluetooth disconnect</string>
+    <string name="menu_bluetooth_settings">connect</string>
+    <string name="menu_bluetooth_disconnect">disconnect</string>
     
     <string name="modeLabel">Mode</string>
     <string name="modeSparkleLabel">sparkle</string>
@@ -52,7 +54,7 @@
 	<string name="pulse_random_color">random color</string>
 	
 	<string name="mainLegsOn">got your legs on?</string>
-	<string name="mainArmsOn">got your legs on?</string>
+	<string name="mainArmsOn">got your arms on?</string>
 	<string name="mainMinBrightness">min brightness</string>
 	<string name="mainMaxBrightness">max brightness</string>
 	

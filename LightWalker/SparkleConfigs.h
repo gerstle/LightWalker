@@ -11,12 +11,10 @@ class SparkleConfigs
         SparkleConfigs();
 
         RGB footFlashColor;
-        RGB footSparkleColor;
-        RGB legSparkleColor;
+        RGB sparkleColor;
         int flashLength;
         int sparkleLength;
-        byte footDownFadeRate;
-        byte footUpFadeRate;
+        byte fadeRate;
 };
 
 #endif
