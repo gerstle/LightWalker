@@ -2,6 +2,7 @@
 #define LWMainConfigs_h
 
 #include "Enums.h"
+#include "colors.h"
 
 class MainConfigs
 {
@@ -13,6 +14,8 @@ class MainConfigs
         WalkingModeEnum defaultMode;
         bool legsOn;
         bool armsOn;
+        RGB minColors[COLOR_COUNT];
+        RGB maxColors[COLOR_COUNT];
 };
 
 #endif

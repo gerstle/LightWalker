@@ -1,9 +1,9 @@
 #ifndef LWSparkleConfigs_h
 #define LWSparkleConfigs_h
 
-#include "colors.h"
 #include "Enums.h"
 #include "Arduino.h"
+#include "colors.h"
 
 class SparkleConfigs
 {

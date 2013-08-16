@@ -1,8 +1,8 @@
 #ifndef LWPulseConfigs_h
 #define LWPulseConfigs_h
 
-#include "colors.h"
 #include "Enums.h"
+#include "colors.h"
 
 class PulseConfigs
 {

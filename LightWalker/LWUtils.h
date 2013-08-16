@@ -12,7 +12,6 @@
 #include <TCL.h>
 #include <ADXL345.h>
 #include <Wire.h>
-
 #include "colors.h"
 
 // <gerstle> TX is the arduino's TX... attach to bluetooth RX

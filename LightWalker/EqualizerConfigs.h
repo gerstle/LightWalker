@@ -1,8 +1,8 @@
 #ifndef LWEqualizerConfigs_h
 #define LWEqualizerConfigs_h
 
-#include "colors.h"
 #include "Enums.h"
+#include "colors.h"
 
 class EqualizerConfigs
 {
@@ -17,6 +17,7 @@ class EqualizerConfigs
         bool allBands;
         int RMSThreshold;
         int peak;
+        bool rainbow;
 };
 
 #endif

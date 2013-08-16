@@ -27,4 +27,8 @@
         android:key="eqAllBands"
         android:title="all bands" />
     
+    <CheckBoxPreference
+		android:defaultValue="false"
+        android:key="eqRainbow"
+        android:title="rainbow of fruit flavor?" />
 </PreferenceScreen>

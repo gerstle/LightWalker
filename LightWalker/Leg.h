@@ -106,24 +106,7 @@ class Leg
 
         // <cgerstle> steps
         unsigned long lastSharpPeakTime;
-        /*
-        int valueIndex;
-        int xValues[ADXL_VALUE_COUNT];
-        int yValues[ADXL_VALUE_COUNT];
-        int zValues[ADXL_VALUE_COUNT];
 
-        int xTotal;
-        int xAverage;
-        int xAverageOld;
-
-        int yTotal;
-        int yAverage;
-        int yAverageOld;
-
-        int zTotal;
-        int zAverage;
-        int zAverageOld;
-        */
         float xEMA;
         float yEMA;
         float zEMA;
@@ -146,6 +129,10 @@ class Leg
 
         int xSignificantlyLowerThanAverageThreshold; 
         bool readyForStep;
+
+        // <cgerstle> equalizer
+        int _rainbowColorCount;
+        int _pixelsPerColor;
 };
 
 #endif

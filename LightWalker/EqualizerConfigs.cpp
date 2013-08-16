@@ -7,4 +7,5 @@ EqualizerConfigs::EqualizerConfigs()
     allBands = false;
     RMSThreshold = 50;
     peak = 0;
+    rainbow = false;
 }

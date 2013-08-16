@@ -387,6 +387,8 @@ void Leg::equalizer_listen(float level_percent, byte r, byte g, byte b)
         int i = 0;
         int lower_threshold = _half - (level_percent * _half);
         int upper_threshold = (level_percent * _half) + _half;
+        int rainbow_color_offset = 2;
+        int rainbow_color;
 
         for (i = 0; i < _pixelCount; i++)
         {
@@ -395,9 +397,19 @@ void Leg::equalizer_listen(float level_percent, byte r, byte g, byte b)
             {
                 if (config->main.minBrightness > 0)
                 {
-                    _pixels[i].r = config->equalizer.minColor.r;
-                    _pixels[i].g = config->equalizer.minColor.g;
-                    _pixels[i].b = config->equalizer.minColor.b;
+                    if (config->equalizer.rainbow)
+                    {
+                        rainbow_color = (i / _pixelsPerColor) + rainbow_color_offset;
+                        _pixels[i].r = config->main.minColors[rainbow_color].r;
+                        _pixels[i].g = config->main.minColors[rainbow_color].g;
+                        _pixels[i].b = config->main.minColors[rainbow_color].b;
+                    }
+                    else
+                    {
+                        _pixels[i].r = config->equalizer.minColor.r;
+                        _pixels[i].g = config->equalizer.minColor.g;
+                        _pixels[i].b = config->equalizer.minColor.b;
+                    }
                 }
                 else
                 {
@@ -405,6 +417,13 @@ void Leg::equalizer_listen(float level_percent, byte r, byte g, byte b)
                     _pixels[i].g = 0;
                     _pixels[i].b = 0;
                 }
+            }
+            else if (config->equalizer.rainbow)
+            {
+                rainbow_color = (i / _pixelsPerColor) + rainbow_color_offset;
+                _pixels[i].r = config->main.maxColors[rainbow_color].r;
+                _pixels[i].g = config->main.maxColors[rainbow_color].g;
+                _pixels[i].b = config->main.maxColors[rainbow_color].b;
             }
             else
             {
@@ -515,6 +534,10 @@ void Leg::setWalkingMode(WalkingModeEnum mode, ADXL345 *adxl)
             _pulse_color.b = config->pulse.color.b;
             _pulse_isDimming = false;
             _pulse_length = random(config->pulse.minPulseTime, config->pulse.maxPulseTime);
+            break;
+        case equalizer:
+            _rainbowColorCount = COLOR_COUNT - 2;
+            _pixelsPerColor = _pixelCount / _rainbowColorCount;
             break;
     }
 }

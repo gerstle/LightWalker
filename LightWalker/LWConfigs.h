@@ -69,6 +69,7 @@ enum Preferences
     eqColor,
     eqAllLights,
     eqAllBands,
+    eqRainbow,
 
     //------------------------------------------------------------------------
     // Gravity
