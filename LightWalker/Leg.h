@@ -44,7 +44,8 @@ class Leg
         unsigned long currentTime;
 
         Leg();
-        void Init(LWConfigs *c, char *n, int i2c_channel, WalkingModeEnum mode, ADXL345 *adxl, byte count, byte half, RGB *p);
+        void init(LWConfigs *c, char *n, int i2c_channel, WalkingModeEnum mode, ADXL345 *adxl, byte count, byte half, RGB *p);
+        void setPixelCount(byte count, byte half);
         void off();
         void setWalkingMode(WalkingModeEnum mode, ADXL345 *adxl);
         void detectStep(ADXL345 *adxl);
@@ -68,8 +69,8 @@ class Leg
         LWConfigs *config;
 
         // <gerstle> Generic stuff
-        int lower_foot_border;
-        int upper_foot_border;
+        int _lower_foot_border;
+        int _upper_foot_border;
         LightModeEnum _lightMode;
         unsigned long _lightModeChangeTime;
         WalkingModeEnum _walkingMode;

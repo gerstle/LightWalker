@@ -14,10 +14,10 @@
 
 void LW::initLegs(WalkingModeEnum m)
 {
-    _legs[0].Init(&config, "left leg", ADXL_ONE, mode, &_adxl, LEFT_LEG_PIXEL_COUNT, 35, _leftLegPixels);
-    _legs[1].Init(&config, "right leg", ADXL_TWO, mode, &_adxl, RIGHT_LEG_PIXEL_COUNT, 35, _rightLegPixels);
-    _legs[2].Init(&config, "left arm", ADXL_THREE, mode, &_adxl, LEFT_ARM_PIXEL_COUNT, 50, _leftArmPixels);
-    _legs[3].Init(&config, "right arm", ADXL_FOUR, mode, &_adxl, RIGHT_ARM_PIXEL_COUNT, 50, _rightArmPixels);
+    _legs[0].init(&config, "left leg", ADXL_ONE, mode, &_adxl, FULL_LEG_PIXEL_COUNT, FULL_LEG_HALF, _leftLegPixels);
+    _legs[1].init(&config, "right leg", ADXL_TWO, mode, &_adxl, FULL_LEG_PIXEL_COUNT, FULL_LEG_HALF, _rightLegPixels);
+    _legs[2].init(&config, "left arm", ADXL_THREE, mode, &_adxl, ARM_PIXEL_COUNT, ARM_HALF, _leftArmPixels);
+    _legs[3].init(&config, "right arm", ADXL_FOUR, mode, &_adxl, ARM_PIXEL_COUNT, ARM_HALF, _rightArmPixels);
 
     mode = m;
     setMode(mode);
@@ -202,4 +202,28 @@ void LW::equalizer_listen(unsigned long currentTime)
 
     for (int i = 0; i < LEG_COUNT; i++)
         _legs[i].equalizer_listen(brightness, r, g, b);
+}
+
+void LW::setLegsOff()
+{
+    _legs[0].setPixelCount(NO_STILTS_LEG_PIXEL_COUNT, NO_STILTS_LEG_HALF);
+    _legs[1].setPixelCount(NO_STILTS_LEG_PIXEL_COUNT, NO_STILTS_LEG_HALF);
+}
+
+void LW::setLegsOn()
+{
+    _legs[0].setPixelCount(FULL_LEG_PIXEL_COUNT, FULL_LEG_HALF);
+    _legs[1].setPixelCount(FULL_LEG_PIXEL_COUNT, FULL_LEG_HALF);
+}
+
+void LW::setArmsOff()
+{
+    _legs[2].setPixelCount(0, 0);
+    _legs[3].setPixelCount(0, 0);
+}
+
+void LW::setArmsOn()
+{
+    _legs[2].setPixelCount(ARM_PIXEL_COUNT, ARM_HALF);
+    _legs[3].setPixelCount(ARM_PIXEL_COUNT, ARM_HALF);
 }

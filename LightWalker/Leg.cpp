@@ -16,7 +16,7 @@ Leg::Leg()
     name[0] = '\0';
 }
 
-void Leg::Init(LWConfigs *c, char *n, int i2c_channel, WalkingModeEnum mode, ADXL345 *adxl, byte count, byte half, RGB *p)
+void Leg::init(LWConfigs *c, char *n, int i2c_channel, WalkingModeEnum mode, ADXL345 *adxl, byte count, byte half, RGB *p)
 {
     config = c;
     strcpy(name, n);
@@ -25,15 +25,8 @@ void Leg::Init(LWConfigs *c, char *n, int i2c_channel, WalkingModeEnum mode, ADX
     step = false;
     _lightMode = None;
     _lightModeChangeTime = millis();
-    _half = half;
     _pixels = p;
-    _pixelCount = count;
-
-    if ((_pixelCount % 2) > 0)
-        lower_foot_border = _half - 4;
-    else
-        lower_foot_border = _half - 5;
-    upper_foot_border = _half + 4;
+    setPixelCount(count, half);
 
     LWUtils.selectI2CChannels(channel);
     LWUtils.initADXL(adxl);
@@ -152,10 +145,10 @@ void Leg::sparkle_sameStatus()
 
 void Leg::_sparkle_flash()
 {
-    Serial.print("flashing "); Serial.println(name);
+    // Serial.print("flashing "); Serial.println(name);
     for (int i = 0; i < _pixelCount; i++)
     {
-        if ((i < lower_foot_border) || (i > upper_foot_border))
+        if ((i < _lower_foot_border) || (i > _upper_foot_border))
             _setPixel(i, COLORS[BLACK], 0);
         else
             _setPixel(i, config->sparkle.footFlashColor, 0);
@@ -165,7 +158,7 @@ void Leg::_sparkle_flash()
 
 void Leg::_sparkle_shimmer()
 {
-    Serial.print("shimmering "); Serial.println(name);
+    // Serial.print("shimmering "); Serial.println(name);
     float max = ((float) min(40, config->main.maxBrightness)) / 100;
     float brightness = 0;
     int dice = 0;
@@ -201,14 +194,14 @@ void Leg::_sparkle_shimmer()
 
 void Leg::_sparkle_sparkle()
 {
-    Serial.print("\tsparkling "); Serial.println(name);
+    //Serial.print("\tsparkling "); Serial.println(name);
     float brightness;
     float rand;
 
     // leading leg
-    for (int i = 0; i < lower_foot_border; i++)
+    for (int i = 0; i < _lower_foot_border; i++)
     {
-        brightness = ((float) i / (float) lower_foot_border);
+        brightness = ((float) i / (float) _lower_foot_border);
         rand = (float)random(0, min(20, brightness * 100)) / 100;
         brightness = brightness - rand;
         //Serial.print(i); Serial.print("\t"); Serial.print(brightness); Serial.print("\t"); Serial.println(rand);
@@ -223,7 +216,7 @@ void Leg::_sparkle_sparkle()
     if (currentTime > (_lightModeChangeTime + config->sparkle.flashLength))
         footColor = &config->sparkle.sparkleColor;
 
-    for (int i = lower_foot_border; i <= upper_foot_border; i++)
+    for (int i = _lower_foot_border; i <= _upper_foot_border; i++)
     {
         _pixels[i].r = (*footColor).r;
         _pixels[i].g = (*footColor).g;
@@ -232,9 +225,9 @@ void Leg::_sparkle_sparkle()
     }
 
     // trailing leg
-    for (int i = upper_foot_border + 1; i < _pixelCount; i++)
+    for (int i = _upper_foot_border + 1; i < _pixelCount; i++)
     {
-        brightness = ((float) (_pixelCount - 1 - i) / (float) lower_foot_border);
+        brightness = ((float) (_pixelCount - 1 - i) / (float) _lower_foot_border);
         rand = (float)random(0, min(20, brightness * 100)) / 100;
         brightness = brightness - rand;
         //Serial.print(i); Serial.print("\t"); Serial.print(brightness); Serial.print("\t"); Serial.println(rand);
@@ -249,7 +242,7 @@ void Leg::_sparkle_sparkle()
     else
     {
         for (int i = 0; i < _pixelCount; i++)
-            if ((i >= lower_foot_border) && (i <= upper_foot_border))
+            if ((i >= _lower_foot_border) && (i <= _upper_foot_border))
             {
                 _pixels[i].r = byte((float)config->sparkle.sparkleColor.r);
                 _pixels[i].g = byte((float)config->sparkle.sparkleColor.g);
@@ -261,7 +254,7 @@ void Leg::_sparkle_sparkle()
 
 void Leg::_sparkle_fade()
 {
-    Serial.print("\t\tfading "); Serial.println(name);
+    // Serial.print("\t\tfading "); Serial.println(name);
     int still_fading = 0;
 
     for (int i = 0; i < _pixelCount; i++)
@@ -427,8 +420,6 @@ void Leg::equalizer_listen(float level_percent, byte r, byte g, byte b)
 
 void Leg::_setPixel(int i, RGB color, byte dimmer)
 {
-    if (i == 0)
-        Serial.println(i);
     if (color.r > dimmer)
         _pixels[i].r = color.r - dimmer;
     else
@@ -452,11 +443,6 @@ void Leg::_setPixel(int i, RGB color, byte dimmer)
 // if all zero... scale default to min
 void Leg::upToMin(byte *r, byte *g, byte *b, RGB defaultColor)
 {
-    if (channel == 1)
-    {
-        Serial.print("got "); LWUtils.printRGB(*r, *g, *b, false);
-    }
-
     if ((*r < config->main.minBrightness) && 
         (*g < config->main.minBrightness) &&
         (*b < config->main.minBrightness))
@@ -491,14 +477,7 @@ void Leg::upToMin(byte *r, byte *g, byte *b, RGB defaultColor)
         *r = (byte)(scale * (float)defaultColor.r);
         *g = (byte)(scale * (float)defaultColor.g);
         *b = (byte)(scale * (float)defaultColor.b);
-
-        if (channel == 1)
-        {
-            Serial.print("scale -> "); LWUtils.printRGB(*r, *g, *b, false);
-        }
     }
-    else if (channel == 1)
-        Serial.print(".");
 }
 
 void Leg::off()
@@ -583,7 +562,7 @@ void Leg::detectStep(ADXL345 *adxl)
         {
             stepDetected = true;
             readyForStep = false;
-            Serial.print("X\t\t");
+            //Serial.print("X\t\t");
         }
     }
 
@@ -591,7 +570,7 @@ void Leg::detectStep(ADXL345 *adxl)
         if (!stepDetected && (y >= (yEMA + yAvgDiffThreshold)))
         {
             stepDetected = true;
-            Serial.print("y\t\t");
+            //Serial.print("y\t\t");
         }
 
 
@@ -599,12 +578,12 @@ void Leg::detectStep(ADXL345 *adxl)
         if (!stepDetected && (z >= (zEMA + zAvgDiffThreshold)))
         {
             stepDetected = true;
-            Serial.print("Z\t\t");
+            //Serial.print("Z\t\t");
         }
 
     if (stepDetected)
     {
-        Serial.print(name); Serial.println("\tSTEP!");
+        //Serial.print(name); Serial.println("\tSTEP!");
         lastSharpPeakTime = millis();
         step = true;
         sparkle_footdown();
@@ -615,7 +594,6 @@ void Leg::detectStep(ADXL345 *adxl)
 
 void Leg::gravity2Lights(ADXL345 *adxl)
 {
-    bool print = false;
 	double xyz[3];
 
     LWUtils.selectI2CChannels(channel);
@@ -623,10 +601,7 @@ void Leg::gravity2Lights(ADXL345 *adxl)
 
     currentTime = millis();
 
-    if (print)
-    {
-        Serial.print(xyz[0]); Serial.print(","); Serial.print(xyz[1]); Serial.print(","); Serial.print(xyz[2]);
-    }
+    //Serial.print(xyz[0]); Serial.print(","); Serial.print(xyz[1]); Serial.print(","); Serial.print(xyz[2]);
 
     if (_indexOne == 2)
     {
@@ -654,10 +629,7 @@ void Leg::gravity2Lights(ADXL345 *adxl)
             _pixels[0].b = map(abs(xyz[_indexThree]) * 100, 0, 192, config->main.minBrightness, config->main.maxBrightness);
         else
             _pixels[0].b = 0;
-        if (print)
-        {
-            Serial.print("\tb: "); Serial.print(_pixels[0].b);
-        }
+        //Serial.print("\tb: "); Serial.print(_pixels[0].b);
     }
     else
         _pixels[0].b = map(abs(xyz[_indexThree]) * 100, 0, 192, config->main.minBrightness, config->main.maxBrightness);
@@ -728,6 +700,17 @@ void Leg::gravity2Lights(ADXL345 *adxl)
         _pixels[i].b = _pixels[0].b;
         LWUtils.sendColor(_pixels[i]);
     }
-    if (print)
-        Serial.println("");
+    //Serial.println("");
+}
+
+void Leg::setPixelCount(byte count, byte half)
+{
+    _pixelCount = count;
+    _half = half;
+
+    if ((_pixelCount % 2) > 0)
+        _lower_foot_border = _half - 4;
+    else
+        _lower_foot_border = _half - 5;
+    _upper_foot_border = _half + 4;
 }

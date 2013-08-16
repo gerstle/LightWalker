@@ -26,10 +26,12 @@
 #define EQ_EMA_PEAK_N 5 
 
 #define LEG_COUNT 4
-#define LEFT_LEG_PIXEL_COUNT 75
-#define RIGHT_LEG_PIXEL_COUNT 75
-#define LEFT_ARM_PIXEL_COUNT 100
-#define RIGHT_ARM_PIXEL_COUNT 100
+#define FULL_LEG_PIXEL_COUNT 75
+#define FULL_LEG_HALF 35
+#define NO_STILTS_LEG_PIXEL_COUNT 25
+#define NO_STILTS_LEG_HALF 13
+#define ARM_PIXEL_COUNT 100
+#define ARM_HALF 50
 
 class LW
 {
@@ -42,6 +44,11 @@ class LW
         void equalizer_baseline();
         void setMode(WalkingModeEnum m);
 
+        void setLegsOff();
+        void setLegsOn();
+        void setArmsOff();
+        void setArmsOn();
+
         LWConfigs config;
         WalkingModeEnum mode;
 
@@ -52,10 +59,10 @@ class LW
 
     private:
         Leg _legs[LEG_COUNT];
-        RGB _leftLegPixels[LEFT_LEG_PIXEL_COUNT];
-        RGB _rightLegPixels[RIGHT_LEG_PIXEL_COUNT];
-        RGB _leftArmPixels[LEFT_ARM_PIXEL_COUNT];
-        RGB _rightArmPixels[RIGHT_ARM_PIXEL_COUNT];
+        RGB _leftLegPixels[FULL_LEG_PIXEL_COUNT];
+        RGB _rightLegPixels[FULL_LEG_PIXEL_COUNT];
+        RGB _leftArmPixels[ARM_PIXEL_COUNT];
+        RGB _rightArmPixels[ARM_PIXEL_COUNT];
 
         unsigned long _laststatus;
 

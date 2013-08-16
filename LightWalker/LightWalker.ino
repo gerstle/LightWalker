@@ -267,16 +267,30 @@ bool executeCommand(int key, char *value, int valueLen)
             ResetEQColor();
             break;
         case mainLegsOn:
+            // <cgerstle> being a little lazy here... should do all this just by the configs, but...
             if (strncmp(value, one_str, valueLen) == 0)
+            {
                 lw.config.main.legsOn = true;
+                lw.setLegsOn();
+            }
             else
+            {
                 lw.config.main.legsOn = false;
+                lw.setLegsOff();
+            }
             break;
         case mainArmsOn:
+            // <cgerstle> being a little lazy here... should do all this just by the configs, but...
             if (strncmp(value, one_str, valueLen) == 0)
+            {
                 lw.config.main.armsOn = true;
+                lw.setArmsOn();
+            }
             else
+            {
                 lw.config.main.armsOn = false;
+                lw.setArmsOff();
+            }
             break;
 
         // ------------------------------------------------------------------------
