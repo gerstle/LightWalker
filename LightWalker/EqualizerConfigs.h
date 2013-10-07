@@ -18,6 +18,7 @@ class EqualizerConfigs
         int RMSThreshold;
         int peak;
         bool rainbow;
+        bool fullRainbow;
 };
 
 #endif

@@ -148,6 +148,7 @@ void LW::equalizer_listen(unsigned long currentTime)
     int tmp;
     byte r, g, b = 0;
     float brightness;
+    static bool emaCheck = true;
 
     if (currentTime <= (_lastEQReading + 3))
         return;
@@ -171,10 +172,15 @@ void LW::equalizer_listen(unsigned long currentTime)
     }
 
     if ((level < eqNminus1) && (eqNminus1 > eqNminus2) && (level > eqEMA))
-        eqEMAPeak = (float)(level - eqEMAPeak) * ((float)2 / (float)(EQ_EMA_PEAK_N + 1)) + eqEMAPeak;
+    {
+        // <cgerstle> artificially inflate the max...
+        tmp = (1024 - level) / 4 + level; 
+        eqEMAPeak = (float)(tmp - eqEMAPeak) * ((float)2 / (float)(EQ_EMA_PEAK_N + 1)) + eqEMAPeak;
+    }
 
-    if (random(0,1) == 0)
+    if (emaCheck)
         eqEMA = (float)(level - eqEMA) * ((float)2 / (float)(EQ_EMA_N + 1)) + eqEMA;
+    emaCheck = !emaCheck;
 
     eqNminus2 = eqNminus1;
     eqNminus1 = level;
@@ -182,9 +188,10 @@ void LW::equalizer_listen(unsigned long currentTime)
     if (level < config.equalizer.RMSThreshold)
         level = 0;
 
-    brightness = map(level, eqEMA, eqEMAPeak, 0, 100) / 100;
+    brightness = (float)map(level, eqEMA, eqEMAPeak, 0, 100) / (float)100;
     if (brightness < 0.0)
         brightness = 0;
+    //Serial.print(level); Serial.print("\t"); Serial.print(eqEMA); Serial.print("\t"); Serial.print(eqEMAPeak); Serial.print("\t"); Serial.println(brightness);
 
     if (config.equalizer.allLights)
     {

@@ -8,4 +8,5 @@ EqualizerConfigs::EqualizerConfigs()
     RMSThreshold = 50;
     peak = 0;
     rainbow = false;
+    fullRainbow = false;
 }

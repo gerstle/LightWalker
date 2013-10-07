@@ -392,6 +392,7 @@ void Leg::equalizer_listen(float level_percent, byte r, byte g, byte b)
 
         for (i = 0; i < _pixelCount; i++)
         {
+            // <cgerstle> this is the "OFF"
             if (((i < _half) && (i < lower_threshold)) ||
                 ((i > _half) && (i > upper_threshold)))
             {
@@ -400,6 +401,9 @@ void Leg::equalizer_listen(float level_percent, byte r, byte g, byte b)
                     if (config->equalizer.rainbow)
                     {
                         rainbow_color = (i / _pixelsPerColor) + rainbow_color_offset;
+                        if (rainbow_color >= COLOR_COUNT)
+                            rainbow_color = COLOR_COUNT - 1;
+
                         _pixels[i].r = config->main.minColors[rainbow_color].r;
                         _pixels[i].g = config->main.minColors[rainbow_color].g;
                         _pixels[i].b = config->main.minColors[rainbow_color].b;
@@ -418,13 +422,17 @@ void Leg::equalizer_listen(float level_percent, byte r, byte g, byte b)
                     _pixels[i].b = 0;
                 }
             }
+            // <cgerstle> this is the "ON" for rainbow
             else if (config->equalizer.rainbow)
             {
                 rainbow_color = (i / _pixelsPerColor) + rainbow_color_offset;
+                if (rainbow_color >= COLOR_COUNT)
+                    rainbow_color = COLOR_COUNT - 1;
                 _pixels[i].r = config->main.maxColors[rainbow_color].r;
                 _pixels[i].g = config->main.maxColors[rainbow_color].g;
                 _pixels[i].b = config->main.maxColors[rainbow_color].b;
             }
+            // <gerstle> this is the "ON" for not rainbow
             else
             {
                 _pixels[i].r = config->equalizer.maxColor.r;

@@ -23,7 +23,7 @@
 #include "EqualizerConfigs.h"
 
 #define EQ_EMA_N 200
-#define EQ_EMA_PEAK_N 5 
+#define EQ_EMA_PEAK_N 20
 
 #define LEG_COUNT 4
 #define FULL_LEG_PIXEL_COUNT 75
@@ -51,11 +51,6 @@ class LW
 
         LWConfigs config;
         WalkingModeEnum mode;
-
-//         int eqValues[VALUE_COUNT];
-//         int eqValueIndex;
-//         double eqValueTotal;
-//         int eqValueAvg;
 
     private:
         Leg _legs[LEG_COUNT];
