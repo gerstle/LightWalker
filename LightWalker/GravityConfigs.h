@@ -10,10 +10,6 @@ class GravityConfigs
 {
     public:
         GravityConfigs();
-
-        RGB colorOne;
-        RGB colorTwo;
-        RGB colorThree;
         bool rotate;
 };
 

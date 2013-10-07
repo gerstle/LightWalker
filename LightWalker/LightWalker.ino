@@ -244,15 +244,6 @@ bool executeCommand(int key, char *value, int valueLen)
         // ------------------------------------------------------------------------
         // Gravity
         // ------------------------------------------------------------------------
-        case gravityColorOne:
-            ParseColor(value, &(lw.config.gravity.colorOne));
-            break;
-        case gravityColorTwo:
-            ParseColor(value, &(lw.config.gravity.colorTwo));
-            break;
-        case gravityColorThree:
-            ParseColor(value, &(lw.config.gravity.colorThree));
-            break;
         case gravityRotate:
             if (strncmp(value, one_str, 1) == 0)
                 lw.config.gravity.rotate = true;

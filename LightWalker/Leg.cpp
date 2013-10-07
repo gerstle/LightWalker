@@ -624,8 +624,6 @@ void Leg::gravity2Lights(ADXL345 *adxl)
 
     currentTime = millis();
 
-    //Serial.print(xyz[0]); Serial.print(","); Serial.print(xyz[1]); Serial.print(","); Serial.print(xyz[2]);
-
     if (_indexOne == 2)
     {
         if (xyz[_indexOne] > 0)
@@ -652,7 +650,6 @@ void Leg::gravity2Lights(ADXL345 *adxl)
             _pixels[0].b = map(abs(xyz[_indexThree]) * 100, 0, 192, config->main.minBrightness, config->main.maxBrightness);
         else
             _pixels[0].b = 0;
-        //Serial.print("\tb: "); Serial.print(_pixels[0].b);
     }
     else
         _pixels[0].b = map(abs(xyz[_indexThree]) * 100, 0, 192, config->main.minBrightness, config->main.maxBrightness);
@@ -684,7 +681,7 @@ void Leg::gravity2Lights(ADXL345 *adxl)
             _lastXSwitch = millis();
         }
 
-        if ((abs(xyz[1]) > 0.97) && _canYSwitch)
+        if ((abs(xyz[1]) > 0.95) && _canYSwitch)
         {
             if (_indexOne == 1)
             {
@@ -723,7 +720,6 @@ void Leg::gravity2Lights(ADXL345 *adxl)
         _pixels[i].b = _pixels[0].b;
         LWUtils.sendColor(_pixels[i]);
     }
-    //Serial.println("");
 }
 
 void Leg::setPixelCount(byte count, byte half)
