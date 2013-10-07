@@ -199,7 +199,7 @@ public class AppUtil extends Application {
 				sendMessage(AppUtil.ConstructMessage(entry.getKey(), value));
                 
 				// <cgerstle> when you're sending a bunch of data, you've
-				// gotta give the other some time to pull it off
+				// gotta give the other end some time to pull it off
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {

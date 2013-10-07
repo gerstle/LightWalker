@@ -28,6 +28,8 @@ package com.inappropirates.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.UUID;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -284,7 +286,7 @@ public class BluetoothChatService {
                 	if (mmServerSocket != null)
                 		socket = mmServerSocket.accept();
                 } catch (IOException e) {
-                    Log.e(AppUtil.TAG, "Socket Type: " + mSocketType + " accept() failed", e);
+                    //Log.e(AppUtil.TAG, "Socket Type: " + mSocketType + " accept() failed", e);
                     break;
                 }
 
@@ -344,10 +346,28 @@ public class BluetoothChatService {
             // Get a BluetoothSocket for a connection with the
             // given BluetoothDevice
             try {
-               tmp = device.createRfcommSocketToServiceRecord(MY_UUID_SECURE);
-            } catch (IOException e) {
-                Log.e(AppUtil.TAG, "Socket Type: " + mSocketType + "create() failed", e);
-            }
+               //tmp = device.createRfcommSocketToServiceRecord(MY_UUID_SECURE);
+            	Method m = device.getClass().getMethod("createRfcommSocket", new Class[] {int.class});
+                tmp = (BluetoothSocket) m.invoke(device, Integer.valueOf(1));
+            //} catch (IOException e) {
+            //    Log.e(AppUtil.TAG, "Socket Type: " + mSocketType + "create() failed - IOException", e);
+            } catch (NoSuchMethodException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				Log.e(AppUtil.TAG, "Socket Type: " + mSocketType + "create() failed - NoSuchMethodException", e);
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				Log.e(AppUtil.TAG, "Socket Type: " + mSocketType + "create() failed - IllegalArgumentExecption", e);
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				Log.e(AppUtil.TAG, "Socket Type: " + mSocketType + "create() failed - IllegalAccessException", e);
+			} catch (InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				Log.e(AppUtil.TAG, "Socket Type: " + mSocketType + "create() failed - InvocationTargetException", e);
+			}
             mmSocket = tmp;
         }
 
@@ -449,9 +469,12 @@ public class BluetoothChatService {
 	    	            connectionLost();
 	    	        }
     	        	
-    	        	Log.i(AppUtil.TAG, "Received: " + new String(buffer, 0, (byteIndex - 1)));
-    	        	m = mHandler.obtainMessage(AppUtil.MESSAGE_READ, byteIndex - 1, -1, buffer);
-                	m.sendToTarget();
+	        		if (byteIndex > 0)
+	        		{
+	        			Log.i(AppUtil.TAG, "Received: " + new String(buffer, 0, (byteIndex - 1)));
+	        			m = mHandler.obtainMessage(AppUtil.MESSAGE_READ, byteIndex - 1, -1, buffer);
+	        			m.sendToTarget();
+	        		}
                 	byteIndex = 0;
             }
         }
