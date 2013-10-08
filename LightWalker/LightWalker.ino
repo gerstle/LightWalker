@@ -162,6 +162,9 @@ bool executeCommand(int key, char *value, int valueLen)
                 case pulse:
                     newMode = pulse;
                     break;
+                case bubble:
+                    newMode = bubble;
+                    break;
             }
 
             lw.setMode(newMode);
@@ -249,6 +252,28 @@ bool executeCommand(int key, char *value, int valueLen)
                 lw.config.gravity.rotate = true;
             else
                 lw.config.gravity.rotate = false;
+            break;
+
+        //------------------------------------------------------------------------
+        // Bubble
+        //------------------------------------------------------------------------
+        case bubbleBackgroundColor:
+            ParseColor(value, &(lw.config.bubble.backgroundColor));
+            break;
+        case bubbleBubbleColor:
+            ParseColor(value, &(lw.config.bubble.bubbleColor));
+            break;
+        case bubbleSpeed:
+            lw.config.bubble.speed = atoi(value);
+            break;
+        case bubbleWidth:
+            lw.config.bubble.width = atoi(value);
+            break;
+        case bubbleTrail:
+            if (strncmp(value, one_str, 1) == 0)
+                lw.config.bubble.trail = true;
+            else
+                lw.config.bubble.trail = false;
             break;
 
         default:

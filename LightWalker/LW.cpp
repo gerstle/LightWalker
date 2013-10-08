@@ -72,8 +72,18 @@ void LW::walk()
         _legs[i].currentTime = currentTime;
         switch (mode)
         {
+            case bubble:
+                if (_legs[i].detectStep(&_adxl))
+                    _legs[i].bubble_step();
+                else
+                    _legs[i].bubble_bubble();
+                break;
+
             case sparkle:
-                _legs[i].detectStep(&_adxl);
+                if (_legs[i].detectStep(&_adxl))
+                    _legs[i].sparkle_footdown();
+                else
+                    _legs[i].sparkle_sameStatus();
                 break;
 
             case gravity:

@@ -48,12 +48,11 @@ class Leg
         void setPixelCount(byte count, byte half);
         void off();
         void setWalkingMode(WalkingModeEnum mode, ADXL345 *adxl);
-        void detectStep(ADXL345 *adxl);
+        bool detectStep(ADXL345 *adxl);
         void upToMin(byte *r, byte *g, byte *b, RGB defaultColor);
 
         // <gerstle> Sparkle
         void sparkle_footdown();
-        void sparkle_footup();
         void sparkle_sameStatus();
 
         // <gerstle> pulse
@@ -64,6 +63,10 @@ class Leg
 
         // <gerstle> gravity
         void gravity2Lights(ADXL345 *adxl);
+
+        // <cgerstle> bubble
+        void bubble_bubble();
+        void bubble_step();
 
     private:
         LWConfigs *config;
@@ -133,6 +136,10 @@ class Leg
         // <cgerstle> equalizer
         int _rainbowColorCount;
         int _pixelsPerColor;
+
+        // <gerstle> bubble
+        int _leadingBubbleBottom;
+        int _trailingBubbleBottom;
 };
 
 #endif

@@ -42,42 +42,7 @@ void Leg::init(LWConfigs *c, char *n, int i2c_channel, WalkingModeEnum mode, ADX
     xSignificantlyLowerThanAverageThreshold = 45; 
     readyForStep = false;
     lastSharpPeakTime = millis();
-    /*
-    valueIndex = 0;
 
-    xTotal = 0;
-    xAverage = 0;
-    xAverageOld = 0;
-
-    yTotal = 0;
-    yAverage = 0;
-    yAverageOld = 0;
-
-    zTotal = 0;
-    zAverage = 0;
-    zAverageOld = 0;
-
-    for (valueIndex = 0; valueIndex < ADXL_VALUE_COUNT; valueIndex++)
-    {
-        adxl->readXYZ(&x, &y, &z); //read the accelerometer values and store them in variables  x,y,z
-
-        x = abs(x);
-        y = abs(y);
-        z = z;
-
-        xValues[valueIndex] = x;
-        yValues[valueIndex] = y;
-        zValues[valueIndex] = z;
-
-        xTotal += xValues[valueIndex];
-        yTotal += yValues[valueIndex];
-        zTotal += zValues[valueIndex];
-    }
-
-    xAverage = xTotal / ADXL_VALUE_COUNT;
-    yAverage = yTotal / ADXL_VALUE_COUNT;
-    zAverage = zTotal / ADXL_VALUE_COUNT;
-    */
     int valueIndex = 0;
     int xValueTotal, yValueTotal, zValueTotal  = 0;
     for (valueIndex = 0; valueIndex < ADXL_VALUE_COUNT; valueIndex++)
@@ -163,16 +128,17 @@ void Leg::_sparkle_shimmer()
     float brightness = 0;
     int dice = 0;
 
-    // leading leg
     for (int i = 0; i < _pixelCount; i++)
     {
         dice = random(0, 100);
+        // <cgerstle> leave the middle ones on bright...
         if ((i <= (_half + 1)) && (i >= (_half - 1)))
         {
             _pixels[i].r = byte((float)config->sparkle.sparkleColor.r * max);
             _pixels[i].g = byte((float)config->sparkle.sparkleColor.g * max);
             _pixels[i].b = byte((float)config->sparkle.sparkleColor.b * max);
         }
+        // <cgerstle> sparkle the rest if minbrightness is on
         else if ((config->main.minBrightness > 0) && (dice == 0))
         {
             brightness = ((float) random(0, 20)) / 100 * max;
@@ -180,6 +146,7 @@ void Leg::_sparkle_shimmer()
             _pixels[i].g = byte((float)config->sparkle.sparkleColor.g * brightness);
             _pixels[i].b = byte((float)config->sparkle.sparkleColor.b * brightness);
         }
+        // <cgerstle> just turn off things
         else if (config->main.minBrightness == 0)
         {
             _pixels[i].r = 0;
@@ -363,11 +330,6 @@ void Leg::pulse_pulse(unsigned long syncTime, int syncLength, int syncValue, boo
     
         _setPixel(i, newColor, 0);
     }
-
-//     if (channel == 1)
-//     {
-//         Serial.print("\t\t"); LWUtils.printRGB(_pixels[0], true);
-//     }
 }
 
 void Leg::equalizer_listen(float level_percent, byte r, byte g, byte b)
@@ -536,6 +498,8 @@ void Leg::setWalkingMode(WalkingModeEnum mode, ADXL345 *adxl)
     {
         case masterOff:
             off();
+            break;
+
         case pulse:
             _pulse_color.r = config->pulse.color.r;
             _pulse_color.g = config->pulse.color.g;
@@ -543,15 +507,22 @@ void Leg::setWalkingMode(WalkingModeEnum mode, ADXL345 *adxl)
             _pulse_isDimming = false;
             _pulse_length = random(config->pulse.minPulseTime, config->pulse.maxPulseTime);
             break;
+
         case equalizer:
             _rainbowColorCount = COLOR_COUNT - 2;
             _pixelsPerColor = _pixelCount / _rainbowColorCount;
+            break;
+
+        case bubble:
+            Serial.println("setting bubble location to -1");
+            _leadingBubbleBottom = -1;
+            _trailingBubbleBottom = _pixelCount;
             break;
     }
 }
 
 int x, y, z;
-void Leg::detectStep(ADXL345 *adxl)
+bool Leg::detectStep(ADXL345 *adxl)
 {
     bool stepDetected = false;
 
@@ -617,10 +588,10 @@ void Leg::detectStep(ADXL345 *adxl)
         //Serial.print(name); Serial.println("\tSTEP!");
         lastSharpPeakTime = millis();
         step = true;
-        sparkle_footdown();
+        return true;
     }
     else
-        sparkle_sameStatus();
+        return false;
 }
 
 void Leg::gravity2Lights(ADXL345 *adxl)
@@ -723,9 +694,21 @@ void Leg::gravity2Lights(ADXL345 *adxl)
     LWUtils.sendColor(_pixels[0]);
     for (int i = 1; i < _pixelCount; i++)
     {
-        _pixels[i].r = _pixels[0].r;
-        _pixels[i].g = _pixels[0].g;
-        _pixels[i].b = _pixels[0].b;
+        if ((_pixels[0].r > 10) && (random(0, 20) == 0))
+            _pixels[i].r = _pixels[0].r - random(0, 10);
+        else
+            _pixels[i].r = _pixels[0].r;
+
+        if ((_pixels[0].g > 10) && (random(0, 20) == 0))
+            _pixels[i].g = _pixels[0].g - random(0, 10);
+        else
+            _pixels[i].g = _pixels[0].g;
+
+        if ((_pixels[0].b > 10) && (random(0, 20) == 0))
+            _pixels[i].b = _pixels[0].b - random(0, 10);
+        else
+            _pixels[i].b = _pixels[0].b;
+
         LWUtils.sendColor(_pixels[i]);
     }
 }
@@ -740,4 +723,85 @@ void Leg::setPixelCount(byte count, byte half)
     else
         _lower_foot_border = _half - 5;
     _upper_foot_border = _half + 4;
+}
+
+void Leg::bubble_step()
+{
+    _leadingBubbleBottom = _half;
+    _trailingBubbleBottom = _half + 1 + (_half - _leadingBubbleBottom);
+    bubble_bubble();
+}
+
+void Leg::bubble_bubble()
+{
+    float max = ((float) min(40, config->main.maxBrightness)) / 100;
+    float rBrightness, gBrightness, bBrightness = 0;
+    int dice = 0;
+    int leadingBubbleTop, trailingBubbleTop = 0;
+
+    leadingBubbleTop = _leadingBubbleBottom - config->bubble.width + 1;
+    trailingBubbleTop = _trailingBubbleBottom + config->bubble.width - 1;
+
+    // <gerstle> bubble location
+    /*
+    if ((_leadingBubbleBottom >= 0) || (_trailingBubbleBottom > _pixelCount))
+    {
+        leadingBubbleBottom = _bubbleLocation;
+        leadingBubbleTop = _bubbleLocation - config->bubble.width + 1;
+
+        trailingBubbleBottom = _half + 1 + (_half - _bubbleLocation);
+        trailingBubbleTop = trailingBubbleBottom + config->bubble.width - 1;
+    }
+    else
+    {
+        leadingBubbleBottom = _bubbleLocation;
+        leadingBubbleTop = _bubbleLocation - config->bubble.width + 1;
+
+        trailingBubbleBottom = _pixelCount;
+        trailingBubbleTop = _pixelCount + config->bubble.width;
+    }
+    */
+
+    if (channel == 1)
+    {
+        Serial.print(_leadingBubbleBottom); Serial.print("\t");
+        Serial.print(_trailingBubbleBottom); Serial.print("\t");
+        Serial.println();
+    }
+
+    for (int i = 0; i < _pixelCount; i++)
+    {
+        dice = random(0, 100);
+
+        if ((i <= _half) && (i <= _leadingBubbleBottom) && (i >= leadingBubbleTop))
+        {
+            _pixels[i].r = byte((float)config->bubble.bubbleColor.r);
+            _pixels[i].g = byte((float)config->bubble.bubbleColor.g);
+            _pixels[i].b = byte((float)config->bubble.bubbleColor.b);
+        }
+        else if ((i > _half) && (i >= _trailingBubbleBottom) && (i <= trailingBubbleTop))
+        {
+            _pixels[i].r = byte((float)config->bubble.bubbleColor.r);
+            _pixels[i].g = byte((float)config->bubble.bubbleColor.g);
+            _pixels[i].b = byte((float)config->bubble.bubbleColor.b);
+        }
+        else if ((dice == 0) ||
+            (!config->bubble.trail && ((i == (_leadingBubbleBottom + 1)) || (i == (_trailingBubbleBottom - 1)))))
+        {
+            rBrightness = ((float) random(10, 40)) / 100 * max;
+            gBrightness = ((float) random(10, 40)) / 100 * max;
+            bBrightness = ((float) random(10, 40)) / 100 * max;
+            _pixels[i].r = byte((float)config->bubble.backgroundColor.r * rBrightness);
+            _pixels[i].g = byte((float)config->bubble.backgroundColor.g * gBrightness);
+            _pixels[i].b = byte((float)config->bubble.backgroundColor.b * bBrightness);
+        }
+
+        _setPixel(i, _pixels[i], 0);
+    }
+
+    if ((_leadingBubbleBottom >= 0) || (_trailingBubbleBottom <= _pixelCount))
+    {
+        _leadingBubbleBottom -= config->bubble.speed;
+        _trailingBubbleBottom += config->bubble.speed;
+    }
 }

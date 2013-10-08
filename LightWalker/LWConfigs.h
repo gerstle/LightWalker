@@ -27,6 +27,7 @@
 #include "SparkleConfigs.h"
 #include "EqualizerConfigs.h"
 #include "GravityConfigs.h"
+#include "BubbleConfigs.h"
 
 
 class LWConfigs
@@ -39,5 +40,6 @@ class LWConfigs
         SparkleConfigs sparkle;
         EqualizerConfigs equalizer;
         GravityConfigs gravity;
+        BubbleConfigs bubble;
 };
 #endif

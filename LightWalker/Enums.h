@@ -7,7 +7,8 @@ enum WalkingModeEnum
     gravity,
     equalizer,
     sparkle,
-    pulse
+    pulse,
+    bubble
 };
 
 enum Preferences
@@ -57,4 +58,13 @@ enum Preferences
     // Gravity
     //------------------------------------------------------------------------
     gravityRotate,
+
+    //------------------------------------------------------------------------
+    // Bubble
+    //------------------------------------------------------------------------
+    bubbleBackgroundColor,
+    bubbleBubbleColor,
+    bubbleSpeed,
+    bubbleWidth,
+    bubbleTrail
 };

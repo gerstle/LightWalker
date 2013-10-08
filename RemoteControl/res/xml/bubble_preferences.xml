@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PreferenceScreen
+       xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:robobunny="http://robobunny.com"
+       android:key="bubble_preferences">
+       
+    <com.robobunny.SeekBarPreference
+        android:key="bubbleSpeed"
+        android:title="speed"
+        android:defaultValue="1"
+        android:max="5"
+        robobunny:min="1" />
+    
+    <com.robobunny.SeekBarPreference
+        android:key="bubbleWidth"
+        android:title="bubble width"
+        android:defaultValue="3"
+        android:max="20"
+        robobunny:min="1" />
+    
+    <com.inappropirates.remotecontrol.ColorPickerPreference
+        android:key="bubbleBackgroundColor"
+        android:title="background color"
+        />
+    
+    <com.inappropirates.remotecontrol.ColorPickerPreference
+        android:key="bubbleBubbleColor"
+        android:title="bubble color"
+        />
+    
+    <CheckBoxPreference
+		android:defaultValue="true"
+        android:key="bubbleTrail"
+        android:title="leave a trail?" />
+</PreferenceScreen>

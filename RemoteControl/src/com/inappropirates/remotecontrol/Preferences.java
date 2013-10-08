@@ -46,4 +46,13 @@ public enum Preferences {
 	// Gravity
 	//------------------------------------------------------------------------
 	gravityRotate,
+
+    //------------------------------------------------------------------------
+    // Bubble
+    //------------------------------------------------------------------------
+    bubbleBackgroundColor,
+    bubbleBubbleColor,
+    bubbleSpeed,
+    bubbleWidth,
+    bubbleTrail
 }

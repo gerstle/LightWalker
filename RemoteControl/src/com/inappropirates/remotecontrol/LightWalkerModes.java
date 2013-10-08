@@ -8,5 +8,6 @@ public enum LightWalkerModes {
 	gravity,
 	equalizer,
 	sparkle,
-	pulse
+	pulse,
+	bubble
 }
