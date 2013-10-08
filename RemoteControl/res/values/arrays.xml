@@ -2,10 +2,10 @@
 <resources>
     <!-- MAKE SURE THIS LIST CORRESPONDS TO LIGHTWALKERMODES ENUM -->
     <string-array name="modeList">
-        <item name="main">Main</item>
-        <item name="gravity">Gravity</item>
-        <item name="equalizer">Equalizer</item>
-        <item name="sparkle">Sparkle</item>
-        <item name="pulse">Pulse</item>
+        <item name="main">main</item>
+        <item name="gravity">gravity</item>
+        <item name="equalizer">equalizer</item>
+        <item name="sparkle">sparkle</item>
+        <item name="pulse">pulse</item>
     </string-array>
 </resources>

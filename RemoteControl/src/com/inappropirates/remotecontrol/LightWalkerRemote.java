@@ -84,9 +84,8 @@ public class LightWalkerRemote extends Activity {
 			return;
 		}
 
-		mPrefs = getSharedPreferences("main_preferences.xml", MODE_PRIVATE);
-		AppUtil.mSelectedMode = LightWalkerModes.valueOf(mPrefs.getString(
-				"mainPrefDefaultMode", LightWalkerModes.pulse.toString()));
+		mPrefs = getSharedPreferences("main_preferences", MODE_PRIVATE);
+		AppUtil.mSelectedMode = LightWalkerModes.valueOf(mPrefs.getString("mainDefaultMode", LightWalkerModes.pulse.toString()));
 	}
 
 	@Override
@@ -143,7 +142,7 @@ public class LightWalkerRemote extends Activity {
 
 	@Override
 	public void onDestroy() {
-		super.onDestroy();
+ 		super.onDestroy();
 
 		// if (AppUtil.mBluetoothAdapter.isEnabled() && (AppUtil.mChatService !=
 		// null)) {

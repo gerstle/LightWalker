@@ -45,8 +45,5 @@ public enum Preferences {
 	//------------------------------------------------------------------------
 	// Gravity
 	//------------------------------------------------------------------------
-	gravityColorOne,
-	gravityColorTwo,
-	gravityColorThree,
 	gravityRotate,
 }

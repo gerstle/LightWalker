@@ -7,8 +7,8 @@
         <com.robobunny.SeekBarPreference
         android:key="eqRMSThreshold"
         android:title="RMS Threshold"
-        android:defaultValue="150"
-        android:max="500"
+        android:defaultValue="115"
+        android:max="1024"
         robobunny:min="0"
         />
         
@@ -28,7 +28,8 @@
         android:title="all bands" />
     
     <CheckBoxPreference
-		android:defaultValue="false"
+		android:defaultValue="true"
         android:key="eqRainbow"
         android:title="rainbow of fruit flavor?" />
+
 </PreferenceScreen>

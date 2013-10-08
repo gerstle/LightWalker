@@ -7,7 +7,7 @@
     <com.robobunny.SeekBarPreference
         android:key="pulseMinRate"
         android:title="min pulse rate (ms)"
-        android:defaultValue="500"
+        android:defaultValue="200"
         android:max="2000"
         robobunny:min="200"
         robobunny:unitsLeft=""
@@ -16,14 +16,14 @@
     <com.robobunny.SeekBarPreference
         android:key="pulseMaxRate"
         android:title="max pulse rate (ms)"
-        android:defaultValue="3000"
+        android:defaultValue="4500"
         android:max="10000"
         robobunny:min="250"
         robobunny:unitsLeft=""
 		robobunny:unitsRight="" />
     
     <CheckBoxPreference
-		android:defaultValue="false"
+		android:defaultValue="true"
         android:key="pulseRandom"
         android:title="random color" />
         
