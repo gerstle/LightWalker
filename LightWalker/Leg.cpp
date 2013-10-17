@@ -514,9 +514,8 @@ void Leg::setWalkingMode(WalkingModeEnum mode, ADXL345 *adxl)
             break;
 
         case bubble:
-            Serial.println("setting bubble location to -1");
-            _leadingBubbleBottom = -1;
-            _trailingBubbleBottom = _pixelCount;
+            _leadingBubbleBottom = -10;
+            _trailingBubbleBottom = _pixelCount + 10;
             break;
     }
 }
@@ -729,71 +728,52 @@ void Leg::bubble_step()
 {
     _leadingBubbleBottom = _half;
     _trailingBubbleBottom = _half + 1 + (_half - _leadingBubbleBottom);
+    _bubbleOn = random(0, 2);
     bubble_bubble();
 }
 
 void Leg::bubble_bubble()
 {
-    float max = ((float) min(40, config->main.maxBrightness)) / 100;
-    float rBrightness, gBrightness, bBrightness = 0;
     int dice = 0;
     int leadingBubbleTop, trailingBubbleTop = 0;
+    RGB bubbleColor;
 
     leadingBubbleTop = _leadingBubbleBottom - config->bubble.width + 1;
     trailingBubbleTop = _trailingBubbleBottom + config->bubble.width - 1;
-
-    // <gerstle> bubble location
-    /*
-    if ((_leadingBubbleBottom >= 0) || (_trailingBubbleBottom > _pixelCount))
-    {
-        leadingBubbleBottom = _bubbleLocation;
-        leadingBubbleTop = _bubbleLocation - config->bubble.width + 1;
-
-        trailingBubbleBottom = _half + 1 + (_half - _bubbleLocation);
-        trailingBubbleTop = trailingBubbleBottom + config->bubble.width - 1;
-    }
-    else
-    {
-        leadingBubbleBottom = _bubbleLocation;
-        leadingBubbleTop = _bubbleLocation - config->bubble.width + 1;
-
-        trailingBubbleBottom = _pixelCount;
-        trailingBubbleTop = _pixelCount + config->bubble.width;
-    }
-    */
-
-    if (channel == 1)
-    {
-        Serial.print(_leadingBubbleBottom); Serial.print("\t");
-        Serial.print(_trailingBubbleBottom); Serial.print("\t");
-        Serial.println();
-    }
 
     for (int i = 0; i < _pixelCount; i++)
     {
         dice = random(0, 100);
 
-        if ((i <= _half) && (i <= _leadingBubbleBottom) && (i >= leadingBubbleTop))
+        if (((i <= _half) && (i <= _leadingBubbleBottom) && (i >= leadingBubbleTop)) ||
+            ((i > _half) && (i >= _trailingBubbleBottom) && (i <= trailingBubbleTop)))
         {
-            _pixels[i].r = byte((float)config->bubble.bubbleColor.r);
-            _pixels[i].g = byte((float)config->bubble.bubbleColor.g);
-            _pixels[i].b = byte((float)config->bubble.bubbleColor.b);
+            if (_bubbleOn)
+            {
+                _pixels[i].r = config->bubble.bubbleColor.r;
+                _pixels[i].g = config->bubble.bubbleColor.g;
+                _pixels[i].b = config->bubble.bubbleColor.b;
+            }
+            else
+            {
+                _pixels[i].r = 0;
+                _pixels[i].g = 0;
+                _pixels[i].b = 0;
+            }
         }
-        else if ((i > _half) && (i >= _trailingBubbleBottom) && (i <= trailingBubbleTop))
+        else if (!config->bubble.trail &&
+                 (((i > _leadingBubbleBottom) && (i <= (_leadingBubbleBottom + config->bubble.speed))) ||
+                  ((i < _trailingBubbleBottom) && (i >= (_trailingBubbleBottom - config->bubble.speed)))))
         {
-            _pixels[i].r = byte((float)config->bubble.bubbleColor.r);
-            _pixels[i].g = byte((float)config->bubble.bubbleColor.g);
-            _pixels[i].b = byte((float)config->bubble.bubbleColor.b);
+            _pixels[i].r = config->bubble.backgroundColors[0].r;
+            _pixels[i].g = config->bubble.backgroundColors[0].g;
+            _pixels[i].b = config->bubble.backgroundColors[0].b;
         }
-        else if ((dice == 0) ||
-            (!config->bubble.trail && ((i == (_leadingBubbleBottom + 1)) || (i == (_trailingBubbleBottom - 1)))))
+        else if (dice < 3)
         {
-            rBrightness = ((float) random(10, 40)) / 100 * max;
-            gBrightness = ((float) random(10, 40)) / 100 * max;
-            bBrightness = ((float) random(10, 40)) / 100 * max;
-            _pixels[i].r = byte((float)config->bubble.backgroundColor.r * rBrightness);
-            _pixels[i].g = byte((float)config->bubble.backgroundColor.g * gBrightness);
-            _pixels[i].b = byte((float)config->bubble.backgroundColor.b * bBrightness);
+            _pixels[i].r = config->bubble.backgroundColors[dice].r;
+            _pixels[i].g = config->bubble.backgroundColors[dice].g;
+            _pixels[i].b = config->bubble.backgroundColors[dice].b;
         }
 
         _setPixel(i, _pixels[i], 0);

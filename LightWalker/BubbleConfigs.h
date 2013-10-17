@@ -11,6 +11,7 @@ class BubbleConfigs
     public:
         BubbleConfigs();
         RGB backgroundColor;
+        RGB backgroundColors[3];
         RGB bubbleColor;
         int speed;
         int width;

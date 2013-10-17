@@ -92,8 +92,8 @@ void serialEvent1()
 
 bool executeCommand(int key, char *value, int valueLen)
 {
-    Serial.print("key: "); Serial.print(key);
-    Serial.print(" value: "); Serial.print(value); Serial.print("("); Serial.print(valueLen); Serial.println(")");
+    //Serial.print("key: "); Serial.print(key);
+    //Serial.print(" value: "); Serial.print(value); Serial.print("("); Serial.print(valueLen); Serial.println(")");
 
     int valueInt;
 
@@ -259,6 +259,7 @@ bool executeCommand(int key, char *value, int valueLen)
         //------------------------------------------------------------------------
         case bubbleBackgroundColor:
             ParseColor(value, &(lw.config.bubble.backgroundColor));
+            InitBubbleBackgroundColors();
             break;
         case bubbleBubbleColor:
             ParseColor(value, &(lw.config.bubble.bubbleColor));
@@ -352,5 +353,23 @@ void ResetColor()
         lw.config.main.minColors[i].r = map(COLORS[i].r, 0, 255, 0, lw.config.main.minBrightness);
         lw.config.main.minColors[i].g = map(COLORS[i].g, 0, 255, 0, lw.config.main.minBrightness);
         lw.config.main.minColors[i].b = map(COLORS[i].b, 0, 255, 0, lw.config.main.minBrightness);
+    }
+}
+
+// <cgerstle> the idea here is to cache 3 sparkle colors that can then be used
+// instead of calculating during running of bubble
+void InitBubbleBackgroundColors()
+{
+    float max = ((float) min(40, lw.config.main.maxBrightness)) / 100;
+    float rBrightness, gBrightness, bBrightness = 0;
+
+    for (int i = 0; i < 3; i++)
+    {
+        rBrightness = ((float) random(10, 40)) / 100 * max;
+        gBrightness = ((float) random(10, 40)) / 100 * max;
+        bBrightness = ((float) random(10, 40)) / 100 * max;
+        lw.config.bubble.backgroundColors[i].r = byte((float)lw.config.bubble.backgroundColor.r * rBrightness);
+        lw.config.bubble.backgroundColors[i].g = byte((float)lw.config.bubble.backgroundColor.g * gBrightness);
+        lw.config.bubble.backgroundColors[i].b = byte((float)lw.config.bubble.backgroundColor.b * bBrightness);
     }
 }

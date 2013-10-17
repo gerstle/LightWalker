@@ -140,6 +140,7 @@ class Leg
         // <gerstle> bubble
         int _leadingBubbleBottom;
         int _trailingBubbleBottom;
+        bool _bubbleOn;
 };
 
 #endif
