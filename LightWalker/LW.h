@@ -30,8 +30,10 @@
 #define FULL_LEG_HALF 35
 #define NO_STILTS_LEG_PIXEL_COUNT 25
 #define NO_STILTS_LEG_HALF 13
-#define ARM_PIXEL_COUNT 100
-#define ARM_HALF 50
+#define LEFT_ARM_PIXEL_COUNT 100
+#define LEFT_ARM_HALF 50
+#define RIGHT_ARM_PIXEL_COUNT 102
+#define RIGHT_ARM_HALF 50
 
 class LW
 {
@@ -56,8 +58,8 @@ class LW
         Leg _legs[LEG_COUNT];
         RGB _leftLegPixels[FULL_LEG_PIXEL_COUNT];
         RGB _rightLegPixels[FULL_LEG_PIXEL_COUNT];
-        RGB _leftArmPixels[ARM_PIXEL_COUNT];
-        RGB _rightArmPixels[ARM_PIXEL_COUNT];
+        RGB _leftArmPixels[LEFT_ARM_PIXEL_COUNT];
+        RGB _rightArmPixels[RIGHT_ARM_PIXEL_COUNT];
 
         unsigned long _laststatus;
 

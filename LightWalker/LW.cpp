@@ -16,8 +16,8 @@ void LW::initLegs(WalkingModeEnum m)
 {
     _legs[0].init(&config, "left leg", ADXL_ONE, mode, &_adxl, FULL_LEG_PIXEL_COUNT, FULL_LEG_HALF, _leftLegPixels);
     _legs[1].init(&config, "right leg", ADXL_TWO, mode, &_adxl, FULL_LEG_PIXEL_COUNT, FULL_LEG_HALF, _rightLegPixels);
-    _legs[2].init(&config, "left arm", ADXL_THREE, mode, &_adxl, ARM_PIXEL_COUNT, ARM_HALF, _leftArmPixels);
-    _legs[3].init(&config, "right arm", ADXL_FOUR, mode, &_adxl, ARM_PIXEL_COUNT, ARM_HALF, _rightArmPixels);
+    _legs[2].init(&config, "left arm", ADXL_THREE, mode, &_adxl, LEFT_ARM_PIXEL_COUNT, LEFT_ARM_HALF, _leftArmPixels);
+    _legs[3].init(&config, "right arm", ADXL_FOUR, mode, &_adxl, RIGHT_ARM_PIXEL_COUNT, RIGHT_ARM_HALF, _rightArmPixels);
 
     mode = m;
     setMode(mode);
@@ -241,6 +241,6 @@ void LW::setArmsOff()
 
 void LW::setArmsOn()
 {
-    _legs[2].setPixelCount(ARM_PIXEL_COUNT, ARM_HALF);
-    _legs[3].setPixelCount(ARM_PIXEL_COUNT, ARM_HALF);
+    _legs[2].setPixelCount(LEFT_ARM_PIXEL_COUNT, LEFT_ARM_HALF);
+    _legs[3].setPixelCount(RIGHT_ARM_PIXEL_COUNT, RIGHT_ARM_HALF);
 }
