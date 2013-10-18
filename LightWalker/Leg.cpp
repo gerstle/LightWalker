@@ -168,7 +168,7 @@ void Leg::_sparkle_sparkle()
     // leading leg
     for (int i = 0; i < _lower_foot_border; i++)
     {
-        brightness = ((float) i / (float) _lower_foot_border);
+        brightness = ((float) i / (float) _half);
         rand = (float)random(0, min(20, brightness * 100)) / 100;
         brightness = brightness - rand;
         //Serial.print(i); Serial.print("\t"); Serial.print(brightness); Serial.print("\t"); Serial.println(rand);
@@ -194,13 +194,14 @@ void Leg::_sparkle_sparkle()
     // trailing leg
     for (int i = _upper_foot_border + 1; i < _pixelCount; i++)
     {
-        brightness = ((float) (_pixelCount - 1 - i) / (float) _lower_foot_border);
+        brightness = ((float) (_pixelCount - 1 - i) / (float) _half);
         rand = (float)random(0, min(20, brightness * 100)) / 100;
         brightness = brightness - rand;
         //Serial.print(i); Serial.print("\t"); Serial.print(brightness); Serial.print("\t"); Serial.println(rand);
         _pixels[i].r = byte((float)config->sparkle.sparkleColor.r * brightness);
         _pixels[i].g = byte((float)config->sparkle.sparkleColor.g * brightness);
         _pixels[i].b = byte((float)config->sparkle.sparkleColor.b * brightness);
+
         _setPixel(i, _pixels[i], 0);
     }
 

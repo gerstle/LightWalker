@@ -77,7 +77,6 @@ class Leg
         LightModeEnum _lightMode;
         unsigned long _lightModeChangeTime;
         WalkingModeEnum _walkingMode;
-        //RGB _pixels[PIXELS_PER_LEG];
         RGB *_pixels;
         byte _pixelCount;
         byte _half;
