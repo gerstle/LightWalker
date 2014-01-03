@@ -32,7 +32,7 @@
         android:key="pulseSyncLegs"
         android:title="synchronize legs" />
     
-    <com.inappropirates.remotecontrol.ColorPickerPreference
+    <com.inappropirates.util.ColorPickerPreference
         android:key="pulseColor"
         android:title="color"
         />

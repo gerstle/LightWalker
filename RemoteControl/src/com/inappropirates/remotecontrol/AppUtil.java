@@ -16,7 +16,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.inappropirates.remotecontrol.R;
 import com.inappropirates.util.BluetoothChatService;
 
 public class AppUtil extends Application {

@@ -31,12 +31,12 @@
         robobunny:unitsLeft=""
 		robobunny:unitsRight="" />
     
-    <com.inappropirates.remotecontrol.ColorPickerPreference
+    <com.inappropirates.util.ColorPickerPreference
         android:key="sparkleFootFlashColor"
         android:title="foot flash color"
         />
     
-    <com.inappropirates.remotecontrol.ColorPickerPreference
+    <com.inappropirates.util.ColorPickerPreference
         android:key="sparkleSparkleColor"
         android:title="sparkle color"
         />

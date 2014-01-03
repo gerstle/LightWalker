@@ -1,4 +1,4 @@
-package com.inappropirates.remotecontrol;	
+package com.inappropirates.util;	
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -47,9 +47,9 @@ public class ColorPickerPreference extends DialogPreference implements OnClickLi
 	 * Inner class representing the color chooser.
 	 */
 	private class ColorPickerView extends View {
-		private static final int CENTER_X = 150;
-		private static final int CENTER_Y = 150;
-		private static final int CENTER_RADIUS = 50;
+		private int CENTER_X = 400;
+		private int CENTER_Y = 400;
+		private int CENTER_RADIUS = 50;
 
 		private Paint paint = null;
 		private Paint mCenterPaint = null;
@@ -69,7 +69,7 @@ public class ColorPickerPreference extends DialogPreference implements OnClickLi
 			paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 			paint.setShader(new SweepGradient(0, 0, mColors, null));
 			paint.setStyle(Paint.Style.STROKE);
-			paint.setStrokeWidth(85);
+			paint.setStrokeWidth(300);
 
 			mCenterPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 			mCenterPaint.setColor(mColor);
@@ -120,7 +120,7 @@ public class ColorPickerPreference extends DialogPreference implements OnClickLi
 				width = CENTER_X*2 + 50;
 			}
 
-			setMeasuredDimension(width, CENTER_Y*2);
+			setMeasuredDimension(width, CENTER_Y * 2);
 		}
 		/**
 		 * @param s

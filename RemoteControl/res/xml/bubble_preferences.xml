@@ -18,12 +18,12 @@
         android:max="20"
         robobunny:min="1" />
     
-    <com.inappropirates.remotecontrol.ColorPickerPreference
+    <com.inappropirates.util.ColorPickerPreference
         android:key="bubbleBackgroundColor"
         android:title="background color"
         />
     
-    <com.inappropirates.remotecontrol.ColorPickerPreference
+    <com.inappropirates.util.ColorPickerPreference
         android:key="bubbleBubbleColor"
         android:title="bubble color"
         />

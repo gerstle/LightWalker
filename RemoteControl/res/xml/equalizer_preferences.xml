@@ -12,7 +12,7 @@
         robobunny:min="0"
         />
         
-    <com.inappropirates.remotecontrol.ColorPickerPreference
+    <com.inappropirates.util.ColorPickerPreference
         android:key="eqColor"
         android:title="color"
         />
