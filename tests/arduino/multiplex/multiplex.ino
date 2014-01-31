@@ -1,7 +1,5 @@
-#include <Wire.h>
+#include <i2c_t3.h>
 #include <ADXL345.h>
-#include <SPI.h>
-#include <TCL.h>
 
 #define TCA9548AADDR 0x74 // 1110100
 
@@ -10,13 +8,14 @@
 #define ADXL_THREE 0x4
 #define ADXL_FOUR 0x8
 
-// For now, one object works...
 ADXL345 adxl;
-unsigned long lastStatus = millis();
 double xyz[3];
+
+unsigned long lastStatus = millis();
  
 void setup()
 {
+    delay(3000);
     Serial.begin(9600);
 
     Wire.begin();
@@ -42,43 +41,52 @@ void setup()
     Serial.println("done");
 }
  
+//elapsedMillis lastStatus;
 void loop()
 {
-    unsigned long currentTime = millis();
     bool printStatus = false;
 
+   unsigned long currentTime = millis();
+ 
     if (currentTime > (lastStatus + 500))
     {
         printStatus = true;
         lastStatus = currentTime;
     }
 
+//     if (lastStatus >= 1000)
+//     {
+//         lastStatus = lastStatus - 1000;
+//         printStatus = true;
+//     }
+
     selectI2CChannels(ADXL_ONE);
-    adxl.getAccelemeter(xyz);
+    adxl.getAcceleration(xyz);
     if (printStatus)
         printXYZ("  ONE");
  
     selectI2CChannels(ADXL_TWO);
-    adxl.getAccelemeter(xyz);
+    adxl.getAcceleration(xyz);
     if (printStatus)
         printXYZ("  TWO");
  
     selectI2CChannels(ADXL_THREE);
-    adxl.getAccelemeter(xyz);
+    adxl.getAcceleration(xyz);
     if (printStatus)
         printXYZ("THREE");
  
     selectI2CChannels(ADXL_FOUR);
-    adxl.getAccelemeter(xyz);
+    adxl.getAcceleration(xyz);
     if (printStatus)
         printXYZ(" FOUR");
 }
  
-void selectI2CChannels(int channels) 
+void selectI2CChannels(byte channels) 
 {
     Wire.beginTransmission(TCA9548AADDR);
     Wire.write(channels);
     Wire.endTransmission();  
+    //print_i2c_status();
 }
 
 void printXYZ(char label[])

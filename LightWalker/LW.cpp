@@ -8,39 +8,38 @@
 
 #include  "LW.h"
 
-// ----------------------------------------------------------------------------
-// LW Class
-// ----------------------------------------------------------------------------
-
 void LW::initLegs(WalkingModeEnum m)
 {
-    _legs[0].init(&config, "left leg", ADXL_ONE, mode, &_adxl, FULL_LEG_PIXEL_COUNT, FULL_LEG_HALF, _leftLegPixels);
-    _legs[1].init(&config, "right leg", ADXL_TWO, mode, &_adxl, FULL_LEG_PIXEL_COUNT, FULL_LEG_HALF, _rightLegPixels);
-    _legs[2].init(&config, "left arm", ADXL_THREE, mode, &_adxl, LEFT_ARM_PIXEL_COUNT, LEFT_ARM_HALF, _leftArmPixels);
-    _legs[3].init(&config, "right arm", ADXL_FOUR, mode, &_adxl, RIGHT_ARM_PIXEL_COUNT, RIGHT_ARM_HALF, _rightArmPixels);
+    Serial.print("total LED count: "); Serial.println(LED_COUNT);
+    _legs[0].init(&config, "left leg", ADXL_ONE, _mode, &_adxl, LEG_PIXEL_COUNT, LEG_HALF, leds);
+    Serial.println("    left leg");
+    _legs[1].init(&config, "right leg", ADXL_TWO, _mode, &_adxl, LEG_PIXEL_COUNT, LEG_HALF, &(leds[LEG_PIXEL_COUNT]));
+    Serial.println("    right leg");
+    _legs[2].init(&config, "left arm", ADXL_THREE, _mode, &_adxl, LEFT_ARM_PIXEL_COUNT, LEFT_ARM_HALF, &(leds[LEG_PIXEL_COUNT * 2]));
+    Serial.println("    left arm");
+    _legs[3].init(&config, "right arm", ADXL_FOUR, _mode, &_adxl, RIGHT_ARM_PIXEL_COUNT, RIGHT_ARM_HALF, &(leds[LEG_PIXEL_COUNT * 2 + LEFT_ARM_PIXEL_COUNT]));
+    Serial.println("    right arm");
 
-    mode = m;
-    setMode(mode);
+    _mode = m;
+    setMode(_mode);
 }
 
 void LW::setMode(WalkingModeEnum m)
 {
-    mode = m;
-    _lightModeChangeTime = millis();
+    _mode = m;
     for (int i = 0; i < LEG_COUNT; i++)
-        _legs[i].setWalkingMode(mode, &_adxl);
+        _legs[i].setWalkingMode(_mode);
 
-    switch (mode)
+    switch (_mode)
     {
         case equalizer:
-            equalizer_baseline();
+            equalizerBaseline();
             break;
     }
 }
 
 void LW::off()
 {
-    TCL.sendEmptyFrame();
     for (int i = 0; i < LEG_COUNT; i++)
         _legs[i].off();
 }
@@ -48,78 +47,102 @@ void LW::off()
 // <gerstle> check for inputs
 void LW::walk()
 {
-    TCL.sendEmptyFrame();
-
-    unsigned long currentTime = millis();
-    bool displayStatus = false;
     bool pulseChangeColor = false;
-    if (currentTime > (_laststatus + 2000))
-        displayStatus = false;
+    bool pulseDimming = false;
+    int pulseValue = 0;
+    byte eqLevel = 0;
+
+    // <gerstle> only listen to the EQ once per frame
+    if (_mode == equalizer)
+        eqLevel = equalizerListen();
 
     // <gerstle> foreach leg, check the sensor
     for (int i = 0; i < LEG_COUNT; i++)
     {
-        if (displayStatus && DEBUG)
-        {
-//             Serial.print("    leg "); Serial.println(_legs[i].name);
-//             Serial.print("        pin: "); Serial.println(_legs[i].trigger_pin);
-//             Serial.print("        pin state: "); Serial.println(sensorState);
-//             Serial.print("        status: "); Serial.println(_legs[i].status);
-            _laststatus = millis();
-        }
-
         // <gerstle> init leg for this run
-        _legs[i].currentTime = currentTime;
-        switch (mode)
+        switch (_mode)
         {
-            case bubble:
-                if (_legs[i].detectStep(&_adxl))
-                    _legs[i].bubble_step();
-                else
-                    _legs[i].bubble_bubble();
-                break;
-
-            case sparkle:
-                if (_legs[i].detectStep(&_adxl))
-                    _legs[i].sparkle_footdown();
-                else
-                    _legs[i].sparkle_sameStatus();
-                break;
-
-            case gravity:
-                _legs[i].gravity2Lights(&_adxl);
-                break;
-
-            case equalizer:
-                equalizer_listen(currentTime);
-                break;
-
+            // ------------------------------------------------------------------------
+            // Pulse
+            // ------------------------------------------------------------------------
             case pulse:
-                if (config.pulse.syncLegs && (currentTime >= (_lightModeChangeTime + (_pulse_length * 2))))
-                {
-                    _pulse_length = random(config.pulse.minPulseTime, config.pulse.maxPulseTime);
-                    _lightModeChangeTime = currentTime;
-                    _pulse_isDimming = false;
-                    pulseChangeColor = true;
-                }
-                else if (currentTime >= (_lightModeChangeTime + _pulse_length))
-                    _pulse_isDimming = true;
-                
-                int value;
-                if (config.pulse.syncLegs)
-                    if (_pulse_isDimming)
-                        value = (_pulse_length * 2) - (currentTime - _lightModeChangeTime);
-                    else
-                        value = currentTime - _lightModeChangeTime;
 
-                _legs[i].pulse_pulse(_lightModeChangeTime, _pulse_length, value, pulseChangeColor);
+                if (config.pulse.syncLegs)
+                {
+                    pulseValue = config.pulse.syncLegsTimer;
+                    if (config.pulse.syncLegsTimer >= (_pulse_length * 2))
+                    {
+                        _pulse_length = random(config.pulse.minPulseTime, config.pulse.maxPulseTime);
+                        config.pulse.syncLegsTimer = 0;
+                        pulseValue = config.pulse.syncLegsTimer;
+                        pulseChangeColor = true;
+                        pulseDimming = false;
+                    }
+                    else if (config.pulse.syncLegsTimer >= _pulse_length)
+                    {
+                        pulseValue = (_pulse_length * 2) - config.pulse.syncLegsTimer;
+                        pulseDimming = true;
+                    }
+                
+                    _legs[i].pulseLegMode.setSyncData(_pulse_length, pulseValue, pulseChangeColor, pulseDimming);
+                }
+
+                _legs[i].frame();
+                break;
+
+            // ------------------------------------------------------------------------
+            // Sparkle
+            // ------------------------------------------------------------------------
+            case sparkle:
+                _legs[i].frame();
+                break;
+
+            // ------------------------------------------------------------------------
+            // Equalizer
+            // ------------------------------------------------------------------------
+            case equalizer:
+                _legs[i].equalizerLegMode.eqLevel = eqLevel;
+                _legs[i].frame();
+                break;
+
+            // ------------------------------------------------------------------------
+            // Gravity
+            // ------------------------------------------------------------------------
+            case gravity:
+                _legs[i].frame();
+                break;
+
+            //------------------------------------------------------------------------
+            // Bubble
+            //------------------------------------------------------------------------
+            case bubble:
+                _legs[i].frame();
+                break;
+
+            //------------------------------------------------------------------------
+            // Rainbow
+            //------------------------------------------------------------------------
+            case rainbow:
+                _legs[i].frame();
+                break;
+            
+            //------------------------------------------------------------------------
+            // Chaos
+            //------------------------------------------------------------------------
+            case chaos:
+                break;
+            
+            //------------------------------------------------------------------------
+            // Flames
+            //------------------------------------------------------------------------
+            case flames:
                 break;
         }
     }
-    TCL.sendEmptyFrame();
+    LEDS.show();
 }
 
-void LW::equalizer_baseline()
+void LW::equalizerBaseline()
 {
     int tmp, value;
     int eqValueTotal = 0;
@@ -149,20 +172,21 @@ void LW::equalizer_baseline()
     
     eqEMA = eqValueTotal / EQ_EMA_N;
     eqEMAPeak = peak;
-    _lastEQReading = millis();
 }
 
-void LW::equalizer_listen(unsigned long currentTime)
+// <gerstle> returns a byte between 0 and 100
+byte LW::equalizerListen()
 {
     int level = 0;
     int tmp;
-    byte r, g, b = 0;
-    float brightness;
     static bool emaCheck = true;
 
-    if (currentTime <= (_lastEQReading + 3))
-        return;
-    _lastEQReading = currentTime;
+// <gerstle> might want to renable this if I'm seeing
+// performance issues with the microphone
+//     if (_lastEQReading < 3)
+//         return;
+// 
+//     _lastEQReading = 0;
 
     // <gerstle> get the value
     digitalWrite(AUDIO_RESET_PIN, HIGH);
@@ -195,52 +219,9 @@ void LW::equalizer_listen(unsigned long currentTime)
     eqNminus2 = eqNminus1;
     eqNminus1 = level;
     
-    if (level < config.equalizer.RMSThreshold)
+    if (level < config.equalizer.rmsThreshold)
         level = 0;
 
-    brightness = (float)map(level, eqEMA, eqEMAPeak, 0, 100) / (float)100;
-    if (brightness < 0.0)
-        brightness = 0;
-    //Serial.print(level); Serial.print("\t"); Serial.print(eqEMA); Serial.print("\t"); Serial.print(eqEMAPeak); Serial.print("\t"); Serial.println(brightness);
-
-    if (config.equalizer.allLights)
-    {
-        r = byte((float)config.equalizer.maxColor.r * brightness);
-        g = byte((float)config.equalizer.maxColor.g * brightness);
-        b = byte((float)config.equalizer.maxColor.b * brightness);
-
-        if ((r == 0) && (g == 0) && (b == 0))
-        {
-            r = config.equalizer.minColor.r;
-            g = config.equalizer.minColor.g;
-            b = config.equalizer.minColor.b;
-        }
-    }
-
-    for (int i = 0; i < LEG_COUNT; i++)
-        _legs[i].equalizer_listen(brightness, r, g, b);
-}
-
-void LW::setLegsOff()
-{
-    _legs[0].setPixelCount(NO_STILTS_LEG_PIXEL_COUNT, NO_STILTS_LEG_HALF);
-    _legs[1].setPixelCount(NO_STILTS_LEG_PIXEL_COUNT, NO_STILTS_LEG_HALF);
-}
-
-void LW::setLegsOn()
-{
-    _legs[0].setPixelCount(FULL_LEG_PIXEL_COUNT, FULL_LEG_HALF);
-    _legs[1].setPixelCount(FULL_LEG_PIXEL_COUNT, FULL_LEG_HALF);
-}
-
-void LW::setArmsOff()
-{
-    _legs[2].setPixelCount(0, 0);
-    _legs[3].setPixelCount(0, 0);
-}
-
-void LW::setArmsOn()
-{
-    _legs[2].setPixelCount(LEFT_ARM_PIXEL_COUNT, LEFT_ARM_HALF);
-    _legs[3].setPixelCount(RIGHT_ARM_PIXEL_COUNT, RIGHT_ARM_HALF);
+    return max(0, map(level, eqEMA, eqEMAPeak, 0, 100));
+//     Serial.print(level); Serial.print("\t"); Serial.print(eqEMA); Serial.print("\t"); Serial.print(eqEMAPeak); Serial.print("\t"); Serial.println(eqLevel);
 }

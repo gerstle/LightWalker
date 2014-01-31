@@ -1,0 +1,25 @@
+#ifndef PulseLegMode_h
+#define PulseLegMode_h
+
+#include "LegMode.h"
+#include "FastSPI_LED2.h"
+
+class PulseLegMode : public LegMode
+{
+    public:
+        virtual void setup(LWConfigs *c, char *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p);
+        virtual void frame();
+        void setSyncData(int syncLength, int syncValue, bool changeColor, bool dimming);
+
+
+    private:
+        elapsedMillis _lastChangeTimer;
+        CHSV _pulseColor;
+        int _pulseLength;
+        int _syncLength;
+        int _syncValue;
+        int _changeColor;
+        bool _isDimming;
+};
+
+#endif

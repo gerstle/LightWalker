@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,20 +23,20 @@ public class AppUtil extends Application {
 	
 	public static final boolean DEBUG = true;
 	public static final String TAG = "LightWalkerRemote";
-	public static Context mContext;
+	public static Context context;
 	
-	public static final char mKeyDelimiter = '=';
-	public static final char mColorDelimiter = ',';
+	public static final char keyDelimiter = '=';
+	public static final char colorDelimiter = ',';
 		
-    public static BluetoothAdapter mBluetoothAdapter = null;
-    public static BluetoothChatService mChatService = null;
-    public static Context mApplicationContext = null;
+    public static BluetoothAdapter bluetoothAdapter = null;
+    public static BluetoothChatService chatService = null;
+    public static Context applicationContext = null;
 
- 	public static TextView mTitle;
-    public static String mConnectedDeviceName = null;
-    public static LightWalkerModes mSelectedMode;
-    public static EditText mCommandText;
-    private static StringBuffer mOutStringBuffer;
+ 	public static TextView title;
+    public static String connectedDeviceName = null;
+    public static LightWalkerModes selectedMode;
+    public static EditText commandText;
+    private static StringBuffer outStringBuffer;
     
     public static LightWalkerRemote mLightWalker = null;
     
@@ -49,8 +50,7 @@ public class AppUtil extends Application {
     public static final String DEVICE_NAME = "device_name";
     public static final String TOAST = "toast";
     
-    public static TextView mBluetoothMessageTextView;
-    public static String mBluetoothMessageLabel;
+    public static ListLogger logger;
     
     //public static RMSThread mRMSThread = null;
     
@@ -62,22 +62,22 @@ public class AppUtil extends Application {
                 if(DEBUG) Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
                 switch (msg.arg1) {
                 case BluetoothChatService.STATE_CONNECTED:
-                    mTitle.setText(R.string.title_connected_to);
-                    mTitle.append(mConnectedDeviceName);
+                    title.setText(R.string.title_connected_to);
+                    title.append(connectedDeviceName);
                     
                     // Initialize the buffer for outgoing messages
-                    mOutStringBuffer = new StringBuffer("");
-                    String modeName = mSelectedMode.toString().toLowerCase(Locale.ENGLISH);
-                    SharedPreferences pref = mContext.getSharedPreferences(modeName  + "_preferences", MODE_PRIVATE);
+                    outStringBuffer = new StringBuffer("");
+                    String modeName = selectedMode.toString().toLowerCase(Locale.ENGLISH);
+                    SharedPreferences pref = context.getSharedPreferences(modeName  + "_preferences", MODE_PRIVATE);
                     
-                    AppUtil.setMode(mSelectedMode, pref, true);
+                    AppUtil.setMode(selectedMode, pref, true);
                     break;
                 case BluetoothChatService.STATE_CONNECTING:
-                    mTitle.setText(R.string.title_connecting);
+                    title.setText(R.string.title_connecting);
                     break;
                 case BluetoothChatService.STATE_LISTEN:
                 case BluetoothChatService.STATE_NONE:
-                    mTitle.setText(R.string.title_not_connected);
+                    title.setText(R.string.title_not_connected);
                     break;
                 }
                 break;
@@ -89,23 +89,27 @@ public class AppUtil extends Application {
                 byte[] readBuf = (byte[]) msg.obj;
                 // construct a string from the valid bytes in the buffer
                 String readMessage = new String(readBuf, 0, msg.arg1);
-                mBluetoothMessageTextView.setText(mBluetoothMessageLabel + readMessage);
+                
+                //if (bluetoothLog.getLineCount() > 100)
+                	//bluetoothLog.setText("");
+                logger.Log(readMessage);
+                //bluetoothLog.setSelection(bluetoothLog.getText().length());
                 
                 if (readMessage.equals("SettingsPlease"))
                 {
-                	String modeName = mSelectedMode.toString().toLowerCase(Locale.ENGLISH);
-                    AppUtil.sendModeSettings(LightWalkerModes.main, mContext.getSharedPreferences("main_preferences", MODE_PRIVATE));
-                    AppUtil.setMode(mSelectedMode, mContext.getSharedPreferences(modeName  + "_preferences", MODE_PRIVATE), true);
+                	String modeName = selectedMode.toString().toLowerCase(Locale.ENGLISH);
+                    AppUtil.sendModeSettings(context.getSharedPreferences("main_preferences", MODE_PRIVATE));
+                    AppUtil.setMode(selectedMode, context.getSharedPreferences(modeName  + "_preferences", MODE_PRIVATE), true);
                 }
                 break;
             case MESSAGE_DEVICE_NAME:
                 // save the connected device's name
-                mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
-                Toast.makeText(mApplicationContext, "Connected to "
-                               + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
+                connectedDeviceName = msg.getData().getString(DEVICE_NAME);
+                Toast.makeText(applicationContext, "Connected to "
+                               + connectedDeviceName, Toast.LENGTH_SHORT).show();
                 break;
             case MESSAGE_TOAST:
-                Toast.makeText(mApplicationContext, msg.getData().getString(TOAST), 
+                Toast.makeText(applicationContext, msg.getData().getString(TOAST), 
                                Toast.LENGTH_SHORT).show();
                 break;
             }
@@ -131,11 +135,12 @@ public class AppUtil extends Application {
     }
     
     public static void setMode(LightWalkerModes mode, SharedPreferences prefs, boolean override) {
-    	if (((mode != LightWalkerModes.main) && (mode != AppUtil.mSelectedMode)) || override)
+    	if (((mode != LightWalkerModes.main) && (mode != AppUtil.selectedMode)) || override)
     	{
-    		//<cgerstle> quit processing things while we send commands
+    		// <cgerstle> quit processing things while we send commands
     		// give it it a second to chill.
-    		AppUtil.sendMessage(AppUtil.ConstructMessage("mode", "masterOff"));
+    		// <cgerstle> fuck that.
+    		//AppUtil.sendMessage(AppUtil.ConstructMessage("mode", String.valueOf(LightWalkerModes.masterOff.ordinal())));
 
 			try {
 				Thread.sleep(100);
@@ -143,17 +148,21 @@ public class AppUtil extends Application {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-    		AppUtil.mSelectedMode = mode;
-    		AppUtil.sendModeSettings(mode, prefs);
+    		AppUtil.selectedMode = mode;
+    		AppUtil.sendModeSettings(prefs);
     		//AppUtil.sendMessage(AppUtil.ConstructMessage("mode", mode.toString()));
     		AppUtil.sendMessage(AppUtil.ConstructMessage("mode", String.valueOf(mode.ordinal())));
     	}
     }
     
 	public static void sendMessage(String message) {
+		//bluetoothLog.append(message.concat("\r\n"));
+		//bluetoothLog.setSelection(bluetoothLog.getText().length());
+		logger.Log(message);
+		
 		// Check that we're actually connected before trying anything
-        if (AppUtil.mChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
-            Toast.makeText(mContext, R.string.title_not_connected, Toast.LENGTH_SHORT).show();
+        if (AppUtil.chatService.getState() != BluetoothChatService.STATE_CONNECTED) {
+            Toast.makeText(context, R.string.title_not_connected, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -167,14 +176,14 @@ public class AppUtil extends Application {
 				Log.d(AppUtil.TAG, "code not encode to ASCII");
 				e.printStackTrace();
 			}
-            AppUtil.mChatService.write(send);
+            AppUtil.chatService.write(send);
 
             // Reset out string buffer to zero and clear the edit text field
-            mOutStringBuffer.setLength(0);
+            outStringBuffer.setLength(0);
         }
 	}
 	
-	public static void sendModeSettings(LightWalkerModes mode, SharedPreferences prefs) {
+	public static void sendModeSettings(SharedPreferences prefs) {
     	Map<String,?> keys = prefs.getAll();
 
 		String value = null;
@@ -210,7 +219,7 @@ public class AppUtil extends Application {
     }
     
     public static String ConstructMessage(String key, String value) {
-    	return String.valueOf(Preferences.valueOf(key).ordinal()) + mKeyDelimiter + value;
+    	return String.valueOf(Preferences.valueOf(key).ordinal()) + keyDelimiter + value;
     	// return key + mKeyDelimiter + value;
     }
     
@@ -223,25 +232,33 @@ public class AppUtil extends Application {
     
     public static String Color2String(int color) {
     	String rv = "";
-    	rv += "" + RoundColor(Color.red(color)) + mColorDelimiter +
-    			RoundColor(Color.green(color)) + mColorDelimiter +
-    					RoundColor(Color.blue(color));
+    	
+    	int newColor = Color.argb(Color.alpha(color), RoundColor(Color.red(color)), RoundColor(Color.green(color)), RoundColor(Color.blue(color)));
+    	float[] hsvColor = new float[3];
+    	Color.colorToHSV(newColor, hsvColor);
+    	
+    	rv += "" + (int)AppUtil.Map(hsvColor[0], 0, 360, 0, 255) + colorDelimiter +
+    			   (int)AppUtil.Map(hsvColor[1], 0, 1, 0, 255) + colorDelimiter +
+    			   (int)AppUtil.Map(hsvColor[2], 0, 1, 0, 255);
     	
     	Log.i(AppUtil.TAG, "setting color to: " + rv);
     	return rv;
     }
     
     final static int roundValue = 17;
-    private static int RoundColor(int color)
-    {
+    private static int RoundColor(int color) {
     	int modValue = color % roundValue;
       	if (modValue == 0)
     		return color;
     	
-      	int half = roundValue / 2;
-      	if (modValue <= half)
+      	int cutoff = (int) (roundValue * 0.8);
+      	if (modValue <= cutoff)
       		return color - modValue;
       	else
       		return color + (roundValue - modValue);
+    }
+    
+    public static float Map(float value, float fromLow, float fromHigh, float toLow, float toHigh) {
+    	return toLow + (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow);
     }
 }

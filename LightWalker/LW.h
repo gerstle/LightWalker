@@ -10,11 +10,12 @@
 #ifndef LW_h
 #define LW_h
 
-#include <ADXL345.h>
-#include <TCL.h>
+#include "ADXL345_t3.h"
+#include "FastSPI_LED2.h"
 
 #include "LWUtils.h"
 #include "LWConfigs.h"
+
 #include "Leg.h"
 
 #include "MainConfigs.h"
@@ -22,59 +23,35 @@
 #include "SparkleConfigs.h"
 #include "EqualizerConfigs.h"
 
-#define EQ_EMA_N 200
-#define EQ_EMA_PEAK_N 20
-
-#define LEG_COUNT 4
-#define FULL_LEG_PIXEL_COUNT 75
-#define FULL_LEG_HALF 35
-#define NO_STILTS_LEG_PIXEL_COUNT 25
-#define NO_STILTS_LEG_HALF 13
-#define LEFT_ARM_PIXEL_COUNT 100
-#define LEFT_ARM_HALF 50
-#define RIGHT_ARM_PIXEL_COUNT 102
-#define RIGHT_ARM_HALF 50
-
 class LW
 {
     public:
-        LW() : config(), _laststatus(millis()), mode(masterOff), _lightModeChangeTime(millis()), _pulse_length(0), _pulse_isDimming(0) {}
+        LW() : config() {}
         void initLegs(WalkingModeEnum m);
         void off();
         void walk();
-        void equalizer_listen(unsigned long currentTime);
-        void equalizer_baseline();
+        byte equalizerListen();
+        void equalizerBaseline();
         void setMode(WalkingModeEnum m);
 
-        void setLegsOff();
-        void setLegsOn();
-        void setArmsOff();
-        void setArmsOn();
-
         LWConfigs config;
-        WalkingModeEnum mode;
+
+        CRGB leds[LEG_PIXEL_COUNT + LEG_PIXEL_COUNT + LEFT_ARM_PIXEL_COUNT + RIGHT_ARM_PIXEL_COUNT];
 
     private:
+        WalkingModeEnum _mode = masterOff;
         Leg _legs[LEG_COUNT];
-        RGB _leftLegPixels[FULL_LEG_PIXEL_COUNT];
-        RGB _rightLegPixels[FULL_LEG_PIXEL_COUNT];
-        RGB _leftArmPixels[LEFT_ARM_PIXEL_COUNT];
-        RGB _rightArmPixels[RIGHT_ARM_PIXEL_COUNT];
-
-        unsigned long _laststatus;
-
-        unsigned long _lightModeChangeTime;
 
         // <gerstle> pulse
-        int _pulse_length;
-        bool _pulse_isDimming;
+        int _pulse_length = 0;
 
+        // <gerstle> equalizer
         ADXL345 _adxl;
         float eqEMA;
         float eqEMAPeak;
         int eqNminus2;
         int eqNminus1;
-        unsigned long _lastEQReading;
+        elapsedMillis _lastEQReading;
 };
 
 #endif

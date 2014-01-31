@@ -2,23 +2,20 @@
 #define LWEqualizerConfigs_h
 
 #include "Enums.h"
-#include "colors.h"
+#include "FastSPI_LED2.h"
 
 class EqualizerConfigs
 {
     public:
-        EqualizerConfigs();
-
-        RGB color;
-        RGB minColor;
-        RGB maxColor;
-        int brightnessPercent;
-        bool allLights;
-        bool allBands;
-        int RMSThreshold;
-        int peak;
-        bool rainbow;
-        bool fullRainbow;
+        CHSV color;
+        int brightnessPercent = 0;
+        bool allLights = false;
+        bool allBands = false;
+        int rmsThreshold = 75;
+        int peak = 0;
+        bool rainbow = false;
+        bool fullRainbow = false;
+        int minValue = 50;
 };
 
 #endif

@@ -2,20 +2,14 @@
 #define LWMainConfigs_h
 
 #include "Enums.h"
-#include "colors.h"
 
 class MainConfigs
 {
     public:
-        MainConfigs();
-
-        int minBrightness;
-        int maxBrightness;
-        WalkingModeEnum defaultMode;
-        bool legsOn;
-        bool armsOn;
-        RGB minColors[COLOR_COUNT];
-        RGB maxColors[COLOR_COUNT];
+        int maxBrightness = 200;
+        WalkingModeEnum defaultMode = sparkle;
+        bool legsOn = true;
+        bool armsOn = true;
 };
 
 #endif

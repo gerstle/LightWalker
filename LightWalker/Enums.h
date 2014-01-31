@@ -4,11 +4,14 @@ enum WalkingModeEnum
 {
     masterOff,
     main,
-    gravity,
-    equalizer,
-    sparkle,
     pulse,
-    bubble
+    sparkle,
+    equalizer,
+    gravity,
+    bubble,
+    rainbow,
+    chaos,
+    flames
 };
 
 enum Preferences
@@ -16,10 +19,7 @@ enum Preferences
     // ------------------------------------------------------------------------
     // Main
     // ------------------------------------------------------------------------
-    mainMinBrightness,
     mainMaxBrightness,
-    mainLegsOn,
-    mainArmsOn,
     mainDefaultMode,
 
     //------------------------------------------------------------------------
@@ -30,11 +30,11 @@ enum Preferences
     //------------------------------------------------------------------------
     // Pulse
     //------------------------------------------------------------------------
-    pulseMinRate,
-    pulseMaxRate,
-    pulseRandomColor,
-    pulseSyncLegs,
-    pulseColor,
+	pulseMinRate,
+	pulseMaxRate,
+	pulseSyncLegs,
+	pulseColor,
+	pulseMode,
 
     //------------------------------------------------------------------------
     // Sparkle
@@ -44,6 +44,7 @@ enum Preferences
     sparkleSparkleLength,
     sparkleFootFlashColor,
     sparkleSparkleColor,
+    sparkleMinValue,
 
     //------------------------------------------------------------------------
     // Equalizer
@@ -53,11 +54,13 @@ enum Preferences
     eqAllLights,
     eqAllBands,
     eqRainbow,
+    eqMinValue,
 
     //------------------------------------------------------------------------
     // Gravity
     //------------------------------------------------------------------------
     gravityRotate,
+    gravityMinValue,
 
     //------------------------------------------------------------------------
     // Bubble
@@ -66,5 +69,20 @@ enum Preferences
     bubbleBubbleColor,
     bubbleSpeed,
     bubbleWidth,
-    bubbleTrail
+    bubbleTrail,
+    
+    //------------------------------------------------------------------------
+    // Rainbow
+    //------------------------------------------------------------------------
+    rainbowMode,
+    rainbowMinValue,
+    rainbowDelay
+    
+    //------------------------------------------------------------------------
+    // Chaos
+    //------------------------------------------------------------------------
+    
+    //------------------------------------------------------------------------
+    // Flames
+    //------------------------------------------------------------------------
 };

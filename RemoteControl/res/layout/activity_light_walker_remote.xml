@@ -1,6 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/LinearLayout1"
+    android:id="@+id/logText"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -11,46 +11,45 @@
     tools:context=".LightWalkerRemote" >
 
     <LinearLayout
-        android:id="@+id/LinearLayout3"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:layout_weight="0.38"
+        android:orientation="vertical" >
 
-        <EditText
-            android:id="@+id/commandText"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ems="10"
-            android:hint="@string/commandHint"
-            android:inputType="text" />
-
-        <Button
-            android:id="@+id/buttonSend"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/commandSend" />
+        <ListView
+            android:id="@+id/modeList"
+            android:layout_width="match_parent"
+            android:layout_height="224dp"
+            android:entries="@array/modeList" >
+        </ListView>
     </LinearLayout>
 
     <TextView
-        android:id="@+id/bluetoothMessageView"
+        android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/bluetooth_response"
+        android:layout_weight="0.00"
+        android:text="Log"
         android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.60"
+        android:orientation="vertical" >
+
+        <ListView
+            android:id="@+id/logList"
+            android:layout_width="match_parent"
+            android:layout_height="172dp"
+            android:background="@color/black" >
+        </ListView>
+    </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="2dip"
         android:background="#2B3856" />
-
-    <ListView
-        android:id="@+id/modeList"
-        android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:layout_weight="0.46"
-        android:entries="@array/modeList" >
-    </ListView>
 
     <TextView
         android:id="@+id/Status"

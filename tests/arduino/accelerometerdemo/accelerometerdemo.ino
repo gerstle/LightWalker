@@ -1,26 +1,37 @@
 #include <Wire.h>
 #include <ADXL345.h>
-#include <SPI.h>
-#include <TCL.h>
 
 ADXL345 adxl;
+
+#define TCA9548AADDR 0x74 // 1110100
+#define ADXL_ONE 0x1
  
 void setup()
 {
     Serial.begin(9600);
 
-    Wire.begin();
-
-    Serial.print("initing adxl0...");
-    initADXL(adxl);
-    Serial.println("done");
+//     Wire.begin();
+// 
+//     Serial.print("initing adxl0...");
+//     selectI2CChannels(ADXL_ONE);
+//     initADXL(adxl);
+//     Serial.println("done");
 }
  
+byte a = 254;
+byte b = 253;
+int y;
 void loop()
 {
-    double xyz[3];
-    adxl.getAccelemeter(xyz);
-    Serial.print(xyz[0]); Serial.print(","); Serial.print(xyz[1]); Serial.print(","); Serial.println(xyz[2]);
+//     double xyz[3];
+//     adxl.getAcceleration(xyz);
+    //Serial.print(xyz[0]); Serial.print(","); Serial.print(xyz[1]); Serial.print(","); Serial.println(xyz[2]);
+
+    Serial.print(a, BIN); Serial.print("\t");
+    Serial.print(b, BIN); Serial.print("\t");
+	y = (((int)a) << 8) | b;
+    Serial.print(y, BIN); Serial.print("\t");
+    Serial.println(y);
 
     delay(500);
 }
@@ -52,4 +63,11 @@ void initADXL(ADXL345 adxl)
     //set values for what is considered freefall (0-255)
     adxl.setFreeFallThreshold(7); //(5 - 9) recommended - 62.5mg per increment
     adxl.setFreeFallDuration(45); //(20 - 70) recommended - 5ms per increment
+}
+
+void selectI2CChannels(int channels) 
+{
+    Wire.beginTransmission(TCA9548AADDR);
+    Wire.write(channels);
+    Wire.endTransmission();  
 }

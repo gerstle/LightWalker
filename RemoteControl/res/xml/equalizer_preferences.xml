@@ -4,14 +4,22 @@
        xmlns:robobunny="http://robobunny.com"
        android:key="equalizer_preferences">
        
-        <com.robobunny.SeekBarPreference
+    <com.robobunny.SeekBarPreference
         android:key="eqRMSThreshold"
         android:title="RMS Threshold"
         android:defaultValue="115"
         android:max="1024"
         robobunny:min="0"
         />
-        
+
+    <com.robobunny.SeekBarPreference
+        android:key="eqMinValue"
+        android:title="Min Brightness"
+        android:defaultValue="50"
+        android:max="255"
+        robobunny:min="0"
+        />
+    
     <com.inappropirates.util.ColorPickerPreference
         android:key="eqColor"
         android:title="color"

@@ -9,10 +9,15 @@ package com.inappropirates.remotecontrol;
 
 public final class R {
     public static final class array {
-        public static final int btStatusValues=0x7f050001;
+        public static final int btStatusValues=0x7f050006;
         /**  MAKE SURE THIS LIST CORRESPONDS TO LIGHTWALKERMODES ENUM 
          */
         public static final int modeList=0x7f050000;
+        public static final int modeListValues=0x7f050001;
+        public static final int pulseColorStyles=0x7f050002;
+        public static final int pulseColorStylesValues=0x7f050003;
+        public static final int rainbowModeValues=0x7f050005;
+        public static final int rainbowModes=0x7f050004;
     }
     public static final class attr {
     }
@@ -35,27 +40,25 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int LinearLayout1=0x7f0b0000;
-        public static final int LinearLayout3=0x7f0b0001;
-        public static final int Status=0x7f0b0006;
-        public static final int action_settings=0x7f0b0014;
-        public static final int bluetoothMessageView=0x7f0b0004;
-        public static final int buttonSend=0x7f0b0003;
-        public static final int button_scan=0x7f0b000d;
-        public static final int commandText=0x7f0b0002;
-        public static final int menu_bluetooth=0x7f0b0012;
-        public static final int menu_bluetooth_disconnect=0x7f0b0013;
-        public static final int modeList=0x7f0b0005;
-        public static final int new_devices=0x7f0b000c;
-        public static final int paired_devices=0x7f0b000a;
-        public static final int seekBarPrefBarContainer=0x7f0b0011;
-        public static final int seekBarPrefUnitsLeft=0x7f0b0010;
-        public static final int seekBarPrefUnitsRight=0x7f0b000e;
-        public static final int seekBarPrefValue=0x7f0b000f;
-        public static final int title_left_text=0x7f0b0007;
-        public static final int title_new_devices=0x7f0b000b;
-        public static final int title_paired_devices=0x7f0b0009;
-        public static final int title_right_text=0x7f0b0008;
+        public static final int Status=0x7f0b0004;
+        public static final int action_settings=0x7f0b0012;
+        public static final int button_scan=0x7f0b000b;
+        public static final int logList=0x7f0b0003;
+        public static final int logText=0x7f0b0000;
+        public static final int menu_bluetooth=0x7f0b0010;
+        public static final int menu_bluetooth_disconnect=0x7f0b0011;
+        public static final int modeList=0x7f0b0001;
+        public static final int new_devices=0x7f0b000a;
+        public static final int paired_devices=0x7f0b0008;
+        public static final int seekBarPrefBarContainer=0x7f0b000f;
+        public static final int seekBarPrefUnitsLeft=0x7f0b000e;
+        public static final int seekBarPrefUnitsRight=0x7f0b000c;
+        public static final int seekBarPrefValue=0x7f0b000d;
+        public static final int textView1=0x7f0b0002;
+        public static final int title_left_text=0x7f0b0005;
+        public static final int title_new_devices=0x7f0b0009;
+        public static final int title_paired_devices=0x7f0b0007;
+        public static final int title_right_text=0x7f0b0006;
     }
     public static final class layout {
         public static final int activity_light_walker_remote=0x7f030000;
@@ -156,10 +159,13 @@ public final class R {
     }
     public static final class xml {
         public static final int bubble_preferences=0x7f040000;
-        public static final int equalizer_preferences=0x7f040001;
-        public static final int gravity_preferences=0x7f040002;
-        public static final int main_preferences=0x7f040003;
-        public static final int pulse_preferences=0x7f040004;
-        public static final int sparkle_preferences=0x7f040005;
+        public static final int chaos_preferences=0x7f040001;
+        public static final int equalizer_preferences=0x7f040002;
+        public static final int flames_preferences=0x7f040003;
+        public static final int gravity_preferences=0x7f040004;
+        public static final int main_preferences=0x7f040005;
+        public static final int pulse_preferences=0x7f040006;
+        public static final int rainbow_preferences=0x7f040007;
+        public static final int sparkle_preferences=0x7f040008;
     }
 }

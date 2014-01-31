@@ -2,20 +2,18 @@
 #define LWBubbleConfigs_h
 
 #include "Enums.h"
-#include "Arduino.h"
-#include "colors.h"
+#include "FastSPI_LED2.h"
 
 
 class BubbleConfigs
 {
     public:
-        BubbleConfigs();
-        RGB backgroundColor;
-        RGB backgroundColors[3];
-        RGB bubbleColor;
-        int speed;
-        int width;
-        bool trail;
+        CHSV backgroundColor;
+        CHSV backgroundColors[3];
+        CHSV bubbleColor;
+        int speed = 5;
+        int width = 3;
+        bool trail = true;
 };
 
 #endif
