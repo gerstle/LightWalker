@@ -31,7 +31,6 @@ void GravityLegMode::setup(LWConfigs *c, char *n, int i2c_channel, ADXL345 *adxl
 void GravityLegMode::frame()
 {
 	double xyz[3];
-    short x, y, z;
 
     LWUtils.selectI2CChannels(_channel);
     _adxl->getAcceleration(xyz);

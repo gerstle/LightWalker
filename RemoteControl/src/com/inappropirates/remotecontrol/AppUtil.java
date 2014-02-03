@@ -30,7 +30,6 @@ public class AppUtil extends Application {
 		
     public static BluetoothAdapter bluetoothAdapter = null;
     public static BluetoothChatService chatService = null;
-    public static Context applicationContext = null;
 
  	public static TextView title;
     public static String connectedDeviceName = null;
@@ -67,10 +66,14 @@ public class AppUtil extends Application {
                     
                     // Initialize the buffer for outgoing messages
                     outStringBuffer = new StringBuffer("");
-                    String modeName = selectedMode.toString().toLowerCase(Locale.ENGLISH);
-                    SharedPreferences pref = context.getSharedPreferences(modeName  + "_preferences", MODE_PRIVATE);
                     
-                    AppUtil.setMode(selectedMode, pref, true);
+                    SharedPreferences mPrefs = AppUtil.context.getSharedPreferences("main_preferences", android.content.Context.MODE_PRIVATE);
+                    AppUtil.selectedMode = LightWalkerModes.values()[Integer.parseInt(mPrefs.getString("mainDefaultMode", LightWalkerModes.sparkle.toString()))];
+                    String modeName = AppUtil.selectedMode.toString().toLowerCase(Locale.ENGLISH);
+                    
+                    new SendModeTask().execute(new ModeConfigs(LightWalkerModes.main, mPrefs),
+                    		new ModeConfigs(selectedMode, AppUtil.context.getSharedPreferences(modeName  + "_preferences", android.content.Context.MODE_PRIVATE), true));
+                    
                     break;
                 case BluetoothChatService.STATE_CONNECTING:
                     title.setText(R.string.title_connecting);
@@ -89,80 +92,37 @@ public class AppUtil extends Application {
                 byte[] readBuf = (byte[]) msg.obj;
                 // construct a string from the valid bytes in the buffer
                 String readMessage = new String(readBuf, 0, msg.arg1);
-                
-                //if (bluetoothLog.getLineCount() > 100)
-                	//bluetoothLog.setText("");
                 logger.Log(readMessage);
-                //bluetoothLog.setSelection(bluetoothLog.getText().length());
                 
                 if (readMessage.equals("SettingsPlease"))
                 {
-                	String modeName = selectedMode.toString().toLowerCase(Locale.ENGLISH);
-                    AppUtil.sendModeSettings(context.getSharedPreferences("main_preferences", MODE_PRIVATE));
-                    AppUtil.setMode(selectedMode, context.getSharedPreferences(modeName  + "_preferences", MODE_PRIVATE), true);
+                	String modeName = AppUtil.selectedMode.toString().toLowerCase(Locale.ENGLISH);
+                	new SendModeTask().execute(
+                    		new ModeConfigs(selectedMode, AppUtil.context.getSharedPreferences(modeName  + "_preferences", android.content.Context.MODE_PRIVATE), true));
                 }
                 break;
             case MESSAGE_DEVICE_NAME:
                 // save the connected device's name
                 connectedDeviceName = msg.getData().getString(DEVICE_NAME);
-                Toast.makeText(applicationContext, "Connected to "
+                Toast.makeText(context, "Connected to "
                                + connectedDeviceName, Toast.LENGTH_SHORT).show();
                 break;
             case MESSAGE_TOAST:
-                Toast.makeText(applicationContext, msg.getData().getString(TOAST), 
+                Toast.makeText(context, msg.getData().getString(TOAST), 
                                Toast.LENGTH_SHORT).show();
                 break;
             }
         }
     };
     
-    /*
-    public static final Handler mRMSHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-            case RMSThread.FREQUENCY_CHANGE:
-            	if (AppUtil.mChatService.getState() == BluetoothChatService.STATE_CONNECTED)
-            		AppUtil.sendMessage(AppUtil.ConstructMessage("prefEqualizerLevel", String.valueOf((int) Math.round((msg.arg1 / (msg.arg2 * 3)) * 100))));
-            	break;
-            }
-        }
-    };
-    */
-    
-    public static void setMode(LightWalkerModes mode, SharedPreferences prefs) {
-    	AppUtil.setMode(mode, prefs, false);
-    }
-    
-    public static void setMode(LightWalkerModes mode, SharedPreferences prefs, boolean override) {
-    	if (((mode != LightWalkerModes.main) && (mode != AppUtil.selectedMode)) || override)
-    	{
-    		// <cgerstle> quit processing things while we send commands
-    		// give it it a second to chill.
-    		// <cgerstle> fuck that.
-    		//AppUtil.sendMessage(AppUtil.ConstructMessage("mode", String.valueOf(LightWalkerModes.masterOff.ordinal())));
-
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    		AppUtil.selectedMode = mode;
-    		AppUtil.sendModeSettings(prefs);
-    		//AppUtil.sendMessage(AppUtil.ConstructMessage("mode", mode.toString()));
-    		AppUtil.sendMessage(AppUtil.ConstructMessage("mode", String.valueOf(mode.ordinal())));
-    	}
-    }
-    
-	public static void sendMessage(String message) {
-		//bluetoothLog.append(message.concat("\r\n"));
-		//bluetoothLog.setSelection(bluetoothLog.getText().length());
-		logger.Log(message);
+	public static void sendMessage(String message, boolean logMessage) {
+		if (logMessage)
+			logger.Log(message);
 		
 		// Check that we're actually connected before trying anything
         if (AppUtil.chatService.getState() != BluetoothChatService.STATE_CONNECTED) {
-            Toast.makeText(context, R.string.title_not_connected, Toast.LENGTH_SHORT).show();
+        	if (logMessage)
+        		Toast.makeText(context, R.string.title_not_connected, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -182,45 +142,9 @@ public class AppUtil extends Application {
             outStringBuffer.setLength(0);
         }
 	}
-	
-	public static void sendModeSettings(SharedPreferences prefs) {
-    	Map<String,?> keys = prefs.getAll();
-
-		String value = null;
-		for(Map.Entry<String,?> entry : keys.entrySet()) {
-			// <cgerstle> the colors have gotta be handled special like
-			if (keyIsColor(entry.getKey()))
-				value = AppUtil.Color2String((Integer)entry.getValue());
-			else
-			{
-				Object o = entry.getValue();
-				if (o instanceof Integer)
-					value = o.toString();
-				else if (o instanceof String)
-					value = (String) o;
-				else if (o instanceof Boolean)
-					value = ((Boolean) o) ? "1" : "0";
-			}
-			
-			if ((value != null) && (value.length() > 0))
-			{
-				sendMessage(AppUtil.ConstructMessage(entry.getKey(), value));
-                
-				// <cgerstle> when you're sending a bunch of data, you've
-				// gotta give the other end some time to pull it off
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-    }
     
     public static String ConstructMessage(String key, String value) {
     	return String.valueOf(Preferences.valueOf(key).ordinal()) + keyDelimiter + value;
-    	// return key + mKeyDelimiter + value;
     }
     
     public static boolean keyIsColor(String key) {

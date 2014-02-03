@@ -6,7 +6,7 @@
 class EqualizerLegMode : public LegMode
 {
     public:
-        byte eqLevel = 0;
+        float eqLevel = 0.0;
         virtual void setup(LWConfigs *c, char *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p);
         virtual void frame();
 

@@ -13,13 +13,13 @@ void Leg::init(LWConfigs *c, char *n, int i2c_channel, WalkingModeEnum mode, ADX
     _config = c;
     name = n;
     _channel = i2c_channel;
-    _pixels = p;
+    pixels = p;
     _adxl = adxl;
-    _pixelCount = count;
+    pixelCount = count;
     _half = half;
 
     Serial.print(name); Serial.println(" initialized with:");
-    Serial.print("    pixel count: "); Serial.println(_pixelCount);
+    Serial.print("    pixel count: "); Serial.println(pixelCount);
     Serial.print("    half: "); Serial.println(_half);
 
     LWUtils.selectI2CChannels(_channel);
@@ -28,7 +28,9 @@ void Leg::init(LWConfigs *c, char *n, int i2c_channel, WalkingModeEnum mode, ADX
     // <gerstle> init ADXL EMA's
     short x, y, z;
     int valueIndex = 0;
-    int xValueTotal, yValueTotal, zValueTotal  = 0;
+    double xValueTotal = 0;
+    double yValueTotal = 0;
+    double zValueTotal  = 0;
     for (valueIndex = 0; valueIndex < ADXL_VALUE_COUNT; valueIndex++)
     {
         _adxl->readXYZ(&x, &y, &z); //read the accelerometer values and store them in variables  x,y,z
@@ -64,6 +66,7 @@ void Leg::setWalkingMode(WalkingModeEnum mode)
     switch (_walkingMode)
     {
         case masterOff:
+            _leg_mode = NULL;
             off();
             break;
 
@@ -93,7 +96,7 @@ void Leg::setWalkingMode(WalkingModeEnum mode)
     }
 
     if (_leg_mode != NULL)
-        _leg_mode->setup(_config, name, _channel, _adxl, _pixelCount, _half, _pixels);
+        _leg_mode->setup(_config, name, _channel, _adxl, pixelCount, _half, pixels);
 }
 
 void Leg::frame()
@@ -102,8 +105,6 @@ void Leg::frame()
     // needs for each of the modes
     switch (_walkingMode)
     {
-        case pulse:
-            break;
         case sparkle:
         case bubble:
             _leg_mode->stepDetected = detectStep();
@@ -113,7 +114,8 @@ void Leg::frame()
             break;
     }
 
-    _leg_mode->frame();
+    if (_leg_mode != NULL)
+        _leg_mode->frame();
 }
 
 bool Leg::detectStep()
@@ -141,57 +143,61 @@ bool Leg::detectStep()
     zNMinus2 = zNMinus1;
     zNMinus1 = z;
 
-/*
-    Serial.print(x); Serial.print("\t"); Serial.print(y); Serial.print("\t"); Serial.print(z);
-    Serial.print("\t"); Serial.print(xEMA);
-    Serial.print("\t"); Serial.print(yEMA);
-    Serial.print("\t"); Serial.print(zEMA);
-    Serial.print("\t"); Serial.println(readyForStep);
-*/
+//     if (_channel == ADXL_TWO)
+//     {
+//         Serial.print(x); Serial.print("\t"); Serial.print(y); Serial.print("\t"); Serial.print(z);
+//         Serial.print("\t"); Serial.print(xEMA);
+//         Serial.print("\t"); Serial.print(yEMA);
+//         Serial.print("\t"); Serial.print(zEMA);
+//         Serial.print("\t"); Serial.print(readyForStep);
+//         Serial.print("\t"); Serial.print(lastStepTimer);
+//     }
 
     if (x < (xEMA - xSignificantlyLowerThanAverageThreshold))
         readyForStep = true;
 
-    if (readyForStep && (lastSharpPeakTime >= xStepDuration))
+    if (readyForStep && (lastStepTimer >= xStepDuration))
     {
-        lastSharpPeakTime = 0;
         if (x > (xEMA + xAvgDiffThreshold))
         {
+            lastStepTimer = 0;
             step_detected = true;
             readyForStep = false;
-            //Serial.print("X\t\t");
+//             if (_channel == ADXL_TWO)
+//                 Serial.print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
         }
     }
 
-    if (readyForStep && (lastSharpPeakTime >= yStepDuration))
+    if (readyForStep && (lastStepTimer >= yStepDuration))
     {
-        lastSharpPeakTime = 0;
         if (!step_detected && (y >= (yEMA + yAvgDiffThreshold)))
         {
+            lastStepTimer = 0;
             step_detected = true;
-            //Serial.print("y\t\t");
+//             if (_channel == ADXL_TWO)
+//                 Serial.print("YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY");
         }
     }
 
 
-    if (readyForStep && (lastSharpPeakTime >= zStepDuration))
+    if (readyForStep && (lastStepTimer >= zStepDuration))
     {
-        lastSharpPeakTime = 0;
         if (!step_detected && (z >= (zEMA + zAvgDiffThreshold)))
         {
+            lastStepTimer = 0;
             step_detected = true;
-            //Serial.print("Z\t\t");
+//             if (_channel == ADXL_TWO)
+//                 Serial.print("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ");
         }
     }
+//     if (_channel == ADXL_TWO)
+//         Serial.println();
 
-    if (step_detected)
-        return true;
-    else
-        return false;
+    return step_detected;
 }
 
 void Leg::off()
 {
-    for (int i = 0; i < _pixelCount; i++)
-        _pixels[i] = CRGB::Black;
+    for (int i = 0; i < pixelCount; i++)
+        pixels[i] = CRGB::Black;
 }

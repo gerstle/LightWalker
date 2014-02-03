@@ -14,9 +14,13 @@
 #define LWConfigs_h
 
 // <gerstle> MICROPHONE
-#define AUDIO_PIN 9         // read right channel from analog input 9
-#define AUDIO_STROBE_PIN 14  // strobe is attached to digital pin 14
-#define AUDIO_RESET_PIN 15   // reset is attached to digital pin 15
+#define AUDIO_PIN 14                // read right channel from analog input 14
+#define ANALOG_READ_RESOLUTION 10   // Bits of resolution for the ADC.
+#define ANALOG_READ_AVERAGING 16    // Number of samples to average with each ADC reading.
+#define SAMPLE_RATE_HZ 8000         // Sample rate of the audio in hertz.
+#define MAX_BANDS 4
+#define FFT_SIZE 256                // Size of the FFT.  Realistically can only be at most 256 
+                                    // without running out of memory for buffers and other state.
 #define EQ_EMA_N 200
 #define EQ_EMA_PEAK_N 20
 

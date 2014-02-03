@@ -36,19 +36,16 @@ void setup()
     // <gerstle> lights setup
     Serial.print("leds... ");
     LEDS.addLeds<P9813, 11, 13, BGR>((CRGB *)(lw.leds), LED_COUNT);
-    LEDS.setBrightness(128);
+    LEDS.setBrightness(25);
     LEDS.showColor(CRGB::Green);
+    delay(400);
     Serial.println("check");
 
     // <gerstle> audio setup
     Serial.print("microphone... ");
     pinMode(AUDIO_PIN, INPUT);
-    pinMode(AUDIO_STROBE_PIN, OUTPUT);
-    pinMode(AUDIO_RESET_PIN, OUTPUT);
-    analogReference(DEFAULT);
-
-    digitalWrite(AUDIO_RESET_PIN, LOW);
-    digitalWrite(AUDIO_STROBE_PIN, HIGH);
+    analogReadResolution(ANALOG_READ_RESOLUTION);
+    analogReadAveraging(ANALOG_READ_AVERAGING);
     Serial.println("check");
 
     // <cgerstle> Join i2c bus as master
@@ -57,21 +54,25 @@ void setup()
     Serial.println("check");
 
     Serial.println("legs...");
+    LEDS.showColor(CRGB::Black);
     lw.initLegs(masterOff);
     Serial.println("    check");
     Serial.println("Walking!");
 }
 
 elapsedMillis statusTimer;
+int frameCounter = 0;
 void loop()
 {
     // <gerstle> perform LightWalker action
     lw.walk();
 
+    frameCounter++;
     if (statusTimer >= 1000)
     {
-        statusTimer = statusTimer - 1000;
-        Serial.println(".");
+        statusTimer = 0;
+        Serial.print("["); Serial.print(frameCounter); Serial.println("]");
+        frameCounter = 0;
     }
 
     // <gerstle> get commands from bluetooth... should switch this to
@@ -104,7 +105,7 @@ void loop()
 bool executeCommand(int key, char *value, int valueLen)
 {
     Serial.print("key: "); Serial.print(key);
-    Serial.print(" value: "); Serial.print(value); Serial.print("("); Serial.print(valueLen); Serial.println(")");
+    Serial.print(" value: "); Serial.print(value); Serial.print("("); Serial.print(valueLen); Serial.print(")");
 
     int valueInt;
 
@@ -116,6 +117,8 @@ bool executeCommand(int key, char *value, int valueLen)
         case mainMaxBrightness:
             lw.config.main.maxBrightness = atoi(value);
             LEDS.setBrightness(lw.config.main.maxBrightness);
+            break;
+        case mainDefaultMode:
             break;
 
         // ------------------------------------------------------------------------
@@ -260,10 +263,12 @@ bool executeCommand(int key, char *value, int valueLen)
         //------------------------------------------------------------------------
 
         default:
+            Serial.print(" <------------- not recognized");
             return false;
             break;
     }
 
+    Serial.println();
     return true;
 }
 
@@ -295,3 +300,4 @@ void InitBubbleBackgroundColors()
         lw.config.bubble.backgroundColors[i] = CHSV(lw.config.bubble.backgroundColor.hue, lw.config.bubble.backgroundColor.saturation, (byte)max(0, lw.config.bubble.backgroundColor.value - random(0, 100)));
     }
 }
+

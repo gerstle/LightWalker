@@ -11,7 +11,7 @@ class RainbowLegMode : public LegMode
 
     private:
         elapsedMillis _lastChangeTimer;
-        int _lastStartHue;
+        byte _lastStartHue;
         float _increment;
         
 
@@ -19,6 +19,7 @@ class RainbowLegMode : public LegMode
         void _doubleRainbow();
         void _rotate();
         void _rise();
+        int _value;
 };
 
 #endif

@@ -26,32 +26,25 @@
 class LW
 {
     public:
+        LWConfigs config;
+        CRGB leds[LEG_PIXEL_COUNT + LEG_PIXEL_COUNT + LEFT_ARM_PIXEL_COUNT + RIGHT_ARM_PIXEL_COUNT];
+        float eqLevel = 0.0;
+
         LW() : config() {}
         void initLegs(WalkingModeEnum m);
         void off();
         void walk();
-        byte equalizerListen();
-        void equalizerBaseline();
         void setMode(WalkingModeEnum m);
-
-        LWConfigs config;
-
-        CRGB leds[LEG_PIXEL_COUNT + LEG_PIXEL_COUNT + LEFT_ARM_PIXEL_COUNT + RIGHT_ARM_PIXEL_COUNT];
 
     private:
         WalkingModeEnum _mode = masterOff;
         Leg _legs[LEG_COUNT];
+        ADXL345 _adxl;
 
         // <gerstle> pulse
         int _pulse_length = 0;
 
-        // <gerstle> equalizer
-        ADXL345 _adxl;
-        float eqEMA;
-        float eqEMAPeak;
-        int eqNminus2;
-        int eqNminus1;
-        elapsedMillis _lastEQReading;
+        void testLeg(byte legIndex, CRGB color);
 };
 
 #endif

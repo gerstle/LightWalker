@@ -34,6 +34,8 @@ class Leg
     public:
         // <gerstle> Generic
         char *name;
+        CRGB *pixels = NULL;
+        byte pixelCount;
 
         RainbowLegMode rainbowLegMode;
         PulseLegMode pulseLegMode;
@@ -59,34 +61,32 @@ class Leg
         byte _channel;
         ADXL345 *_adxl = NULL;
         LegMode *_leg_mode = NULL;
-        CRGB *_pixels = NULL;
-        byte _pixelCount;
         byte _half;
 
         // <cgerstle> steps
-        elapsedMillis lastSharpPeakTime;
-        float xEMA;
-        float yEMA;
-        float zEMA;
+        elapsedMillis lastStepTimer = 0;
+        float xEMA = 0;
+        float yEMA = 0;
+        float zEMA = 0;
 
-        int xNMinus1;
-        int xNMinus2;
+        int xNMinus1 = 0;
+        int xNMinus2 = 0;
 
-        int yNMinus1;
-        int yNMinus2;
+        int yNMinus1 = 0;
+        int yNMinus2 = 0;
 
-        int zNMinus1;
-        int zNMinus2;
+        int zNMinus1 = 0;
+        int zNMinus2 = 0;
 
-        int xStepDuration = 350; // <cgerstle> a step lasts at least this long... ie, two steps can't occur within this time period
-        int yStepDuration = 750;
-        int zStepDuration = 750;
-        int xAvgDiffThreshold = 160;
-        int yAvgDiffThreshold = 80;
-        int zAvgDiffThreshold = 80;
+        int xStepDuration = 150; // <cgerstle> a step lasts at least this long... ie, two steps can't occur within this time period
+        int yStepDuration = 350;
+        int zStepDuration = 350;
+        int xAvgDiffThreshold = 170;
+        int yAvgDiffThreshold = 150;
+        int zAvgDiffThreshold = 150;
 
         int xSignificantlyLowerThanAverageThreshold = 45;
-        bool readyForStep = false;
+        bool readyForStep = true;
 };
 
 #endif

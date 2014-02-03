@@ -27,7 +27,7 @@ void EqualizerLegMode::setup(LWConfigs *c, char *n, int i2c_channel, ADXL345 *ad
     _setup_complete = true;
 }
 
-// <cgerstle> eqLevel is 0 -> 100
+// <cgerstle> eqLevel is 0.0 -> 1.0
 void EqualizerLegMode::frame()
 {
     if (_config->equalizer.allLights)

@@ -86,7 +86,7 @@ public class LightWalkerRemote extends Activity {
 		}
 
 		mPrefs = getSharedPreferences("main_preferences", MODE_PRIVATE);
-		AppUtil.selectedMode = LightWalkerModes.values()[Integer.parseInt(mPrefs.getString("mainDefaultMode", LightWalkerModes.pulse.toString()))];
+		AppUtil.selectedMode = LightWalkerModes.values()[Integer.parseInt(mPrefs.getString("mainDefaultMode", String.valueOf(LightWalkerModes.sparkle.ordinal())))];
 	}
 
 	@Override
@@ -144,8 +144,6 @@ public class LightWalkerRemote extends Activity {
                 break;
             }
 		}
-
-		AppUtil.applicationContext = getApplicationContext();
 	}
 
 	@Override
