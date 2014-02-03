@@ -10,16 +10,16 @@ class RainbowLegMode : public LegMode
         virtual void frame();
 
     private:
-        elapsedMillis _lastChangeTimer;
-        byte _lastStartHue;
-        float _increment;
+        elapsedMillis _lastChangeTimer = 0;
+        elapsedMillis _lastStepTime = 0;
+        byte _lastStartHue = 0;
+        float _increment = 0;
         
-
         void _singleRainbow();
         void _doubleRainbow();
         void _rotate();
         void _rise();
-        int _value;
+        byte _getValue(int i);
 };
 
 #endif

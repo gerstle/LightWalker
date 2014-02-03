@@ -4,15 +4,16 @@
 #include <arm_math.h>
 #include "audio.h"
 
-float eqEMA = 0;
-float eqEMAPeak = 0;
-float eqNminus2 = 0;
 float eqNminus1 = 0;
 float frequencyWindow[MAX_BANDS + 1];
 IntervalTimer samplingTimer;
 float samples[FFT_SIZE*2];
 float magnitudes[FFT_SIZE];
 int sampleCounter = 0;
+
+int minCounter = 0;
+int maxCounter = 0;
+elapsedMillis adjustmentTimer = 0;
 
 void equalizerBaseline(LWConfigs *config)
 {
@@ -24,58 +25,6 @@ void equalizerBaseline(LWConfigs *config)
 
     spectrumSetup(config);
     samplingBegin();
-
-    // <gerstle> get EQ_EMA_N # of samples...
-    for (eqValueIndex = 0; eqValueIndex < EQ_EMA_N; eqValueIndex++)
-    {
-        // Calculate FFT if a full sample is available.
-        // <gerstle> wait for a sample
-        while (!samplingIsDone()) {}
-
-        // Run FFT on sample data.
-        arm_cfft_radix4_instance_f32 fft_inst;
-        arm_cfft_radix4_init_f32(&fft_inst, FFT_SIZE, 0, 1);
-        arm_cfft_radix4_f32(&fft_inst, samples);
-
-        // Calculate magnitude of complex numbers output by the FFT.
-        arm_cmplx_mag_f32(samples, magnitudes, FFT_SIZE);
-
-        // <gerstle> foreach sample, we've got spin through the bands
-        for (int i = 0; i < config->main.bands; ++i)
-        {
-            windowMean(magnitudes, frequencyToBin(frequencyWindow[i]), frequencyToBin(frequencyWindow[i+1]), &intensity, &otherMean);
-
-            // Convert intensity to decibels.
-            intensity = 20.0 * log10(intensity);
-
-            // Scale the intensity and clamp between 0 and 1.0.
-            intensity -= config->main.spectrumMinDB;
-            intensity = intensity < 0.0 ? 0.0 : intensity;
-            intensity /= (config->main.spectrumMaxDB - config->main.spectrumMinDB);
-            intensity = intensity > 1.0 ? 1.0 : intensity;
-
-            Serial.println(intensity);
-
-            // <gerstle> if looking at all bands, then
-            // we just want the max value out of all bands
-            if (config->equalizer.allBands)
-                value = max(value, intensity);
-            else if (i == 0)
-                value = intensity;
-
-            eqValueTotal += value;
-            peak = max(peak, value);
-        }
-
-        // Restart audio sampling.
-        samplingBegin();
-
-        eqValueTotal += value;
-        peak = max(peak, value);
-    }
-    
-    eqEMA = eqValueTotal / EQ_EMA_N;
-    eqEMAPeak = peak;
 }
 
 // <gerstle> borrowed from adafruit's spectrum.ino example
@@ -179,7 +128,6 @@ float equalizerListen(LWConfigs *config)
             intensity = intensity < 0.0 ? 0.0 : intensity;
             intensity /= (config->main.spectrumMaxDB - config->main.spectrumMinDB);
             intensity = intensity > 1.0 ? 1.0 : intensity;
-//             Serial.print(intensity); Serial.print("\t"); 
 
             // <gerstle> if looking at all bands, then
             // we just want the max value out of all bands
@@ -187,27 +135,38 @@ float equalizerListen(LWConfigs *config)
                 level = max(level, intensity);
             else if (i == 0)
                 level = intensity;
-
-            eqValueTotal += level;
-            peak = max(peak, level);
         }
-//         Serial.print(level); Serial.print("\t"); 
-
-        if ((level < eqNminus1) && (eqNminus1 > eqNminus2) && (level > eqEMA))
-        {
-            // <cgerstle> artificially inflate the max...
-            tmp = (1024 - level) / 4 + level; 
-            eqEMAPeak = (float)(tmp - eqEMAPeak) * ((float)2 / (float)(EQ_EMA_PEAK_N + 1)) + eqEMAPeak;
-        }
-
-        eqEMA = (float)(level - eqEMA) * ((float)2 / (float)(EQ_EMA_N + 1)) + eqEMA;
-        eqNminus2 = eqNminus1;
+        //Serial.print(level); Serial.println("\t"); 
         eqNminus1 = level;
         
-//         if (level < config->equalizer.rmsThreshold)
-//             level = 0;
+        if (level > 0.95)
+            maxCounter++;
+        if (level < 0.10)
+            minCounter++;
 
-//         Serial.print(level); Serial.print("\t"); Serial.print(eqEMA); Serial.print("\t"); Serial.print(eqEMAPeak); Serial.print("\t"); Serial.println(eqLevel);
+        // <cgerstle> auto adjust the min and max DB levels
+        if (adjustmentTimer >= 2000)
+        {
+            adjustmentTimer = 0;
+
+//             Serial.print("                      "); Serial.println(minCounter);
+//             Serial.print("                      "); Serial.println(maxCounter);
+
+            if (minCounter > 5)
+                config->main.spectrumMinDB -= 1.0;
+            else if (minCounter <= 1)
+                config->main.spectrumMinDB += 1.0;
+
+            if (maxCounter > 4)
+                config->main.spectrumMaxDB += 3.0;
+            else if (maxCounter <= 1)
+                config->main.spectrumMaxDB -= 0.5;
+
+//             Serial.print("                               "); Serial.println(config->main.spectrumMinDB);
+//             Serial.print("                               "); Serial.println(config->main.spectrumMaxDB);
+            minCounter = 0;
+            maxCounter = 0;
+        }
 
         // Restart audio sampling.
         samplingBegin();

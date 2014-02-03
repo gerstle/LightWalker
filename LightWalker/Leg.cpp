@@ -107,6 +107,7 @@ void Leg::frame()
     {
         case sparkle:
         case bubble:
+        case rainbow:
             _leg_mode->stepDetected = detectStep();
             break;
 
