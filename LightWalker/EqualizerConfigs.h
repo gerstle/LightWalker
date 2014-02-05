@@ -4,17 +4,21 @@
 #include "Enums.h"
 #include "FastSPI_LED2.h"
 
+enum EqualizerMode
+{
+    EQStaticColor,
+    EQSingleRainbow,
+    EQDoubleRainbow
+};
+
 class EqualizerConfigs
 {
     public:
+        EqualizerMode mode = EQDoubleRainbow;
         CHSV color;
         int brightnessPercent = 0;
-        bool allLights = false;
         bool allBands = false;
-        int rmsThreshold = 75;
         int peak = 0;
-        bool rainbow = false;
-        bool fullRainbow = false;
         int minValue = 50;
 };
 

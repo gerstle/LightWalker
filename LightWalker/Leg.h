@@ -19,12 +19,13 @@
 // each leg has one because a lot of the settings/state is leg
 // specific
 #include "LegMode.h"
-#include "RainbowLegMode.h"
 #include "PulseLegMode.h"
 #include "SparkleLegMode.h"
 #include "EqualizerLegMode.h"
 #include "GravityLegMode.h"
 #include "BubbleLegMode.h"
+#include "RainbowLegMode.h"
+#include "ZebraLegMode.h"
 
 #define ADXL_VALUE_COUNT 100
 
@@ -37,12 +38,13 @@ class Leg
         CRGB *pixels = NULL;
         byte pixelCount;
 
-        RainbowLegMode rainbowLegMode;
         PulseLegMode pulseLegMode;
         SparkleLegMode sparkleLegMode;
         EqualizerLegMode equalizerLegMode;
         GravityLegMode gravityLegMode;
         BubbleLegMode bubbleLegMode;
+        RainbowLegMode rainbowLegMode;
+        ZebraLegMode zebraLegMode;
 
         void init(LWConfigs *c, char *n, int i2c_channel, WalkingModeEnum mode, ADXL345 *adxl, byte count, byte half, CRGB *p);
         void off();

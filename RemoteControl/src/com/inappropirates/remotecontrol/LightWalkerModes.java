@@ -11,6 +11,7 @@ public enum LightWalkerModes {
     gravity,
     bubble,
     rainbow,
+    zebra,
     chaos,
     flames
 }

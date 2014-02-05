@@ -39,7 +39,6 @@ void BubbleLegMode::frame()
     {
         _leadingBubbleBottom = _half;
         _trailingBubbleBottom = _half + 1 + (_half - _leadingBubbleBottom);
-        _bubbleOn = random(0, 2);
     }
 
     leadingBubbleTop = _leadingBubbleBottom - _config->bubble.width + 1;
@@ -52,10 +51,7 @@ void BubbleLegMode::frame()
         if (((i <= _half) && (i <= _leadingBubbleBottom) && (i >= leadingBubbleTop)) ||
             ((i > _half) && (i >= _trailingBubbleBottom) && (i <= trailingBubbleTop)))
         {
-            if (_bubbleOn)
-                _pixels[i] = _config->bubble.bubbleColor;
-            else
-                _pixels[i] = CRGB::Black;
+            _pixels[i] = _config->bubble.bubbleColor;
         }
         else if (!_config->bubble.trail &&
                  (((i > _leadingBubbleBottom) && (i <= (_leadingBubbleBottom + _config->bubble.speed))) ||

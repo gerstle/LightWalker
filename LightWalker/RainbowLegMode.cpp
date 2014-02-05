@@ -42,16 +42,16 @@ void RainbowLegMode::frame()
 
     switch (_config->rainbow.mode)
     {
-        case singleRainbow:
+        case SingleRainbow:
             _singleRainbow();
             break;
-        case doubleRainbow:
+        case DoubleRainbow:
             _doubleRainbow();
             break;
-        case rotate:
+        case Rotate:
             _rotate();
             break;
-        case rise:
+        case Rise:
             _rise();
             break;
     }

@@ -68,7 +68,7 @@ public class AppUtil extends Application {
                     outStringBuffer = new StringBuffer("");
                     
                     SharedPreferences mPrefs = AppUtil.context.getSharedPreferences("main_preferences", android.content.Context.MODE_PRIVATE);
-                    AppUtil.selectedMode = LightWalkerModes.values()[Integer.parseInt(mPrefs.getString("mainDefaultMode", LightWalkerModes.sparkle.toString()))];
+                    AppUtil.selectedMode = LightWalkerModes.values()[Integer.parseInt(mPrefs.getString("mainDefaultMode", String.valueOf(LightWalkerModes.sparkle.ordinal())))];
                     String modeName = AppUtil.selectedMode.toString().toLowerCase(Locale.ENGLISH);
                     
                     new SendModeTask().execute(new ModeConfigs(LightWalkerModes.main, mPrefs),
@@ -96,8 +96,9 @@ public class AppUtil extends Application {
                 
                 if (readMessage.equals("SettingsPlease"))
                 {
+                	SharedPreferences mPrefs = AppUtil.context.getSharedPreferences("main_preferences", android.content.Context.MODE_PRIVATE);
                 	String modeName = AppUtil.selectedMode.toString().toLowerCase(Locale.ENGLISH);
-                	new SendModeTask().execute(
+                	new SendModeTask().execute(new ModeConfigs(LightWalkerModes.main, mPrefs),
                     		new ModeConfigs(selectedMode, AppUtil.context.getSharedPreferences(modeName  + "_preferences", android.content.Context.MODE_PRIVATE), true));
                 }
                 break;

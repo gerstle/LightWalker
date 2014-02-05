@@ -10,6 +10,7 @@ enum WalkingModeEnum
     gravity,
     bubble,
     rainbow,
+    zebra,
     chaos,
     flames
 };
@@ -49,12 +50,10 @@ enum Preferences
     //------------------------------------------------------------------------
     // Equalizer
     //------------------------------------------------------------------------
-    eqRMSThreshold,
-    eqColor,
-    eqAllLights,
-    eqAllBands,
-    eqRainbow,
-    eqMinValue,
+	eqMode,
+	eqColor,
+	eqAllBands,
+	eqMinValue,    
 
     //------------------------------------------------------------------------
     // Gravity
@@ -76,7 +75,13 @@ enum Preferences
     //------------------------------------------------------------------------
     rainbowMode,
     rainbowMinValue,
-    rainbowDelay
+    rainbowDelay,
+    
+    //------------------------------------------------------------------------
+    // Zebra
+    //------------------------------------------------------------------------
+    zebraColorOne,
+    zebraColorTwo
     
     //------------------------------------------------------------------------
     // Chaos

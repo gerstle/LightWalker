@@ -9,7 +9,9 @@ package com.inappropirates.remotecontrol;
 
 public final class R {
     public static final class array {
-        public static final int btStatusValues=0x7f050006;
+        public static final int btStatusValues=0x7f050008;
+        public static final int equalizerModeValues=0x7f050007;
+        public static final int equalizerModes=0x7f050006;
         /**  MAKE SURE THIS LIST CORRESPONDS TO LIGHTWALKERMODES ENUM 
          */
         public static final int modeList=0x7f050000;
@@ -167,5 +169,6 @@ public final class R {
         public static final int pulse_preferences=0x7f040006;
         public static final int rainbow_preferences=0x7f040007;
         public static final int sparkle_preferences=0x7f040008;
+        public static final int zebra_preferences=0x7f040009;
     }
 }

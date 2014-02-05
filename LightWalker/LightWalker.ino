@@ -54,7 +54,6 @@ void setup()
     Serial.println("check");
 
     Serial.println("legs...");
-    LEDS.showColor(CRGB::Black);
     lw.initLegs(masterOff);
     Serial.println("    check");
     Serial.println("Walking!");
@@ -177,29 +176,17 @@ bool executeCommand(int key, char *value, int valueLen)
         // ------------------------------------------------------------------------
         // Equalizer
         // ------------------------------------------------------------------------
+        case eqMode:
+            lw.config.equalizer.mode = static_cast<EqualizerMode>(atoi(value));
+            break;
         case eqColor:
             ParseColor(value, &(lw.config.equalizer.color));
-            break;
-        case eqRMSThreshold:
-            lw.config.equalizer.rmsThreshold = atoi(value);
-            break;
-        case eqAllLights:
-            if (strncmp(value, one_str, 1) == 0)
-                lw.config.equalizer.allLights = true;
-            else
-                lw.config.equalizer.allLights = false;
             break;
         case eqAllBands:
             if (strncmp(value, one_str, 1) == 0)
                 lw.config.equalizer.allBands = true;
             else
                 lw.config.equalizer.allBands = false;
-            break;
-        case eqRainbow:
-            if (strncmp(value, one_str, 1) == 0)
-                lw.config.equalizer.rainbow = true;
-            else
-                lw.config.equalizer.rainbow = false;
             break;
         case eqMinValue:
             lw.config.equalizer.minValue = atoi(value);
@@ -252,6 +239,16 @@ bool executeCommand(int key, char *value, int valueLen)
             break;
         case rainbowDelay:
             lw.config.rainbow.delay = atoi(value);
+            break;
+        
+        //------------------------------------------------------------------------
+        // Zebra
+        //------------------------------------------------------------------------
+        case zebraColorOne:
+            ParseColor(value, &(lw.config.zebra.colorOne));
+            break;
+        case zebraColorTwo:
+            ParseColor(value, &(lw.config.zebra.colorTwo));
             break;
         
         //------------------------------------------------------------------------

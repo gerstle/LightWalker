@@ -51,6 +51,7 @@
 #include "GravityConfigs.h"
 #include "BubbleConfigs.h"
 #include "RainbowConfigs.h"
+#include "ZebraConfigs.h"
 
 class LWConfigs
 {
@@ -62,5 +63,6 @@ class LWConfigs
         GravityConfigs gravity;
         BubbleConfigs bubble;
         RainbowConfigs rainbow;
+        ZebraConfigs zebra;
 };
 #endif

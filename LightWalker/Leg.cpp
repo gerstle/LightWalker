@@ -93,6 +93,10 @@ void Leg::setWalkingMode(WalkingModeEnum mode)
         case rainbow:
             _leg_mode = &rainbowLegMode;
             break;
+
+        case zebra:
+            _leg_mode = &zebraLegMode;
+            break;
     }
 
     if (_leg_mode != NULL)
@@ -108,6 +112,7 @@ void Leg::frame()
         case sparkle:
         case bubble:
         case rainbow:
+        case zebra:
             _leg_mode->stepDetected = detectStep();
             break;
 

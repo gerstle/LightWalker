@@ -3,16 +3,16 @@
 
 enum RainbowMode
 {
-    singleRainbow,
-    doubleRainbow,
-    rotate,
-    rise
+    SingleRainbow,
+    DoubleRainbow,
+    Rotate,
+    Rise
 };
 
 class RainbowConfigs
 {
     public:
-        RainbowMode mode = rise;
+        RainbowMode mode = Rise;
         byte minValue = 40;
         int delay = 25;
 };

@@ -12,16 +12,9 @@
 
 #include "ADXL345_t3.h"
 #include "FastSPI_LED2.h"
-
 #include "LWUtils.h"
 #include "LWConfigs.h"
-
 #include "Leg.h"
-
-#include "MainConfigs.h"
-#include "PulseConfigs.h"
-#include "SparkleConfigs.h"
-#include "EqualizerConfigs.h"
 
 class LW
 {
