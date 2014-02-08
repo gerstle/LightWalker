@@ -175,7 +175,7 @@ void SparkleLegMode::_sparkle()
     for (int i = 0; i < _lowerFootBorder; i++)
     {
         sparkleValue = ((float) i / (float) _half);
-        rand = (float)random(0, min(20, sparkleValue * 100)) / 100;
+        rand = (float)random(0, min(4, sparkleValue * 100)) / 100;
         sparkleValue = (sparkleValue - rand) * 255;
         //Serial.print(i); Serial.print("\t"); Serial.print(sparkleValue); Serial.print("\t"); Serial.println(rand);
         _pixels[i].setHSV(_config->sparkle.sparkleColor.hue, _config->sparkle.sparkleColor.saturation, sparkleValue);

@@ -10,7 +10,7 @@
 #define LWUtils_h
 
 #include "ADXL345_t3.h"
-#include "FastSPI_LED2.h"
+#include "FastLED.h"
 
 class LWUtilsClass
 {

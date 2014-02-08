@@ -11,7 +11,7 @@
 #define LW_h
 
 #include "ADXL345_t3.h"
-#include "FastSPI_LED2.h"
+#include "FastLED.h"
 #include "LWUtils.h"
 #include "LWConfigs.h"
 #include "Leg.h"

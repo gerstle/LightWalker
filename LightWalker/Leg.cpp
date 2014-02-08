@@ -18,12 +18,12 @@ void Leg::init(LWConfigs *c, char *n, int i2c_channel, WalkingModeEnum mode, ADX
     pixelCount = count;
     _half = half;
 
+    LWUtils.selectI2CChannels(_channel);
+    LWUtils.initADXL(_adxl);
+
     Serial.print(name); Serial.println(" initialized with:");
     Serial.print("    pixel count: "); Serial.println(pixelCount);
     Serial.print("    half: "); Serial.println(_half);
-
-    LWUtils.selectI2CChannels(_channel);
-    LWUtils.initADXL(_adxl);
 
     // <gerstle> init ADXL EMA's
     short x, y, z;

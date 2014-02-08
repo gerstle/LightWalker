@@ -13,7 +13,7 @@
 #include "LWUtils.h"
 #include "ADXL345_t3.h"
 #include "LWConfigs.h"
-#include "FastSPI_LED2.h"
+#include "FastLED.h"
 
 // <cgerstle> leg modes are what control the lights for each mode
 // each leg has one because a lot of the settings/state is leg

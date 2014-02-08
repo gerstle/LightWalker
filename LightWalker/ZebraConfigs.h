@@ -1,7 +1,7 @@
 #ifndef LWZebraConfigs_h
 #define LWZebraConfigs_h
 
-#include "FastSPI_LED2.h"
+#include "FastLED.h"
 
 class ZebraConfigs
 {

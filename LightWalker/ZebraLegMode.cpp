@@ -45,10 +45,10 @@ void ZebraLegMode::frame()
             Serial.println("------------------------STEP!");
         _lastStepTimer = 0;
         _lastSlowTimer = 0;
-        _frames = 1;
+        _frames = 3;
     }
 
-    if (_lastStepTimer < 8000)
+    if (_frames < 5000)
     {
         byte stage = _startStage;
         // for (int i = _half - 1; i >= 0; i--) // <gerstle> up

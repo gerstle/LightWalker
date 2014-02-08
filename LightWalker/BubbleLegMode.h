@@ -10,7 +10,7 @@ class BubbleLegMode : public LegMode
         virtual void frame();
 
     private:
-        elapsedMillis _lastChangeTimer;
+        elapsedMillis _timer = 0;
         int _leadingBubbleBottom;
         int _trailingBubbleBottom;
         bool _bubbleOn;

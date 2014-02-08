@@ -2,7 +2,7 @@
 #define LWEqualizerConfigs_h
 
 #include "Enums.h"
-#include "FastSPI_LED2.h"
+#include "FastLED.h"
 
 enum EqualizerMode
 {

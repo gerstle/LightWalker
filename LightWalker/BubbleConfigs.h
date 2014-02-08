@@ -2,14 +2,13 @@
 #define LWBubbleConfigs_h
 
 #include "Enums.h"
-#include "FastSPI_LED2.h"
+#include "FastLED.h"
 
 
 class BubbleConfigs
 {
     public:
         CHSV backgroundColor;
-        CHSV backgroundColors[3];
         CHSV bubbleColor;
         int speed = 5;
         int width = 3;

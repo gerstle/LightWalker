@@ -16,8 +16,8 @@ class ZebraLegMode : public LegMode
         elapsedMillis _lastSlowTimer = 0;
 
         byte _startStage = 0;
-        byte _frame = 0;
-        byte _frames = 1;
+        int _frame = 0;
+        int _frames = 4;
 
         void paintPixel(byte *stage, int index);
 };

@@ -2,7 +2,7 @@
 #define PulseLegMode_h
 
 #include "LegMode.h"
-#include "FastSPI_LED2.h"
+#include "FastLED.h"
 
 class PulseLegMode : public LegMode
 {

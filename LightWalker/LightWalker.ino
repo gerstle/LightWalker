@@ -5,7 +5,7 @@
 
 #include <i2c_t3.h>
 #include "ADXL345_t3.h"
-#include "FastSPI_LED2.h"
+#include "FastLED.h"
 #include "LW.h"
 
 LW lw;
@@ -35,7 +35,7 @@ void setup()
 
     // <gerstle> lights setup
     Serial.print("leds... ");
-    LEDS.addLeds<P9813, 11, 13, BGR>((CRGB *)(lw.leds), LED_COUNT);
+    LEDS.addLeds<P9813, 11, 13, RGB, DATA_RATE_MHZ(15)>((CRGB *)(lw.leds), LED_COUNT);
     LEDS.setBrightness(25);
     LEDS.showColor(CRGB::Green);
     delay(400);
@@ -210,7 +210,6 @@ bool executeCommand(int key, char *value, int valueLen)
         //------------------------------------------------------------------------
         case bubbleBackgroundColor:
             ParseColor(value, &(lw.config.bubble.backgroundColor));
-            InitBubbleBackgroundColors();
             break;
         case bubbleBubbleColor:
             ParseColor(value, &(lw.config.bubble.bubbleColor));
@@ -284,17 +283,3 @@ void ParseColor(char *colorString, CHSV *color)
     (*color).sat = byte(atoi(value));
     (*color).val = byte(atoi(pComma + 1));
 }
-
-// <cgerstle> the idea here is to cache 3 sparkle colors that can then be used
-// instead of calculating during running of bubble
-void InitBubbleBackgroundColors()
-{
-    float max = ((float) min(40, lw.config.main.maxBrightness)) / 100;
-    float brightness = 0;
-
-    for (int i = 0; i < 3; i++)
-    {
-        lw.config.bubble.backgroundColors[i] = CHSV(lw.config.bubble.backgroundColor.hue, lw.config.bubble.backgroundColor.saturation, (byte)max(0, lw.config.bubble.backgroundColor.value - random(0, 100)));
-    }
-}
-
