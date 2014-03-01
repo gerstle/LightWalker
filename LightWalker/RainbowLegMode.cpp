@@ -34,11 +34,7 @@ void RainbowLegMode::setup(LWConfigs *c, char *n, int i2c_channel, ADXL345 *adxl
 void RainbowLegMode::frame()
 {
     if (stepDetected)
-    {
-        if (_channel == ADXL_ONE)
-            Serial.println("------------------------STEP!");
         _lastStepTime = 0;
-    }
 
     switch (_config->rainbow.mode)
     {
@@ -124,14 +120,8 @@ byte RainbowLegMode::_getValue(int i)
         value = ((float) (_pixelCount - 1 - i) / (float) (_pixelCount - _half)) * 255;
     value = max(_config->rainbow.minValue, value);
 
-    if ((_channel == ADXL_ONE) && (i == _half))
-        Serial.println(value);
-
     // <gerstle> now dim over time
     value = max(_config->rainbow.minValue, value - (((float)_lastStepTime / (float)1000) * (float)(value - _config->rainbow.minValue)));
-
-    if ((_channel == ADXL_ONE) && (i == _half))
-        Serial.println(value);
 
     return value;
 }
