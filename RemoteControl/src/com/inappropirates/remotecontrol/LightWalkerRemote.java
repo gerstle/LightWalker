@@ -169,14 +169,16 @@ public class LightWalkerRemote extends Activity {
 		// Intent intent = null;
 		switch (item.getItemId()) {
 		case R.id.menu_bluetooth:
-			// intent = new Intent(this, DeviceListActivity.class);
-			// startActivityForResult(intent, REQUEST_CONNECT_DEVICE_SECURE);
-			String address = "00:06:66:48:59:FB";
+			// <cgerstle> To auto select, comment out the activity starting and uncomment out the applicable address line
+			Intent intent = null;
+			intent = new Intent(this, DeviceListActivity.class);
+			startActivityForResult(intent, REQUEST_CONNECT_DEVICE_SECURE);
+			//String address = "00:06:66:48:59:FB"; // Original sparkfun bluetooth
+			//String address = "00:18:96:B0:01:8F"; // New bluefruit
 
-			BluetoothDevice device = AppUtil.bluetoothAdapter
-					.getRemoteDevice(address);
+			//BluetoothDevice device = AppUtil.bluetoothAdapter.getRemoteDevice(address);
 			// Attempt to connect to the device
-			AppUtil.chatService.connect(device);
+			//AppUtil.chatService.connect(device);
 
 			return true;
 		case R.id.menu_bluetooth_disconnect:

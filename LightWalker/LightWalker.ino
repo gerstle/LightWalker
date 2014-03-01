@@ -28,7 +28,7 @@ void setup()
 
     // <gerstle> bluetooth setup
     Serial.print("bluetooth... ");
-    Uart.begin(57600);
+    Uart.begin(9600);
     delay(200);
     Uart.print("SettingsPlease\r");
     Serial.println("check");
