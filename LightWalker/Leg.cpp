@@ -32,7 +32,7 @@ void Leg::init(LWConfigs *c, char *n, int i2c_channel, WalkingModeEnum mode, ADX
     LWUtils.initADXL(adxl);
 
     // <gerstle> init ADXL EMA's
-    int x, y, z;
+    short x, y, z;
     xStepDuration = 250; // <cgerstle> a step lasts at least this long... ie, two steps can't occur within this time period
     yStepDuration = 750;
     zStepDuration = 750;
@@ -521,7 +521,7 @@ void Leg::setWalkingMode(WalkingModeEnum mode, ADXL345 *adxl)
     }
 }
 
-int x, y, z;
+short x, y, z;
 bool Leg::detectStep(ADXL345 *adxl)
 {
     bool stepDetected = false;

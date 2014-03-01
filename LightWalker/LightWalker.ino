@@ -59,8 +59,20 @@ void setup()
     Serial.println("Walking!");
 }
 
+unsigned long statusTimer = millis();
+unsigned long currentTime = millis();
+int frameCounter = 0;
 void loop()
 {
+    currentTime = millis();
+    frameCounter++;
+    if (currentTime >= (statusTimer + 1000))
+    {
+        statusTimer = currentTime;
+        Serial.print("["); Serial.print(frameCounter); Serial.println("]");
+        frameCounter = 0;
+    }
+
     // <gerstle> perform LightWalker action
     lw.walk();
 }
