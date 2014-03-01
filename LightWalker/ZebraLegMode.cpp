@@ -41,8 +41,6 @@ void ZebraLegMode::frame()
 {
     if (stepDetected)
     {
-        if (_channel == ADXL_ONE)
-            Serial.println("------------------------STEP!");
         _lastStepTimer = 0;
         _lastSlowTimer = 0;
         _frames = 3;
