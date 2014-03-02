@@ -9,7 +9,7 @@ Just watch this - <http://www.youtube.com/watch?v=KcUk5MgrxwE>
 This is an android app that holds configuration settings and sends those to the LightWalker control unit via bluetooth.
 
 ###LightWalker
-This is an arduino sketch that runs on a mega and handles...
+This is a microcontroller sketch that runs on a teensy (originally arduino mega) and handles...
 *  bluetooth communications with the remote control
 *  listening to sensors (microphone, accelerometer) and interpreting
 *  making a bunch of RGB LEDs dance
