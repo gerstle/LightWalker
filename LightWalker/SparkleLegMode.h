@@ -15,12 +15,13 @@ enum LightStateEnum
 class SparkleLegMode : public LegMode
 {
     public:
+        SparkleLegMode() : _state(None) {}
+
         virtual void setup(LWConfigs *c, char *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p);
         virtual void frame();
 
     private:
-        elapsedMillis _lastChangeTimer;
-        LightStateEnum _state = None;
+        LightStateEnum _state;
 
         int _lowerFootBorder;
         int _upperFootBorder;

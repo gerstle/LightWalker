@@ -4,15 +4,16 @@
 #include "Enums.h"
 #include "FastLED.h"
 
-
 class BubbleConfigs
 {
     public:
+        BubbleConfigs() : speed(5), width(3), trail(true) {}
+
         CHSV backgroundColor;
         CHSV bubbleColor;
-        int speed = 5;
-        int width = 3;
-        bool trail = true;
+        int speed;
+        int width;
+        bool trail;
 };
 
 #endif

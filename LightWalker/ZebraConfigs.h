@@ -6,8 +6,10 @@
 class ZebraConfigs
 {
     public:
-        CHSV colorOne = CHSV(0, 0, 255);
-        CHSV colorTwo = CHSV(0, 0, 0);
+        ZebraConfigs() : colorOne(CHSV(0, 0, 255)), colorTwo(CHSV(0, 0, 0)) {}
+
+        CHSV colorOne;
+        CHSV colorTwo;
         byte stage;
         byte frame;
 };

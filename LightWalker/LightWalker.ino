@@ -3,15 +3,27 @@
 // sketch for the LightWalker costume
 // The main work is in the LW & Leg classes
 
-#include <i2c_t3.h>
-#include "ADXL345_t3.h"
+// fix Arduino IDE regex issue with detecting first non-preprocessor directive
+// (breaks when #ifdef is false and contains non-preprocessor line, see:
+// http://code.google.com/p/arduino/issues/detail?id=156)
+
+#ifdef __MK20DX256__
+    #include <i2c_t3.h>
+#else
+    // <gerstle> comment out for teensy!
+    // something is ignoring the ifdef's and including wire regardless which throws multiple definition
+    // errors
+    //#include <Wire.h>
+#endif
+
 #include "FastLED.h"
+#include "ADXL345_compatible.h"
 #include "LW.h"
+#include "audio.h"
 
 LW lw;
 
 // <gerstle> bluetooth comms
-HardwareSerial Uart = HardwareSerial();
 const int msgLength = 128;
 char msg[msgLength];
 int msgIndex = 0;
@@ -28,15 +40,22 @@ void setup()
 
     // <gerstle> bluetooth setup
     Serial.print("bluetooth... ");
-    Uart.begin(9600);
+
+    // <gerstle> need to fix my bluetooth so they're all one baud rate
+#ifdef __MK20DX256__
+    Serial1.begin(9600);
+#else
+    Serial1.begin(57600);
+#endif
+
     delay(200);
-    Uart.print("SettingsPlease\r");
+    Serial1.print("SettingsPlease\r");
     Serial.println("check");
 
     // <gerstle> lights setup
     Serial.print("leds... ");
-    LEDS.addLeds<P9813, 11, 13, RGB, DATA_RATE_MHZ(15)>((CRGB *)(lw.leds), LED_COUNT);
-    LEDS.setBrightness(25);
+    LEDS.addLeds<P9813, LED_CLOCK_PIN, LED_DATA_PIN, RGB, DATA_RATE_MHZ(15)>((CRGB *)(lw.leds), LED_COUNT);
+    LEDS.setBrightness(50);
     LEDS.showColor(CRGB::Green);
     delay(400);
     Serial.println("check");
@@ -44,8 +63,7 @@ void setup()
     // <gerstle> audio setup
     Serial.print("microphone... ");
     pinMode(AUDIO_PIN, INPUT);
-    analogReadResolution(ANALOG_READ_RESOLUTION);
-    analogReadAveraging(ANALOG_READ_AVERAGING);
+    audioSetup();
     Serial.println("check");
 
     // <cgerstle> Join i2c bus as master
@@ -59,26 +77,28 @@ void setup()
     Serial.println("Walking!");
 }
 
-elapsedMillis statusTimer;
+unsigned long statusTimer;
+unsigned long currentTime;
 int frameCounter = 0;
 void loop()
 {
     // <gerstle> perform LightWalker action
     lw.walk();
 
+    currentTime = millis();
     frameCounter++;
-    if (statusTimer >= 1000)
+    if (currentTime >= (statusTimer + 1000))
     {
-        statusTimer = 0;
+        statusTimer = currentTime;
         Serial.print("["); Serial.print(frameCounter); Serial.println("]");
         frameCounter = 0;
     }
 
     // <gerstle> get commands from bluetooth... should switch this to
     // be an interrupt again...
-    if (Uart.available())
+    if (Serial1.available())
     {
-        msg[msgIndex++] = (char)Uart.read();
+        msg[msgIndex++] = (char)Serial1.read();
 
         if (msg[msgIndex - 1] == '\r')
         {
@@ -90,9 +110,9 @@ void loop()
                 pValue++;
 
                 if (executeCommand(atoi(pKey), pValue, msgIndex - (pValue - pKey) - 1))
-                    Uart.print("OK\r");
+                    Serial1.print("OK\r");
                 else
-                    Uart.print("?\r");
+                    Serial1.print("?\r");
             }
 
             memset(msg, '\0', msgIndex - 1);

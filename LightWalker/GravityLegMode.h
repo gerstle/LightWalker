@@ -6,19 +6,19 @@
 class GravityLegMode : public LegMode
 {
     public:
+        GravityLegMode() : _indexOne(0), _indexTwo(1), _indexThree(2), _lastXSwitch(millis()), _lastYSwitch(millis()), _canXSwitch(true), _canYSwitch(true) {}
+
         virtual void setup(LWConfigs *c, char *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p);
         virtual void frame();
 
     private:
-        elapsedMillis _lastChangeTimer;
-
-        byte _indexOne = 0;
-        byte _indexTwo = 1;
-        byte _indexThree = 2;
-        elapsedMillis _lastXSwitch = 0;
-        elapsedMillis _lastYSwitch = 0;
-        bool _canXSwitch = true;
-        bool _canYSwitch = true;
+        byte _indexOne;
+        byte _indexTwo;
+        byte _indexThree;
+        unsigned long _lastXSwitch;
+        unsigned long _lastYSwitch;
+        bool _canXSwitch;
+        bool _canYSwitch;
 
 };
 

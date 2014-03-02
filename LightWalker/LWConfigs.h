@@ -14,24 +14,37 @@
 #define LWConfigs_h
 
 // <gerstle> MICROPHONE
-#define AUDIO_PIN 14                // read right channel from analog input 14
-#define ANALOG_READ_RESOLUTION 10   // Bits of resolution for the ADC.
-#define ANALOG_READ_AVERAGING 16    // Number of samples to average with each ADC reading.
-#define SAMPLE_RATE_HZ 8000         // Sample rate of the audio in hertz.
+#ifdef __MK20DX256__
+    #define AUDIO_PIN 14
+    #define ANALOG_READ_RESOLUTION 10   // Bits of resolution for the ADC.
+    #define ANALOG_READ_AVERAGING 16    // Number of samples to average with each ADC reading.
+    #define SAMPLE_RATE_HZ 8000         // Sample rate of the audio in hertz.
+    #define FFT_SIZE 256                // Size of the FFT.  Realistically can only be at most 256 
+                                        // without running out of memory for buffers and other state.
+#else
+    #define AUDIO_PIN 1
+    #define AUDIO_STROBE_PIN 4  // strobe is attached to digital pin 4
+    #define AUDIO_RESET_PIN 5   // reset is attached to digital pin 5
+#endif
 #define MAX_BANDS 4
-#define FFT_SIZE 256                // Size of the FFT.  Realistically can only be at most 256 
-                                    // without running out of memory for buffers and other state.
 #define EQ_EMA_N 200
 #define EQ_EMA_PEAK_N 20
 
 // <gerstle> ACCELEROMETERS
-#define TCA9548AADDR 0x74 // 1110100
+#define I2C_MULTIPLEXER 0x74 // 1110100
 #define ADXL_ONE 0x1
 #define ADXL_TWO 0x2
 #define ADXL_THREE 0x4
 #define ADXL_FOUR 0x8
 
 // <gerstle> LEDS
+#ifdef __MK20DX256__
+    #define LED_CLOCK_PIN 11
+    #define LED_DATA_PIN 13
+#else
+    #define LED_CLOCK_PIN 51
+    #define LED_DATA_PIN 52
+#endif
 #define LEG_PIXEL_COUNT 75
 #define LEG_HALF 35
 #define LEFT_ARM_PIXEL_COUNT 100

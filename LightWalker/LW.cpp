@@ -70,6 +70,7 @@ void LW::walk()
     bool pulseDimming = false;
     int pulseValue = 0;
     float eqLevel = 0.0;
+    unsigned long currentTime = millis();
 
     // <gerstle> only listen to the EQ once per frame
     if (_mode == equalizer)
@@ -88,20 +89,21 @@ void LW::walk()
 
                 if (config.pulse.syncLegs)
                 {
-                    pulseValue = config.pulse.syncLegsTimer;
-                    if (config.pulse.syncLegsTimer >= (_pulse_length * 2))
+                    if (currentTime >= (config.pulse.syncLegsTimer + (_pulse_length * 2)))
                     {
                         _pulse_length = random(config.pulse.minPulseTime, config.pulse.maxPulseTime);
-                        config.pulse.syncLegsTimer = 0;
-                        pulseValue = config.pulse.syncLegsTimer;
-                        pulseChangeColor = true;
+                        config.pulse.syncLegsTimer = currentTime;
                         pulseDimming = false;
+                        pulseChangeColor = true;
                     }
-                    else if (config.pulse.syncLegsTimer >= _pulse_length)
-                    {
-                        pulseValue = (_pulse_length * 2) - config.pulse.syncLegsTimer;
+                    else if (currentTime >= (config.pulse.syncLegsTimer + _pulse_length))
                         pulseDimming = true;
-                    }
+                    
+                    if (config.pulse.syncLegs)
+                        if (pulseDimming)
+                            pulseValue = (_pulse_length * 2) - (currentTime - config.pulse.syncLegsTimer);
+                        else
+                            pulseValue = currentTime - config.pulse.syncLegsTimer;
                 
                     _legs[i].pulseLegMode.setSyncData(_pulse_length, pulseValue, pulseChangeColor, pulseDimming);
                 }

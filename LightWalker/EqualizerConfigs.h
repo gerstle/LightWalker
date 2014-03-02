@@ -14,12 +14,14 @@ enum EqualizerMode
 class EqualizerConfigs
 {
     public:
-        EqualizerMode mode = EQDoubleRainbow;
+        EqualizerConfigs() : mode(EQDoubleRainbow), brightnessPercent(0), allBands(false), peak(0), minValue(50) {}
+
+        EqualizerMode mode;
         CHSV color;
-        int brightnessPercent = 0;
-        bool allBands = false;
-        int peak = 0;
-        int minValue = 50;
+        int brightnessPercent;
+        bool allBands;
+        int peak;
+        int minValue;
 };
 
 #endif

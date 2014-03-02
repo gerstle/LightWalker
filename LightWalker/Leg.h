@@ -11,7 +11,7 @@
 #define Leg_h
 
 #include "LWUtils.h"
-#include "ADXL345_t3.h"
+#include "ADXL345_compatible.h"
 #include "LWConfigs.h"
 #include "FastLED.h"
 
@@ -33,9 +33,32 @@
 class Leg
 {
     public:
+        Leg() : pixels(NULL),
+                _config(NULL),
+                _adxl(NULL),
+                _leg_mode(NULL),
+                lastStepTimer(millis()),
+                xEMA(0),
+                yEMA(0),
+                zEMA(0),
+                xNMinus1(0),
+                xNMinus2(0),
+                yNMinus1(0),
+                yNMinus2(0),
+                zNMinus1(0),
+                zNMinus2(0),
+                xStepDuration(150),
+                yStepDuration(350),
+                zStepDuration(350),
+                xAvgDiffThreshold(170),
+                yAvgDiffThreshold(150),
+                zAvgDiffThreshold(150),
+                xSignificantlyLowerThanAverageThreshold(45),
+                readyForStep(true) {}
+
         // <gerstle> Generic
         char *name;
-        CRGB *pixels = NULL;
+        CRGB *pixels;
         byte pixelCount;
 
         PulseLegMode pulseLegMode;
@@ -59,36 +82,36 @@ class Leg
     private:
         // <gerstle> Generic stuff
         WalkingModeEnum _walkingMode;
-        LWConfigs *_config = NULL;
+        LWConfigs *_config;
         byte _channel;
-        ADXL345 *_adxl = NULL;
-        LegMode *_leg_mode = NULL;
+        ADXL345 *_adxl;
+        LegMode *_leg_mode;
         byte _half;
 
         // <cgerstle> steps
-        elapsedMillis lastStepTimer = 0;
-        float xEMA = 0;
-        float yEMA = 0;
-        float zEMA = 0;
+        unsigned long lastStepTimer;
+        float xEMA;
+        float yEMA;
+        float zEMA;
 
-        int xNMinus1 = 0;
-        int xNMinus2 = 0;
+        int xNMinus1;
+        int xNMinus2;
 
-        int yNMinus1 = 0;
-        int yNMinus2 = 0;
+        int yNMinus1;
+        int yNMinus2;
 
-        int zNMinus1 = 0;
-        int zNMinus2 = 0;
+        int zNMinus1;
+        int zNMinus2;
 
-        int xStepDuration = 150; // <cgerstle> a step lasts at least this long... ie, two steps can't occur within this time period
-        int yStepDuration = 350;
-        int zStepDuration = 350;
-        int xAvgDiffThreshold = 170;
-        int yAvgDiffThreshold = 150;
-        int zAvgDiffThreshold = 150;
+        int xStepDuration; // <cgerstle> a step lasts at least this long... ie, two steps can't occur within this time period
+        int yStepDuration;
+        int zStepDuration;
+        int xAvgDiffThreshold;
+        int yAvgDiffThreshold;
+        int zAvgDiffThreshold;
 
-        int xSignificantlyLowerThanAverageThreshold = 45;
-        bool readyForStep = true;
+        int xSignificantlyLowerThanAverageThreshold;
+        bool readyForStep;
 };
 
 #endif

@@ -33,8 +33,10 @@ void RainbowLegMode::setup(LWConfigs *c, char *n, int i2c_channel, ADXL345 *adxl
 
 void RainbowLegMode::frame()
 {
+    _currentTime = millis();
+
     if (stepDetected)
-        _lastStepTime = 0;
+        _lastStepTime = _currentTime;
 
     switch (_config->rainbow.mode)
     {
@@ -110,7 +112,7 @@ byte RainbowLegMode::_getValue(int i)
     float value;
 
     // <gerstle> if we didn't just step, return the min
-    if (_lastStepTime > 1500)
+    if (_currentTime > (_lastStepTime + 1500))
         return _config->rainbow.minValue;
 
     // <cgerstle> value based on location... brighter at the bottom
@@ -121,7 +123,7 @@ byte RainbowLegMode::_getValue(int i)
     value = max(_config->rainbow.minValue, value);
 
     // <gerstle> now dim over time
-    value = max(_config->rainbow.minValue, value - (((float)_lastStepTime / (float)1000) * (float)(value - _config->rainbow.minValue)));
+    value = max(_config->rainbow.minValue, value - (((float)(_currentTime - _lastStepTime) / (float)1000) * (float)(value - _config->rainbow.minValue)));
 
     return value;
 }

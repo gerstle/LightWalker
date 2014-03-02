@@ -10,7 +10,7 @@
 #ifndef LW_h
 #define LW_h
 
-#include "ADXL345_t3.h"
+#include "ADXL345_compatible.h"
 #include "FastLED.h"
 #include "LWUtils.h"
 #include "LWConfigs.h"
@@ -19,23 +19,24 @@
 class LW
 {
     public:
+        LW() : config(), eqLevel(0.0), _mode(masterOff), _pulse_length(0) {}
+
         LWConfigs config;
         CRGB leds[LEG_PIXEL_COUNT + LEG_PIXEL_COUNT + LEFT_ARM_PIXEL_COUNT + RIGHT_ARM_PIXEL_COUNT];
-        float eqLevel = 0.0;
+        float eqLevel;
 
-        LW() : config() {}
         void initLegs(WalkingModeEnum m);
         void off();
         void walk();
         void setMode(WalkingModeEnum m);
 
     private:
-        WalkingModeEnum _mode = masterOff;
+        WalkingModeEnum _mode;
         Leg _legs[LEG_COUNT];
         ADXL345 _adxl;
 
         // <gerstle> pulse
-        int _pulse_length = 0;
+        int _pulse_length;
 
         void testLeg(byte legIndex, CRGB color);
 };

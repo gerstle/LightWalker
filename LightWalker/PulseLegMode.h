@@ -13,7 +13,6 @@ class PulseLegMode : public LegMode
 
 
     private:
-        elapsedMillis _lastChangeTimer;
         CHSV _pulseColor;
         int _pulseLength;
         int _syncLength;

@@ -39,11 +39,18 @@ void ZebraLegMode::setup(LWConfigs *c, char *n, int i2c_channel, ADXL345 *adxl, 
 
 void ZebraLegMode::frame()
 {
+    _currentTime = millis();
+
     if (stepDetected)
     {
-        _lastStepTimer = 0;
-        _lastSlowTimer = 0;
+        _lastSlowTimer = _currentTime;
+
+// <gerstle> 3 is too slow for the arduino, but 1 is too fast for teensy        
+#ifdef __MK20DX256__
         _frames = 3;
+#else
+        _frames = 1;
+#endif        
     }
 
     if (_frames < 5000)
@@ -58,9 +65,9 @@ void ZebraLegMode::frame()
         for (int i = _pixelCount - 1; i >= _half; i--) // <gerstle> down
             paintPixel(&stage, i);
 
-        if (_lastSlowTimer >= 400)
+        if (_currentTime >= (_lastSlowTimer + 400))
         {
-            _lastSlowTimer = 0;
+            _lastSlowTimer = _currentTime;
             _frames++;
         }
 

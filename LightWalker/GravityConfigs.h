@@ -4,12 +4,13 @@
 #include "Enums.h"
 #include "FastLED.h"
 
-
 class GravityConfigs
 {
     public:
-        bool rotate = false;
-        byte minValue = 40;
+        GravityConfigs() : rotate(false), minValue(40) {}
+
+        bool rotate;
+        byte minValue;
 };
 
 #endif

@@ -9,7 +9,7 @@
 #ifndef LWUtils_h
 #define LWUtils_h
 
-#include "ADXL345_t3.h"
+#include "ADXL345_compatible.h"
 #include "FastLED.h"
 
 class LWUtilsClass

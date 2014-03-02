@@ -6,14 +6,16 @@
 class RainbowLegMode : public LegMode
 {
     public:
+        RainbowLegMode() : _lastStepTime(millis()), _lastStartHue(0), _increment(0) {}
+
         virtual void setup(LWConfigs *c, char *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p);
         virtual void frame();
 
     private:
-        elapsedMillis _lastChangeTimer = 0;
-        elapsedMillis _lastStepTime = 0;
-        byte _lastStartHue = 0;
-        float _increment = 0;
+        unsigned long _currentTime;
+        unsigned long _lastStepTime;
+        byte _lastStartHue;
+        float _increment;
         
         void _singleRainbow();
         void _doubleRainbow();

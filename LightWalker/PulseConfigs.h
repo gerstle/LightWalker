@@ -14,12 +14,14 @@ enum PulseMode
 class PulseConfigs
 {
     public:
-        CHSV color = CHSV(75, 255, 255);
-        int minPulseTime = 1000;
-        int maxPulseTime = 5000;
-        bool syncLegs = false;
-        PulseMode mode = cycleColor;
-        elapsedMillis syncLegsTimer;
+        PulseConfigs() : color(CHSV(75, 255, 255)), minPulseTime(1000), maxPulseTime(5000), syncLegs(false), mode(cycleColor) {}
+
+        CHSV color;
+        int minPulseTime;
+        int maxPulseTime;
+        bool syncLegs;
+        PulseMode mode;
+        unsigned long syncLegsTimer;
 };
 
 #endif

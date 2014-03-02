@@ -8,7 +8,11 @@
 
 #include "LWUtils.h"
 #include "LWConfigs.h"
-#include "i2c_t3.h"
+#ifdef __MK20DX256__
+    #include <i2c_t3.h>
+#else
+    #include <Wire.h>
+#endif
 
 LWUtilsClass LWUtils;
 
@@ -28,7 +32,7 @@ bool LWUtilsClass::debounce(int switchPin, bool lastState)
 
 void LWUtilsClass::selectI2CChannels(int channels) 
 {
-    Wire.beginTransmission(TCA9548AADDR);
+    Wire.beginTransmission(I2C_MULTIPLEXER);
     Wire.write(channels);
     Wire.endTransmission();  
 }

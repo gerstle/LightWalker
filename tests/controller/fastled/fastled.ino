@@ -6,7 +6,9 @@ CRGB leds[LED_COUNT];
 void setup()
 {
     Serial.print("leds... ");
-    LEDS.addLeds<P9813, 11, 13, RGB, DATA_RATE_MHZ(15)>(leds, LED_COUNT);
+    // <gerstle> teensy is 11 & 13, mega is 51 & 52
+//     LEDS.addLeds<P9813, 11, 13, RGB, DATA_RATE_MHZ(15)>(leds, LED_COUNT);
+    LEDS.addLeds<P9813, 51, 52, RGB, DATA_RATE_MHZ(15)>(leds, LED_COUNT);
     LEDS.setBrightness(25);
     LEDS.showColor(CRGB::Green);
     delay(400);

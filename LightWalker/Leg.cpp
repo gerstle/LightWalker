@@ -128,6 +128,7 @@ bool Leg::detectStep()
 {
     short x, y, z;
     bool step_detected = false;
+    unsigned long currentTime = millis();
 
     LWUtils.selectI2CChannels(_channel);
     _adxl->readXYZ(&x, &y, &z); //read the accelerometer values and store them in variables  x,y,z
@@ -162,11 +163,12 @@ bool Leg::detectStep()
     if (x < (xEMA - xSignificantlyLowerThanAverageThreshold))
         readyForStep = true;
 
-    if (readyForStep && (lastStepTimer >= xStepDuration))
+    //if (readyForStep && (lastStepTimer >= xStepDuration))
+    if (readyForStep && (currentTime >= (lastStepTimer + xStepDuration)))
     {
         if (x > (xEMA + xAvgDiffThreshold))
         {
-            lastStepTimer = 0;
+            lastStepTimer = millis();
             step_detected = true;
             readyForStep = false;
 //             if (_channel == ADXL_TWO)
@@ -174,11 +176,11 @@ bool Leg::detectStep()
         }
     }
 
-    if (readyForStep && (lastStepTimer >= yStepDuration))
+    if (readyForStep && (currentTime >= (lastStepTimer + yStepDuration)))
     {
         if (!step_detected && (y >= (yEMA + yAvgDiffThreshold)))
         {
-            lastStepTimer = 0;
+            lastStepTimer = millis();
             step_detected = true;
 //             if (_channel == ADXL_TWO)
 //                 Serial.print("YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY");
@@ -186,11 +188,11 @@ bool Leg::detectStep()
     }
 
 
-    if (readyForStep && (lastStepTimer >= zStepDuration))
+    if (readyForStep && (currentTime >= (lastStepTimer + zStepDuration)))
     {
         if (!step_detected && (z >= (zEMA + zAvgDiffThreshold)))
         {
-            lastStepTimer = 0;
+            lastStepTimer = millis();
             step_detected = true;
 //             if (_channel == ADXL_TWO)
 //                 Serial.print("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ");
@@ -198,6 +200,8 @@ bool Leg::detectStep()
     }
 //     if (_channel == ADXL_TWO)
 //         Serial.println();
+    if (step_detected)
+        Serial.print("\t\t\t\tSTEP!");
 
     return step_detected;
 }

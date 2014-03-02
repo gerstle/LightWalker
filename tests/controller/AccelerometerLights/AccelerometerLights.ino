@@ -34,7 +34,7 @@ int zAverage = 0;
 int zOld = 0;
 int zNew = 0;
 
-const int pixelCount = 50;
+const int pixelCount = 250;
 RGB pixels[pixelCount];
 
 int aboveAverageCounter = 0; // <cgerstle> counts the number of cycles the zvalue is above average
@@ -85,7 +85,7 @@ void setup()
 	double xyz[3];
     for (valueIndex = 0; valueIndex < valueCount; valueIndex++)
     {
-        adxl.getAccelemeter(xyz);
+        adxl.getAcceleration(xyz);
         xValues[valueIndex] = xyz[0];
         yValues[valueIndex] = xyz[1];
         zValues[valueIndex] = xyz[2];
@@ -124,7 +124,7 @@ void loop()
 { 
     // <gerstle> first off, get values from sensor
 	double xyz[3];
-    adxl.getAccelemeter(xyz);
+    adxl.getAcceleration(xyz);
 
     currentTime = millis();
 

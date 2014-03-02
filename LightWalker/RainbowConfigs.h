@@ -12,9 +12,11 @@ enum RainbowMode
 class RainbowConfigs
 {
     public:
-        RainbowMode mode = Rise;
-        byte minValue = 40;
-        int delay = 25;
+        RainbowConfigs() : mode(Rise), minValue(40), delay(25) {}
+
+        RainbowMode mode;
+        byte minValue;
+        int delay;
 };
 
 #endif

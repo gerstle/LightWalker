@@ -41,15 +41,18 @@ void PulseLegMode::setSyncData(int syncLength, int syncValue, bool changeColor, 
 
 void PulseLegMode::frame()
 {
+    unsigned long currentTime = millis();
+
     if (_config->pulse.syncLegs)
         _pulseLength = _syncLength;
     else
         _changeColor = false;
 
     if (!_config->pulse.syncLegs)
-        if (_lastChangeTimer >= (_pulseLength * 2))
+        //if (_lastChangeTimer >= (_pulseLength * 2))
+        if (currentTime >= _lastChangeTimer + (_pulseLength * 2))
         {
-            _lastChangeTimer = 0;
+            _lastChangeTimer = currentTime;
             if (!_config->pulse.syncLegs)
             {
                 _pulseLength = random(_config->pulse.minPulseTime, _config->pulse.maxPulseTime);
@@ -58,7 +61,7 @@ void PulseLegMode::frame()
             _isDimming = false;
             _changeColor = true;
         }
-        else if (_lastChangeTimer >= _pulseLength)
+        else if (currentTime >= (_lastChangeTimer + _pulseLength))
             _isDimming = true;
 
     if (_changeColor)
@@ -85,9 +88,9 @@ void PulseLegMode::frame()
         value = _syncValue;
     else
         if (_isDimming)
-            value = (_pulseLength * 2) - _lastChangeTimer;
+            value = (_pulseLength * 2) - (currentTime - _lastChangeTimer);
         else
-            value = _lastChangeTimer;
+            value = currentTime - _lastChangeTimer;
 
 
     float brightness = ((float)map(value, 0, _pulseLength, 25, 100) / 100);
