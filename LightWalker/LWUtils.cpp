@@ -7,17 +7,14 @@
  ****************************************************************************/
 
 #include "LWUtils.h"
+#include "LWConfigs.h"
+#ifdef __MK20DX256__
+    #include <i2c_t3.h>
+#else
+    #include <Wire.h>
+#endif
 
 LWUtilsClass LWUtils;
-
-// <gerstle> turn all the lights off
-void LWUtilsClass::goDark(int pixel_count)
-{
-    TCL.sendEmptyFrame();
-    for (int i = 0; i < pixel_count; i++)
-        TCL.sendColor(0x00, 0x00, 0x00);
-    TCL.sendEmptyFrame();
-}
 
 // <gerstle> debounce an input switch
 bool LWUtilsClass::debounce(int switchPin, bool lastState)
@@ -33,19 +30,9 @@ bool LWUtilsClass::debounce(int switchPin, bool lastState)
     return currentState;
 }
 
-void LWUtilsClass::sendColor(RGB color, byte dimmer)
-{
-    TCL.sendColor(color.r - dimmer, color.g - dimmer, color.b - dimmer);
-}
-
-void LWUtilsClass::sendColor(RGB color)
-{
-    sendColor(color, 0);
-}
-
 void LWUtilsClass::selectI2CChannels(int channels) 
 {
-    Wire.beginTransmission(TCA9548AADDR);
+    Wire.beginTransmission(I2C_MULTIPLEXER);
     Wire.write(channels);
     Wire.endTransmission();  
 }
@@ -53,6 +40,7 @@ void LWUtilsClass::selectI2CChannels(int channels)
 void LWUtilsClass::initADXL(ADXL345 *adxl)
 {
     adxl->powerOn();
+    adxl->setRangeSetting(2);
 
     //set activity/ inactivity thresholds (0-255)
     adxl->setActivityThreshold(75); //62.5mg per increment
@@ -69,9 +57,9 @@ void LWUtilsClass::initADXL(ADXL345 *adxl)
     adxl->setFreeFallDuration(45); //(20 - 70) recommended - 5ms per increment
 }
 
-void LWUtilsClass::printRGB(RGB color, bool newLine)
+void LWUtilsClass::printRGB(CRGB color, bool newLine)
 {
-    printRGB(color.r, color.g, color.b, newLine);
+    printRGB((byte)color.r, (byte)color.g, (byte)color.b, newLine);
 }
 
 void LWUtilsClass::printRGB(byte r, byte g, byte b, bool newLine)
@@ -80,4 +68,31 @@ void LWUtilsClass::printRGB(byte r, byte g, byte b, bool newLine)
 
     if (newLine)
         Serial.println();
+}
+
+void LWUtilsClass::setTransitionColor(CRGB* led, double numerator, double denomenator, CHSV fromColor, CHSV toColor)
+{
+    CRGB from = fromColor;
+    CRGB to = toColor;
+    setTransitionColor(led, numerator, denomenator, from, to);
+}
+
+void LWUtilsClass::setTransitionColor(CRGB* led, double numerator, double denomenator, CRGB fromColor, CRGB toColor)
+{
+    if (numerator <= 0)
+        *led = fromColor;
+    else if (numerator >= denomenator)
+        *led = toColor;
+    else
+    {
+        CRGB toDelta = toColor;
+        toDelta %= (byte)(255 * ((float)numerator/(float)denomenator));
+
+        CRGB fromDelta = fromColor;
+        fromDelta %= (byte)(255 * ((float)(denomenator - numerator)/(float)denomenator));
+
+        *led = CRGB::Black;
+        *led += fromDelta;
+        *led += toDelta;
+    }
 }

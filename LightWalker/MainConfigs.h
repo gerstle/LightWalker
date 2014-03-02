@@ -2,20 +2,18 @@
 #define LWMainConfigs_h
 
 #include "Enums.h"
-#include "colors.h"
 
 class MainConfigs
 {
     public:
-        MainConfigs();
+        MainConfigs() : maxBrightness(200), defaultMode(sparkle), spectrumMinDB(20.0), spectrumMaxDB(40.0), bands(MAX_BANDS) {}
 
-        int minBrightness;
         int maxBrightness;
         WalkingModeEnum defaultMode;
-        bool legsOn;
-        bool armsOn;
-        RGB minColors[COLOR_COUNT];
-        RGB maxColors[COLOR_COUNT];
+        float spectrumMinDB; // Audio intensity (in decibels) that maps to low LED brightness.
+        float spectrumMaxDB; // Audio intensity (in decibels) that maps to high LED brightness.
+        int bands; // NEO_PIXEL_COUNT in the spectrum code, I'm using it for frequency bands since I'm not
+                   // tying pixels directly to each band
 };
 
 #endif

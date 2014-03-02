@@ -23,18 +23,20 @@
 		robobunny:unitsRight="" />
     
     <CheckBoxPreference
-		android:defaultValue="true"
-        android:key="pulseRandom"
-        android:title="random color" />
-        
-    <CheckBoxPreference
         android:defaultValue="false"
         android:key="pulseSyncLegs"
         android:title="synchronize legs" />
     
     <com.inappropirates.util.ColorPickerPreference
         android:key="pulseColor"
-        android:title="color"
-        />
+        android:title="color" />
+
+    <ListPreference
+        android:key="pulseMode"
+    	android:title="color Style"
+    	android:entries="@array/pulseColorStyles"
+    	android:entryValues="@array/pulseColorStylesValues"
+    	android:defaultValue="1">
+	</ListPreference>
     
 </PreferenceScreen>

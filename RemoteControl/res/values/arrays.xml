@@ -2,11 +2,66 @@
 <resources>
     <!-- MAKE SURE THIS LIST CORRESPONDS TO LIGHTWALKERMODES ENUM -->
     <string-array name="modeList">
-        <item name="main">main</item>
-        <item name="gravity">gravity</item>
-        <item name="equalizer">equalizer</item>
-        <item name="sparkle">sparkle</item>
-        <item name="pulse">pulse</item>
-        <item name="bubble">bubble</item>
+        <item>main</item>
+        <item>pulse</item>        
+        <item>sparkle</item>
+        <item>equalizer</item>
+        <item>gravity</item>
+        <item>bubble</item>
+        <item>rainbow</item>
+        <item>zebra</item>
+        <item>chaos</item>
+        <item>flames</item>
     </string-array>
+    
+    <string-array name="modeListValues">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+    </string-array>
+    
+    <string-array name="pulseColorStyles">
+    	<item>static</item>
+    	<item>cycle</item>
+    	<item>random</item>
+	</string-array>
+	
+    <string-array name="pulseColorStylesValues">
+    	<item>0</item>
+    	<item>1</item>
+    	<item>2</item>
+	</string-array>
+        
+    <string-array name="rainbowModes">
+    	<item>single</item>
+    	<item>double</item>
+    	<item>rotate</item>
+    	<item>rise</item>
+	</string-array>
+	
+    <string-array name="rainbowModeValues">
+    	<item>0</item>
+    	<item>1</item>
+    	<item>2</item>
+    	<item>3</item>
+	</string-array>
+	
+        <string-array name="equalizerModes">
+    	<item>static color</item>
+    	<item>single rainbow</item>
+    	<item>double rainbow</item>
+	</string-array>
+	
+    <string-array name="equalizerModeValues">
+    	<item>0</item>
+    	<item>1</item>
+    	<item>2</item>
+	</string-array>
 </resources>

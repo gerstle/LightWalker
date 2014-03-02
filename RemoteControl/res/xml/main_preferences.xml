@@ -3,26 +3,6 @@
     xmlns:robobunny="http://robobunny.com"
     android:key="main_preferences" >
  	
-    <CheckBoxPreference
-		android:defaultValue="true"
-        android:key="mainLegsOn"
-        android:title="@string/mainLegsOn" />
-    
-    <CheckBoxPreference
-		android:defaultValue="false"
-        android:key="mainArmsOn"
-        android:title="@string/mainArmsOn" />
-    
-    <com.robobunny.SeekBarPreference
-        android:key="mainMinBrightness"
-        android:title="@string/mainMinBrightness"
-        android:summary="adjust the minimum brightness"
-        android:defaultValue="5"
-        android:max="25"
-        robobunny:min="0"
-        robobunny:unitsLeft=""
-        robobunny:unitsRight="" />
-
 	<com.robobunny.SeekBarPreference
         android:key="mainMaxBrightness"
         android:title="@string/mainMaxBrightness"
@@ -37,7 +17,7 @@
         android:key="mainDefaultMode"
         android:title="default mode"
         android:summary="default mode"
-        android:defaultValue="LightWalkerModes.Pulse" 
+        android:defaultValue="LightWalkerModes.Sparkle" 
         android:entries="@array/modeList"
-        android:entryValues="@array/modeList" /> 
+        android:entryValues="@array/modeListValues" /> 
 </PreferenceScreen>

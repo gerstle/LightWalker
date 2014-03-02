@@ -4,11 +4,15 @@ enum WalkingModeEnum
 {
     masterOff,
     main,
-    gravity,
-    equalizer,
-    sparkle,
     pulse,
-    bubble
+    sparkle,
+    equalizer,
+    gravity,
+    bubble,
+    rainbow,
+    zebra,
+    chaos,
+    flames
 };
 
 enum Preferences
@@ -16,10 +20,7 @@ enum Preferences
     // ------------------------------------------------------------------------
     // Main
     // ------------------------------------------------------------------------
-    mainMinBrightness,
     mainMaxBrightness,
-    mainLegsOn,
-    mainArmsOn,
     mainDefaultMode,
 
     //------------------------------------------------------------------------
@@ -30,11 +31,11 @@ enum Preferences
     //------------------------------------------------------------------------
     // Pulse
     //------------------------------------------------------------------------
-    pulseMinRate,
-    pulseMaxRate,
-    pulseRandomColor,
-    pulseSyncLegs,
-    pulseColor,
+	pulseMinRate,
+	pulseMaxRate,
+	pulseSyncLegs,
+	pulseColor,
+	pulseMode,
 
     //------------------------------------------------------------------------
     // Sparkle
@@ -44,20 +45,21 @@ enum Preferences
     sparkleSparkleLength,
     sparkleFootFlashColor,
     sparkleSparkleColor,
+    sparkleMinValue,
 
     //------------------------------------------------------------------------
     // Equalizer
     //------------------------------------------------------------------------
-    eqRMSThreshold,
-    eqColor,
-    eqAllLights,
-    eqAllBands,
-    eqRainbow,
+	eqMode,
+	eqColor,
+	eqAllBands,
+	eqMinValue,    
 
     //------------------------------------------------------------------------
     // Gravity
     //------------------------------------------------------------------------
     gravityRotate,
+    gravityMinValue,
 
     //------------------------------------------------------------------------
     // Bubble
@@ -66,5 +68,26 @@ enum Preferences
     bubbleBubbleColor,
     bubbleSpeed,
     bubbleWidth,
-    bubbleTrail
+    bubbleTrail,
+    
+    //------------------------------------------------------------------------
+    // Rainbow
+    //------------------------------------------------------------------------
+    rainbowMode,
+    rainbowMinValue,
+    rainbowDelay,
+    
+    //------------------------------------------------------------------------
+    // Zebra
+    //------------------------------------------------------------------------
+    zebraColorOne,
+    zebraColorTwo
+    
+    //------------------------------------------------------------------------
+    // Chaos
+    //------------------------------------------------------------------------
+    
+    //------------------------------------------------------------------------
+    // Flames
+    //------------------------------------------------------------------------
 };

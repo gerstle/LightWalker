@@ -502,17 +502,17 @@ public class BluetoothChatService {
 
         public void cancel() {
 			if (mmInStream != null) {
-	                try {mmInStream.close();} catch (Exception e) {Log.e(AppUtil.TAG, "close() of input stream failed", e);}
+	                //try {mmInStream.close();} catch (IOException e) {Log.e(AppUtil.TAG, "close() of input stream failed", e);}
 	                mmInStream = null;
 	        }
 	
 	        if (mmOutStream != null) {
-	                try {mmOutStream.close();} catch (Exception e) {Log.e(AppUtil.TAG, "close() of output stream failed", e);}
+	                //try {mmOutStream.close();} catch (IOException e) {Log.e(AppUtil.TAG, "close() of output stream failed", e);}
 	                mmOutStream = null;
 	        }
 	
 	        if (mmSocket != null) {
-	                try {mmSocket.close();} catch (Exception e) {Log.e(AppUtil.TAG, "close() of connect socket failed", e);}
+	                try {mmSocket.close();} catch (IOException e) {Log.e(AppUtil.TAG, "close() of connect socket failed", e);}
 	                mmSocket = null;
 	        }
         }

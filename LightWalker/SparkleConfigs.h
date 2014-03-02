@@ -2,19 +2,19 @@
 #define LWSparkleConfigs_h
 
 #include "Enums.h"
-#include "Arduino.h"
-#include "colors.h"
+#include "FastLED.h"
 
 class SparkleConfigs
 {
     public:
-        SparkleConfigs();
+        SparkleConfigs() : footFlashColor(CHSV(255, 0, 255)), sparkleColor(CHSV(255, 0, 255)), flashLength(500), sparkleLength(500), fadeRate(2), minValue(30) {}
 
-        RGB footFlashColor;
-        RGB sparkleColor;
+        CHSV footFlashColor;
+        CHSV sparkleColor;
         int flashLength;
         int sparkleLength;
         byte fadeRate;
+        int minValue;
 };
 
 #endif

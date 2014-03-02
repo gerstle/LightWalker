@@ -8,5 +8,12 @@
 		android:defaultValue="false"
         android:key="gravityRotate"
         android:title="rotate?" />
-    
+
+    <com.robobunny.SeekBarPreference
+        android:key="gravityMinValue"
+        android:title="Min Brightness"
+        android:defaultValue="50"
+        android:max="255"
+        robobunny:min="0"
+        />
 </PreferenceScreen>

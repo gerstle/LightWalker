@@ -3,14 +3,23 @@
 // sketch for the LightWalker costume
 // The main work is in the LW & Leg classes
 
-#include <ADXL345.h>
-#include <Wire.h>
-#include <SPI.h>
-#include <TCL.h>
-#include <avr/pgmspace.h>
-#include "colors.h"
-#include "LWUtils.h"
+// fix Arduino IDE regex issue with detecting first non-preprocessor directive
+// (breaks when #ifdef is false and contains non-preprocessor line, see:
+// http://code.google.com/p/arduino/issues/detail?id=156)
+
+#ifdef __MK20DX256__
+    #include <i2c_t3.h>
+#else
+    // <gerstle> comment out for teensy!
+    // something is ignoring the ifdef's and including wire regardless which throws multiple definition
+    // errors
+    //#include <Wire.h>
+#endif
+
+#include "FastLED.h"
+#include "ADXL345_compatible.h"
 #include "LW.h"
+#include "audio.h"
 
 LW lw;
 
@@ -24,38 +33,47 @@ char one_str[] = "1";
 
 void setup()
 {
+    delay(3000);
+    Serial.println(". ");
     // <gerstle> general setup
     Serial.begin(9600);
-    Serial.println("...");
-    randomSeed(long(millis()));
 
     // <gerstle> bluetooth setup
+    Serial.print("bluetooth... ");
+
+    // <gerstle> need to fix my bluetooth so they're all one baud rate
+#ifdef __MK20DX256__
+    Serial1.begin(9600);
+#else
     Serial1.begin(57600);
-    while (!Serial1)
-    {
-        ; // <gerstle> wait for bluetooth
-    }
+#endif
+
+    delay(200);
     Serial1.print("SettingsPlease\r");
+    Serial.println("check");
 
     // <gerstle> lights setup
-    TCL.begin();
-    TCL.setupDeveloperShield();
-    TCL.sendEmptyFrame();
+    Serial.print("leds... ");
+    LEDS.addLeds<P9813, LED_CLOCK_PIN, LED_DATA_PIN, RGB, DATA_RATE_MHZ(15)>((CRGB *)(lw.leds), LED_COUNT);
+    LEDS.setBrightness(50);
+    LEDS.showColor(CRGB::Green);
+    delay(400);
+    Serial.println("check");
 
     // <gerstle> audio setup
+    Serial.print("microphone... ");
     pinMode(AUDIO_PIN, INPUT);
-    pinMode(AUDIO_STROBE_PIN, OUTPUT);
-    pinMode(AUDIO_RESET_PIN, OUTPUT);
-    analogReference(DEFAULT);
-
-    digitalWrite(AUDIO_RESET_PIN, LOW);
-    digitalWrite(AUDIO_STROBE_PIN, HIGH);
+    audioSetup();
+    Serial.println("check");
 
     // <cgerstle> Join i2c bus as master
+    Serial.print("i2c bus...");
     Wire.begin();
+    Serial.println("check");
 
+    Serial.println("legs...");
     lw.initLegs(masterOff);
-
+    Serial.println("    check");
     Serial.println("Walking!");
 }
 
@@ -75,17 +93,24 @@ void loop()
 
     // <gerstle> perform LightWalker action
     lw.walk();
-}
 
-void serialEvent1()
-{
+    currentTime = millis();
+    frameCounter++;
+    if (currentTime >= (statusTimer + 1000))
+    {
+        statusTimer = currentTime;
+        Serial.print("["); Serial.print(frameCounter); Serial.println("]");
+        frameCounter = 0;
+    }
+
+    // <gerstle> get commands from bluetooth... should switch this to
+    // be an interrupt again...
     if (Serial1.available())
     {
         msg[msgIndex++] = (char)Serial1.read();
 
         if (msg[msgIndex - 1] == '\r')
         {
-            //Serial.println(msg);
             pValue = strchr(msg, '=');
             if (pValue != NULL)
             {
@@ -93,7 +118,10 @@ void serialEvent1()
                 *pValue = '\0';
                 pValue++;
 
-                executeCommand(atoi(pKey), pValue, msgIndex - (pValue - pKey) - 1);
+                if (executeCommand(atoi(pKey), pValue, msgIndex - (pValue - pKey) - 1))
+                    Serial1.print("OK\r");
+                else
+                    Serial1.print("?\r");
             }
 
             memset(msg, '\0', msgIndex - 1);
@@ -104,8 +132,8 @@ void serialEvent1()
 
 bool executeCommand(int key, char *value, int valueLen)
 {
-    //Serial.print("key: "); Serial.print(key);
-    //Serial.print(" value: "); Serial.print(value); Serial.print("("); Serial.print(valueLen); Serial.println(")");
+    Serial.print("key: "); Serial.print(key);
+    Serial.print(" value: "); Serial.print(value); Serial.print("("); Serial.print(valueLen); Serial.print(")");
 
     int valueInt;
 
@@ -114,72 +142,18 @@ bool executeCommand(int key, char *value, int valueLen)
         // ------------------------------------------------------------------------
         // Main 
         // ------------------------------------------------------------------------
-        case mainMinBrightness:
-            lw.config.main.minBrightness = atoi(value);
-            ResetColor();
-            break;
         case mainMaxBrightness:
             lw.config.main.maxBrightness = atoi(value);
-            ResetColor();
+            LEDS.setBrightness(lw.config.main.maxBrightness);
             break;
-        case mainLegsOn:
-            // <cgerstle> being a little lazy here... should do all this just by the configs, but...
-            if (strncmp(value, one_str, valueLen) == 0)
-            {
-                lw.config.main.legsOn = true;
-                lw.setLegsOn();
-            }
-            else
-            {
-                lw.config.main.legsOn = false;
-                lw.setLegsOff();
-            }
-            break;
-        case mainArmsOn:
-            // <cgerstle> being a little lazy here... should do all this just by the configs, but...
-            if (strncmp(value, one_str, valueLen) == 0)
-            {
-                lw.config.main.armsOn = true;
-                lw.setArmsOn();
-            }
-            else
-            {
-                lw.config.main.armsOn = false;
-                lw.setArmsOff();
-            }
+        case mainDefaultMode:
             break;
 
         // ------------------------------------------------------------------------
         // Mode 
         // ------------------------------------------------------------------------
         case mode:
-            valueInt = atoi(value);
-            WalkingModeEnum newMode;
-            ResetColor();
-
-            switch (valueInt)
-            {
-                case masterOff:
-                    newMode = masterOff;
-                    break;
-                case gravity:
-                    newMode = gravity;
-                    break;
-                case equalizer:
-                    newMode = equalizer;
-                    break;
-                case sparkle:
-                    newMode = sparkle;
-                    break;
-                case pulse:
-                    newMode = pulse;
-                    break;
-                case bubble:
-                    newMode = bubble;
-                    break;
-            }
-
-            lw.setMode(newMode);
+            lw.setMode(static_cast<WalkingModeEnum>(atoi(value)));
             break;
 
         // ------------------------------------------------------------------------
@@ -200,6 +174,9 @@ bool executeCommand(int key, char *value, int valueLen)
         case sparkleSparkleColor:
             ParseColor(value, &(lw.config.sparkle.sparkleColor));
             break;
+        case sparkleMinValue:
+            lw.config.sparkle.minValue = atoi(value);
+            break;
 
         // ------------------------------------------------------------------------
         // Pulse
@@ -210,13 +187,6 @@ bool executeCommand(int key, char *value, int valueLen)
         case pulseMaxRate:
             lw.config.pulse.maxPulseTime = atoi(value);
             break;
-        case pulseRandomColor:
-            if (strncmp(value, one_str, valueLen) == 0)
-                lw.config.pulse.randomColor = true;
-            else
-                lw.config.pulse.randomColor = false;
-            break;
-
         case pulseSyncLegs:
             if (strncmp(value, one_str, valueLen) == 0)
                 lw.config.pulse.syncLegs = true;
@@ -227,21 +197,19 @@ bool executeCommand(int key, char *value, int valueLen)
             ParseColor(value, &(lw.config.pulse.color));
             LWUtils.printRGB(lw.config.pulse.color, true);
             break;
+        case pulseMode:
+            lw.config.pulse.mode = static_cast<PulseMode>(atoi(value));
+            //lw.resetPulseMode();
+            break;
 
         // ------------------------------------------------------------------------
         // Equalizer
         // ------------------------------------------------------------------------
+        case eqMode:
+            lw.config.equalizer.mode = static_cast<EqualizerMode>(atoi(value));
+            break;
         case eqColor:
             ParseColor(value, &(lw.config.equalizer.color));
-            break;
-        case eqRMSThreshold:
-            lw.config.equalizer.RMSThreshold = atoi(value);
-            break;
-        case eqAllLights:
-            if (strncmp(value, one_str, 1) == 0)
-                lw.config.equalizer.allLights = true;
-            else
-                lw.config.equalizer.allLights = false;
             break;
         case eqAllBands:
             if (strncmp(value, one_str, 1) == 0)
@@ -249,11 +217,8 @@ bool executeCommand(int key, char *value, int valueLen)
             else
                 lw.config.equalizer.allBands = false;
             break;
-        case eqRainbow:
-            if (strncmp(value, one_str, 1) == 0)
-                lw.config.equalizer.rainbow = true;
-            else
-                lw.config.equalizer.rainbow = false;
+        case eqMinValue:
+            lw.config.equalizer.minValue = atoi(value);
             break;
 
         // ------------------------------------------------------------------------
@@ -265,13 +230,15 @@ bool executeCommand(int key, char *value, int valueLen)
             else
                 lw.config.gravity.rotate = false;
             break;
+        case gravityMinValue:
+            lw.config.gravity.minValue= atoi(value);
+            break;
 
         //------------------------------------------------------------------------
         // Bubble
         //------------------------------------------------------------------------
         case bubbleBackgroundColor:
             ParseColor(value, &(lw.config.bubble.backgroundColor));
-            InitBubbleBackgroundColors();
             break;
         case bubbleBubbleColor:
             ParseColor(value, &(lw.config.bubble.bubbleColor));
@@ -288,100 +255,60 @@ bool executeCommand(int key, char *value, int valueLen)
             else
                 lw.config.bubble.trail = false;
             break;
+    
+        //------------------------------------------------------------------------
+        // Rainbow
+        //------------------------------------------------------------------------
+        case rainbowMode:
+            lw.config.rainbow.mode = static_cast<RainbowMode>(atoi(value));
+            break;
+        case rainbowMinValue:
+            lw.config.rainbow.minValue= atoi(value);
+            break;
+        case rainbowDelay:
+            lw.config.rainbow.delay = atoi(value);
+            break;
+        
+        //------------------------------------------------------------------------
+        // Zebra
+        //------------------------------------------------------------------------
+        case zebraColorOne:
+            ParseColor(value, &(lw.config.zebra.colorOne));
+            break;
+        case zebraColorTwo:
+            ParseColor(value, &(lw.config.zebra.colorTwo));
+            break;
+        
+        //------------------------------------------------------------------------
+        // Chaos
+        //------------------------------------------------------------------------
+        
+        //------------------------------------------------------------------------
+        // Flames
+        //------------------------------------------------------------------------
 
         default:
+            Serial.print(" <------------- not recognized");
             return false;
             break;
     }
 
+    Serial.println();
     return true;
 }
 
-void ParseColor(char *colorString, RGB *color)
+void ParseColor(char *colorString, CHSV *color)
 {
     char *value = colorString;
     char *pComma = strchr(colorString, ',');
     *pComma = '\0';
 
-    (*color).r = byte(atoi(value));
+    (*color).hue = byte(atoi(value));
 
     value = pComma + 1;
     pComma = strchr(value, ',');
     *pComma = '\0';
 
-    (*color).g = byte(atoi(value));
-    (*color).b = byte(atoi(pComma + 1));
-
-    //LWUtils.printRGB(*color, false); Serial.print(" -> ");
-    //(*color).r = map((*color).r, 0, 255, 0, lw.config.main.maxBrightness);
-    //(*color).g = map((*color).g, 0, 255, 0, lw.config.main.maxBrightness);
-    //(*color).b = map((*color).b, 0, 255, 0, lw.config.main.maxBrightness);
-    //LWUtils.printRGB(*color, true);
-}
-
-void ResetColor()
-{
-    // ------------------------------------------------------------------------
-    // <cgerstle> EQ stuff
-    // ------------------------------------------------------------------------
-    lw.config.equalizer.maxColor.r = map(lw.config.equalizer.color.r, 0, 255, 0, lw.config.main.maxBrightness);
-    lw.config.equalizer.maxColor.g = map(lw.config.equalizer.color.g, 0, 255, 0, lw.config.main.maxBrightness);
-    lw.config.equalizer.maxColor.b = map(lw.config.equalizer.color.b, 0, 255, 0, lw.config.main.maxBrightness);
-
-    // <cgerstle> equalizer min
-    int maximum = 0;
-
-    if (lw.config.equalizer.color.r > 0)
-        maximum = max(maximum, lw.config.equalizer.color.r);
-    if (lw.config.equalizer.color.g > 0)
-        maximum = max(maximum, lw.config.equalizer.color.g);
-    if (lw.config.equalizer.color.b > 0)
-        maximum = max(maximum, lw.config.equalizer.color.b);
-
-    if (lw.config.equalizer.color.r == maximum)
-        lw.config.equalizer.minColor.r = lw.config.main.minBrightness;
-    else
-        lw.config.equalizer.minColor.r = 0;
-
-    if (lw.config.equalizer.color.g == maximum)
-        lw.config.equalizer.minColor.g = lw.config.main.minBrightness;
-    else
-        lw.config.equalizer.minColor.g = 0;
-
-    if (lw.config.equalizer.color.b == maximum)
-        lw.config.equalizer.minColor.b = lw.config.main.minBrightness;
-    else
-        lw.config.equalizer.minColor.b = 0;
-
-    // ------------------------------------------------------------------------
-    // <cgerstle> Min/Max stuff
-    // ------------------------------------------------------------------------
-    for (int i = WHITE; i < COLOR_COUNT; i++)
-    {
-        lw.config.main.maxColors[i].r = map(COLORS[i].r, 0, 255, 0, lw.config.main.maxBrightness);
-        lw.config.main.maxColors[i].g = map(COLORS[i].g, 0, 255, 0, lw.config.main.maxBrightness);
-        lw.config.main.maxColors[i].b = map(COLORS[i].b, 0, 255, 0, lw.config.main.maxBrightness);
-
-        lw.config.main.minColors[i].r = map(COLORS[i].r, 0, 255, 0, lw.config.main.minBrightness);
-        lw.config.main.minColors[i].g = map(COLORS[i].g, 0, 255, 0, lw.config.main.minBrightness);
-        lw.config.main.minColors[i].b = map(COLORS[i].b, 0, 255, 0, lw.config.main.minBrightness);
-    }
-}
-
-// <cgerstle> the idea here is to cache 3 sparkle colors that can then be used
-// instead of calculating during running of bubble
-void InitBubbleBackgroundColors()
-{
-    float max = ((float) min(40, lw.config.main.maxBrightness)) / 100;
-    float rBrightness, gBrightness, bBrightness = 0;
-
-    for (int i = 0; i < 3; i++)
-    {
-        rBrightness = ((float) random(10, 40)) / 100 * max;
-        gBrightness = ((float) random(10, 40)) / 100 * max;
-        bBrightness = ((float) random(10, 40)) / 100 * max;
-        lw.config.bubble.backgroundColors[i].r = byte((float)lw.config.bubble.backgroundColor.r * rBrightness);
-        lw.config.bubble.backgroundColors[i].g = byte((float)lw.config.bubble.backgroundColor.g * gBrightness);
-        lw.config.bubble.backgroundColors[i].b = byte((float)lw.config.bubble.backgroundColor.b * bBrightness);
-    }
+    (*color).sat = byte(atoi(value));
+    (*color).val = byte(atoi(pComma + 1));
 }

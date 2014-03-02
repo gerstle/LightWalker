@@ -2,23 +2,26 @@
 #define LWEqualizerConfigs_h
 
 #include "Enums.h"
-#include "colors.h"
+#include "FastLED.h"
+
+enum EqualizerMode
+{
+    EQStaticColor,
+    EQSingleRainbow,
+    EQDoubleRainbow
+};
 
 class EqualizerConfigs
 {
     public:
-        EqualizerConfigs();
+        EqualizerConfigs() : mode(EQDoubleRainbow), brightnessPercent(0), allBands(false), peak(0), minValue(50) {}
 
-        RGB color;
-        RGB minColor;
-        RGB maxColor;
+        EqualizerMode mode;
+        CHSV color;
         int brightnessPercent;
-        bool allLights;
         bool allBands;
-        int RMSThreshold;
         int peak;
-        bool rainbow;
-        bool fullRainbow;
+        int minValue;
 };
 
 #endif

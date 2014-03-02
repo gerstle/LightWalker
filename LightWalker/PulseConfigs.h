@@ -2,20 +2,26 @@
 #define LWPulseConfigs_h
 
 #include "Enums.h"
-#include "colors.h"
+#include "FastLED.h"
+
+enum PulseMode
+{
+    staticColor,
+    cycleColor,
+    randomColor
+};
 
 class PulseConfigs
 {
     public:
-        PulseConfigs();
+        PulseConfigs() : color(CHSV(75, 255, 255)), minPulseTime(1000), maxPulseTime(5000), syncLegs(false), mode(cycleColor) {}
 
-        RGB color;
-        int minBrightness;
-        int maxBrightness;
+        CHSV color;
         int minPulseTime;
         int maxPulseTime;
-        bool randomColor;
         bool syncLegs;
+        PulseMode mode;
+        unsigned long syncLegsTimer;
 };
 
 #endif

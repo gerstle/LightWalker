@@ -2,15 +2,15 @@
 #define LWGravityConfigs_h
 
 #include "Enums.h"
-#include "Arduino.h"
-#include "colors.h"
-
+#include "FastLED.h"
 
 class GravityConfigs
 {
     public:
-        GravityConfigs();
+        GravityConfigs() : rotate(false), minValue(40) {}
+
         bool rotate;
+        byte minValue;
 };
 
 #endif

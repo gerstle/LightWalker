@@ -37,7 +37,7 @@
     <string name="title_not_connected">not connected</string>
     <string name="bt_not_enabled_leaving">Bluetooth is not enabled, exiting</string>
     
-    <string name="bluetooth_response">LightWalker: </string>
+    <string name="bluetooth_response">Received: </string>
     <string name="gravity_x_color">x color</string>
     <string name="gravity_y_color">y color</string>
     <string name="gravity_z_color">z color</string>

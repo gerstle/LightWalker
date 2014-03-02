@@ -1,7 +1,6 @@
 package com.inappropirates.remotecontrol;
 
 import java.util.Locale;
-
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -31,7 +30,7 @@ public class SettingsActivity extends PreferenceActivity {
         mPrefs.registerOnSharedPreferenceChangeListener(spChanged);
         
         if (mMode != LightWalkerModes.main)
-        	AppUtil.setMode(mMode, mPrefs);
+        	new SendModeTask().execute(new ModeConfigs(mMode, mPrefs));
     }
     
     @Override
@@ -66,13 +65,7 @@ public class SettingsActivity extends PreferenceActivity {
 			}
 			
 			if ((value != null) && (value.length() > 0))
-				AppUtil.sendMessage(AppUtil.ConstructMessage(key, value));
-			/*
-			if (key.compareTo("prefEqualizerRMSThreshold") == 0)
-				AppUtil.mRMSThread.mRMSThreshold = sharedPrefs.getInt(key,  200);
-			else if (key.compareTo("prefEqualizerFrequencyThreshold") == 0)
-				AppUtil.mRMSThread.mFrequencyThreshold = sharedPrefs.getInt(key,  20);
-			*/
+				AppUtil.sendMessage(AppUtil.ConstructMessage(key, value), true);
 		}
     };
 }

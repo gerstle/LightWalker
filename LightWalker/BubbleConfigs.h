@@ -2,17 +2,15 @@
 #define LWBubbleConfigs_h
 
 #include "Enums.h"
-#include "Arduino.h"
-#include "colors.h"
-
+#include "FastLED.h"
 
 class BubbleConfigs
 {
     public:
-        BubbleConfigs();
-        RGB backgroundColor;
-        RGB backgroundColors[3];
-        RGB bubbleColor;
+        BubbleConfigs() : speed(5), width(3), trail(true) {}
+
+        CHSV backgroundColor;
+        CHSV bubbleColor;
         int speed;
         int width;
         bool trail;
