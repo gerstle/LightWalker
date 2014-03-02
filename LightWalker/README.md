@@ -1,37 +1,8 @@
-*This is out of date*
+LightWalker.ino
+===============
 
-setup
-=====
+The LightWalker sketch is compatible with both teensy 3.1 (maybe 3.0?) and an arduino mega 2560. At this point in time, you must also have the following libraries installed:
+* [FastLED 2.1](https://github.com/FastLED/FastLED/tree/FastLED2.1) from the [FastLED guys](http://fastled.io)
+* [i2c_t3](http://forum.pjrc.com/threads/21680-New-I2C-library-for-Teensy3) - only for the teensy build
 
-POWER
------
-* walwart   -> arduino power
-
-bluetooth
----------
-* rts-o
-* rx-i      -> tx1 18
-* tx-o      -> rx1 19
-* gnd       -> ground
-* vcc       -> 5v/3.3v
-* cts-i     -> rts-o (loop back)
-
-LED
----
-* LED red (red from 4-lead)             -> battery +
-* LED black (blue from 4-lead)          -> battery -
-* LED green taped (green from 4-lead)   -> duemilanove: 11 mega: 51
-* LED green (yellow from 4-lead)        -> duemilanove: 13 mega: 52
-
-accelerometers
---------------
-* vcc/red       -> multiplex shield 5v
-* gnd/black     -> multiplex shield ground
-* scl/yellow    -> multiplex SCLx - top/outside row 0, 1, 2, 3
-* sda/white     -> multiplex SDAx - bottom/inside row 0, 1, 2, 3
-
-microphone
-----------
-* vcc   -> +3.3v
-* gnd   -> Audio IN gnd
-* aud   -> Audio IN R
+Hardware setup can _sort of_ be found in the two fritzing files included in the repo although they're a bit weird.
