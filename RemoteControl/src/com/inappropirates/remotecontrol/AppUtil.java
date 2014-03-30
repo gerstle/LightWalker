@@ -2,7 +2,6 @@ package com.inappropirates.remotecontrol;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
-import java.util.Map;
 
 import android.app.Application;
 import android.bluetooth.BluetoothAdapter;
@@ -13,7 +12,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 

@@ -6,7 +6,7 @@
 class MainConfigs
 {
     public:
-        MainConfigs() : maxBrightness(200), defaultMode(sparkle), spectrumMinDB(20.0), spectrumMaxDB(40.0), bands(MAX_BANDS) {}
+        MainConfigs() : maxBrightness(200), defaultMode(sparkle), spectrumMinDB(60.0), spectrumMaxDB(90.0), bands(MAX_BANDS) {}
 
         int maxBrightness;
         WalkingModeEnum defaultMode;

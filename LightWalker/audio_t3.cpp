@@ -42,6 +42,7 @@ float equalizerListen(LWConfigs *config)
     float intensity, otherMean;
     float eqValueTotal = 0;
     float peak = 0;
+    bool ignore = false;
 
     // Calculate FFT if a full sample is available.
     if (samplingIsDone())
@@ -61,6 +62,12 @@ float equalizerListen(LWConfigs *config)
 
             // Convert intensity to decibels.
             intensity = 20.0 * log10(intensity);
+            if ((!config->equalizer.allBands) && (i == 0))
+            {
+                if (intensity < 60)
+                    ignore = true;
+//                 Serial.print(intensity); Serial.print("\t"); 
+            }
 
             // Scale the intensity and clamp between 0 and 1.0.
             intensity -= config->main.spectrumMinDB;
@@ -75,42 +82,54 @@ float equalizerListen(LWConfigs *config)
             else if (i == 0)
                 level = intensity;
         }
-        //Serial.print(level); Serial.println("\t"); 
         eqNminus1 = level;
+//         Serial.print(level); Serial.print("\t"); 
         
-        if (level > 0.95)
-            maxCounter++;
-        if (level < 0.10)
-            minCounter++;
-
-        // <cgerstle> auto adjust the min and max DB levels
-        if (adjustmentTimer >= 2000)
+        if (!ignore)
         {
-            adjustmentTimer = 0;
+            if (level > 0.90)
+                maxCounter++;
+            else if (level < 0.10)
+                minCounter++;
+            // <cgerstle> auto adjust the min and max DB levels
+            if (adjustmentTimer >= 2000)
+            {
+                adjustmentTimer = 0;
 
-//             Serial.print("                      "); Serial.println(minCounter);
-//             Serial.print("                      "); Serial.println(maxCounter);
+    //             Serial.print("                      "); Serial.println(minCounter);
+    //             Serial.print("                      "); Serial.println(maxCounter);
 
-            if (minCounter > 5)
-                config->main.spectrumMinDB -= 1.0;
-            else if (minCounter <= 1)
-                config->main.spectrumMinDB += 1.0;
+                if (minCounter > 5)
+                    config->main.spectrumMinDB -= 2.0;
+                else if ((minCounter <= 1) && (config->main.spectrumMinDB < (config->main.spectrumMaxDB - 3)))
+                    config->main.spectrumMinDB += 2.0;
 
-            if (maxCounter > 4)
-                config->main.spectrumMaxDB += 3.0;
-            else if (maxCounter <= 1)
-                config->main.spectrumMaxDB -= 0.5;
+                if (maxCounter > 4)
+                    config->main.spectrumMaxDB += 3.0;
+                else if ((maxCounter <= 1) && (config->main.spectrumMaxDB > (config->main.spectrumMinDB + 2)))
+                    config->main.spectrumMaxDB -= 1.5;
 
-//             Serial.print("                               "); Serial.println(config->main.spectrumMinDB);
-//             Serial.print("                               "); Serial.println(config->main.spectrumMaxDB);
-            minCounter = 0;
-            maxCounter = 0;
+
+//                 Serial.print("                               "); Serial.println(config->main.spectrumMinDB);
+//                 Serial.print("                               "); Serial.println(config->main.spectrumMaxDB);
+                minCounter = 0;
+                maxCounter = 0;
+            }
         }
 
         // Restart audio sampling.
         samplingBegin();
 
-        return level;
+        if (!ignore)
+        {
+//             Serial.println(level);
+            return level;
+        }
+        else
+        {
+//             Serial.println(eqNminus1);
+            return eqNminus1;
+        }
     }
     else
         return eqNminus1;

@@ -22,13 +22,13 @@ class SparkleLegMode : public LegMode
 
     private:
         LightStateEnum _state;
+        unsigned long _currentTime;
 
         int _lowerFootBorder;
         int _upperFootBorder;
 
         void _setState(LightStateEnum newState);
         void _sameStatus();
-        void _footDown();
         void _flash();
         void _shimmer();
         void _sparkle();

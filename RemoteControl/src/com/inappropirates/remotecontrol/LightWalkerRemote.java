@@ -1,7 +1,5 @@
 package com.inappropirates.remotecontrol;
 
-import java.util.Locale;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -10,17 +8,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,8 +31,6 @@ public class LightWalkerRemote extends Activity {
 	private static final int REQUEST_ENABLE_BT = 3;
 
 	static final String EXTRA_MODE_NAME = "android.intent.extra.MODE_NAME";
-
-	private Button mSendButton;
 
 	private SharedPreferences mPrefs;
 

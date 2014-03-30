@@ -13,7 +13,7 @@
 void SparkleLegMode::setup(LWConfigs *c, char *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p)
 {
     _state = Off;
-    _lastChangeTimer = 0;
+    _lastChangeTimer = millis();
 
     if (_setup_complete)
         return;
@@ -42,13 +42,14 @@ void SparkleLegMode::setup(LWConfigs *c, char *n, int i2c_channel, ADXL345 *adxl
 
 void SparkleLegMode::frame()
 {
+    _currentTime = millis();
 //     if (_channel == ADXL_ONE)
 //         Serial.println("sparklelegmode::frame");
     if (stepDetected)
     {
 //         if (_channel == ADXL_ONE)
 //             Serial.println("frame::footdown");
-        _footDown();
+        _flash();
     }
     else
     {
@@ -64,7 +65,7 @@ void SparkleLegMode::_setState(LightStateEnum newState)
     {
 //         if (_channel == ADXL_ONE)
 //             Serial.println("resetting timer");
-        _lastChangeTimer = 0;
+        _lastChangeTimer = _currentTime;
     }
 
 //     if (_channel == ADXL_ONE)
@@ -130,16 +131,6 @@ void SparkleLegMode::_shimmer()
 }
 
 // <gerstle> footdown -> flash -> sparkle -> fade -> off/shimmer
-void SparkleLegMode::_footDown()
-{
-//     if (_channel == ADXL_ONE)
-//     {
-//         Serial.print("step! "); Serial.println(_legName);
-//     }
-    _flash();
-}
-
-// <gerstle> footdown -> flash -> sparkle -> fade -> off/shimmer
 void SparkleLegMode::_flash()
 {
 //     if (_channel == ADXL_ONE)
@@ -182,8 +173,11 @@ void SparkleLegMode::_sparkle()
     }
 
     //foot
+    Serial.print(_currentTime); Serial.print("\t");
+    Serial.print(_lastChangeTimer); Serial.print("\t");
+    Serial.println(_config->sparkle.flashLength);
     CHSV *footColor = &_config->sparkle.footFlashColor;
-    if (_lastChangeTimer >= _config->sparkle.flashLength)
+    if (_currentTime >= (_lastChangeTimer + _config->sparkle.flashLength))
         footColor = &_config->sparkle.sparkleColor;
 
     for (int i = _lowerFootBorder; i <= _upperFootBorder; i++)
@@ -201,7 +195,7 @@ void SparkleLegMode::_sparkle()
     }
 
     // <gerstle> if we're past our sparkle time, start fading
-    if (_lastChangeTimer >= _config->sparkle.sparkleLength)
+    if (_currentTime >= (_lastChangeTimer + _config->sparkle.sparkleLength))
     {
 //         for (int i = 0; i < _pixelCount; i++)
 //             if ((i >= _lowerFootBorder) && (i <= _upperFootBorder))

@@ -56,12 +56,10 @@ void ZebraLegMode::frame()
     if (_frames < 5000)
     {
         byte stage = _startStage;
-        // for (int i = _half - 1; i >= 0; i--) // <gerstle> up
         for (int i = 0; i < _half; i++) // <gerstle> down
             paintPixel(&stage, i);
 
         stage = _startStage;
-        //for (int i = _half; i < _pixelCount; i++) // <gerstle> up
         for (int i = _pixelCount - 1; i >= _half; i--) // <gerstle> down
             paintPixel(&stage, i);
 
@@ -87,11 +85,11 @@ void ZebraLegMode::paintPixel(byte (*stage), int index)
 {
     if ((*stage) == 0)
         LWUtils.setTransitionColor(&(_pixels[index]), _frame, _frames, _config->zebra.colorTwo, _config->zebra.colorOne);
-    else if (((*stage) == 1) || ((*stage) == 2) || ((*stage) == 3))
+    else if (((*stage) >= 1) && ((*stage) <= 4))
         _pixels[index] = _config->zebra.colorTwo;
-    else if ((*stage) == 4)
-        LWUtils.setTransitionColor(&(_pixels[index]), _frame, _frames, _config->zebra.colorOne, _config->zebra.colorTwo);
     else if ((*stage) == 5)
+        LWUtils.setTransitionColor(&(_pixels[index]), _frame, _frames, _config->zebra.colorOne, _config->zebra.colorTwo);
+    else if ((*stage) == 6)
         _pixels[index] = _config->zebra.colorOne;
 
     (*stage)++;

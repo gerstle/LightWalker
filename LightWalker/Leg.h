@@ -26,6 +26,7 @@
 #include "BubbleLegMode.h"
 #include "RainbowLegMode.h"
 #include "ZebraLegMode.h"
+#include "FlamesLegMode.h"
 
 #define ADXL_VALUE_COUNT 100
 
@@ -68,6 +69,7 @@ class Leg
         BubbleLegMode bubbleLegMode;
         RainbowLegMode rainbowLegMode;
         ZebraLegMode zebraLegMode;
+        FlamesLegMode flamesLegMode;
 
         void init(LWConfigs *c, char *n, int i2c_channel, WalkingModeEnum mode, ADXL345 *adxl, byte count, byte half, CRGB *p);
         void off();

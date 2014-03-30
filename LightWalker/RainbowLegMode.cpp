@@ -74,9 +74,9 @@ void RainbowLegMode::_doubleRainbow()
 
 void RainbowLegMode::_rotate()
 {
-    if (_lastChangeTimer >= _config->rainbow.delay)
+    if (_currentTime > (_lastChangeTimer + _config->rainbow.delay))
     {
-        _lastChangeTimer = 0;
+        _lastChangeTimer = _currentTime;
 
         // <gerstle>  this increment shows the entire hue spectrum on a leg
         // if you go less than that, not all the colors show all the time, kinda nice.
@@ -90,9 +90,9 @@ void RainbowLegMode::_rotate()
 
 void RainbowLegMode::_rise()
 {
-    if (_lastChangeTimer >= _config->rainbow.delay)
+    if (_currentTime > (_lastChangeTimer + _config->rainbow.delay))
     {
-        _lastChangeTimer = 0;
+        _lastChangeTimer = _currentTime;
 
         for (int i = 0; i < _half; i++)
             _pixels[i].setHSV(_lastStartHue + (((float)i) * _increment), 255, _getValue(i));

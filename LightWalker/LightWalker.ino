@@ -33,7 +33,7 @@ char one_str[] = "1";
 
 void setup()
 {
-    delay(3000);
+    delay(2000);
     Serial.println(". ");
     // <gerstle> general setup
     Serial.begin(9600);
@@ -286,6 +286,12 @@ bool executeCommand(int key, char *value, int valueLen)
         //------------------------------------------------------------------------
         // Flames
         //------------------------------------------------------------------------
+        case flamesStepMillis:
+            lw.config.flames.stepMillis = atoi(value);
+            break;
+        case flamesDelay:
+            lw.config.flames.delay = atoi(value);
+            break;
 
         default:
             Serial.print(" <------------- not recognized");

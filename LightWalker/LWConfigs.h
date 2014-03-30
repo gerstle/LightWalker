@@ -26,7 +26,7 @@
     #define AUDIO_STROBE_PIN 4  // strobe is attached to digital pin 4
     #define AUDIO_RESET_PIN 5   // reset is attached to digital pin 5
 #endif
-#define MAX_BANDS 4
+#define MAX_BANDS 6
 #define EQ_EMA_N 200
 #define EQ_EMA_PEAK_N 20
 
@@ -65,6 +65,7 @@
 #include "BubbleConfigs.h"
 #include "RainbowConfigs.h"
 #include "ZebraConfigs.h"
+#include "FlamesConfigs.h"
 
 class LWConfigs
 {
@@ -77,5 +78,6 @@ class LWConfigs
         BubbleConfigs bubble;
         RainbowConfigs rainbow;
         ZebraConfigs zebra;
+        FlamesConfigs flames;
 };
 #endif

@@ -3,7 +3,7 @@
 
 #include "LegMode.h"
 
-#define ZEBRA_LIGHTS 6
+#define ZEBRA_LIGHTS 7
 
 class ZebraLegMode : public LegMode
 {
