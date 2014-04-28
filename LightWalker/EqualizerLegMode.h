@@ -14,6 +14,8 @@ class EqualizerLegMode : public LegMode
 
     private:
         unsigned long _lastChangeTimer;
+        double _perlinZ = 0.0;
+        byte _previousValues[MAX_PIXELS_PER_LEG];
 };
 
 #endif

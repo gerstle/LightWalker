@@ -54,6 +54,7 @@ void setup()
 
     // <gerstle> lights setup
     Serial.print("leds... ");
+    //FastLED.setDither(0);
     LEDS.addLeds<P9813, LED_CLOCK_PIN, LED_DATA_PIN, RGB, DATA_RATE_MHZ(15)>((CRGB *)(lw.leds), LED_COUNT);
     LEDS.setBrightness(50);
     LEDS.showColor(CRGB::Green);
@@ -82,6 +83,8 @@ unsigned long currentTime = millis();
 int frameCounter = 0;
 void loop()
 {
+    random16_add_entropy(random());
+
     currentTime = millis();
     frameCounter++;
     if (currentTime >= (statusTimer + 1000))
