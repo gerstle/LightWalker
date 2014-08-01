@@ -28,12 +28,35 @@ void RainbowLegMode::setup(LWConfigs *c, char *n, int i2c_channel, ADXL345 *adxl
     _half = half;
     _pixels = p;
 
+    _perlinZ = (double) random8() / (double) 25500;
+
     _setup_complete = true;
 }
 
 void RainbowLegMode::frame()
 {
+    _halfMin = (double)_config->rainbow.minValue / 2;
     _currentTime = millis();
+
+    switch (_config->rainbow.mode)
+    {
+        case SingleRainbow:
+        case DoubleRainbow:
+            if (_currentTime > (_lastNoiseTimer + 50))
+            {
+                _lastNoiseTimer = _currentTime;
+                _perlinZ += 0.001;
+            }
+            else
+            {
+                // <gerstle> reset back to previous value so the calcuations work
+                // out to be exactly the same again.
+                _perlinZ -= (float)_pixelCount * 0.0005;
+            }
+            break;
+        default:
+            break;
+    }
 
     if (stepDetected)
         _lastStepTime = _currentTime;
@@ -77,6 +100,7 @@ void RainbowLegMode::_rotate()
     if (_currentTime > (_lastChangeTimer + _config->rainbow.delay))
     {
         _lastChangeTimer = _currentTime;
+        _perlinZ += 0.001;
 
         // <gerstle>  this increment shows the entire hue spectrum on a leg
         // if you go less than that, not all the colors show all the time, kinda nice.
@@ -93,6 +117,7 @@ void RainbowLegMode::_rise()
     if (_currentTime > (_lastChangeTimer + _config->rainbow.delay))
     {
         _lastChangeTimer = _currentTime;
+        _perlinZ += 0.001;
 
         for (int i = 0; i < _half; i++)
             _pixels[i].setHSV(_lastStartHue + (((float)i) * _increment), 255, _getValue(i));
@@ -112,8 +137,12 @@ byte RainbowLegMode::_getValue(int i)
     float value;
 
     // <gerstle> if we didn't just step, return the min
-    if (_currentTime > (_lastStepTime + 1500))
-        return _config->rainbow.minValue;
+    if (_currentTime > (_lastStepTime + 1000))
+    {
+        _perlinZ += 0.0005;
+        double noiseModifier = LWUtils.perlinNoise(_perlinZ + sin(i /  4), cos(_perlinZ), _perlinZ);
+        return (noiseModifier * (double)_halfMin) + (double)_halfMin * 1.5;
+    }
 
     // <cgerstle> value based on location... brighter at the bottom
     if (i < _half)

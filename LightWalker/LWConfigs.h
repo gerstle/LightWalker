@@ -45,12 +45,14 @@
     #define LED_CLOCK_PIN 51
     #define LED_DATA_PIN 52
 #endif
+
 #define LEG_PIXEL_COUNT 75
 #define LEG_HALF 35
 #define LEFT_ARM_PIXEL_COUNT 100
 #define LEFT_ARM_HALF 50
 #define RIGHT_ARM_PIXEL_COUNT 102 // <gerstle> right arm has the hat attached with 2 pixels
 #define RIGHT_ARM_HALF 50
+#define MAX_PIXELS_PER_LEG RIGHT_ARM_PIXEL_COUNT
 #define LED_COUNT (LEG_PIXEL_COUNT + LEG_PIXEL_COUNT + LEFT_ARM_PIXEL_COUNT + RIGHT_ARM_PIXEL_COUNT)
 
 // <gerstle> LIGHTWALKER

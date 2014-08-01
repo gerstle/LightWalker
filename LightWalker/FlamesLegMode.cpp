@@ -16,18 +16,6 @@ void FlamesLegMode::setup(LWConfigs *c, char *n, int i2c_channel, ADXL345 *adxl,
     if (_setup_complete)
         return;
 
-    front_current_height = 10;
-    front_next_height = 10;
-    front_accent_low_end = 0;
-    front_accent_high_end = 0;
-    front_reset_accent = true;
-
-    back_current_height = 10;
-    back_next_height = 10;
-    back_accent_low_end = 0;
-    back_accent_high_end = 0;
-    back_reset_accent = true;
-
     // <cgerstle> should probably be doing this in a super constructor...
     _config = c;
     _legName = n;
@@ -50,88 +38,97 @@ void FlamesLegMode::frame()
     if (_currentTime >= (_lastFrame + _config->flames.delay))
     {
         _lastFrame = _currentTime;
+        fire2012();
 
-        _flame(0, _half, true, &front_current_height, &front_next_height, &front_accent_low_end, &front_accent_high_end, &front_reset_accent);
-        _flame(_half, _pixelCount - _half, false, &back_current_height, &back_next_height, &back_accent_low_end, &back_accent_high_end, &back_reset_accent);
+        // <cgerstle> the horns never get lit, just light 'em
+        if (_channel == ADXL_FOUR)
+            _pixels[_pixelCount - 1] = _pixels[_pixelCount -2] = CRGB::Red;
     }
 }
 
-void FlamesLegMode::_flame(int start, int count, bool invert, int *current_height, int *next_height, int *accent_low_end, int *accent_high_end, bool *reset_accent)
+void FlamesLegMode::fire2012()
 {
-    int half = count / 2;
-    int tmpIndex;
+    // Step 1.  Cool down every cell a little
+    for (int i = 0; i < _pixelCount; i++)
+        _heat[i] = qsub8(_heat[i],  random8(0, ((_cooling * 10) / _pixelCount) + 2));
+  
+    // Step 2.  Heat from each cell drifts 'up' and diffuses a little
+    for (int k = _pixelCount - 3; k > _half; k--)
+        _heat[k] = (_heat[k - 1] + _heat[k - 2] + _heat[k - 2] ) / 3;
 
-    // <gerstle> Set the next flame height to be within the range of the LEDs
-    if (*current_height == *next_height)
+    for (int k = 0; k < (_half - 3); k++)
+        _heat[k] = (_heat[k + 1] + _heat[k + 2] + _heat[k + 2] ) / 3;
+    
+    // Step 3.  Randomly ignite new 'sparks' of _heat near the bottom
+    //if (random8() < SPARKING)
+    if ((_currentTime - _lastStepTime) < 200)
     {
-        *next_height += random(-8, 9);
-        *next_height = max(*next_height, 0);
-        *next_height = min(*next_height, count);
+        Serial.println("-----------STEP!");
+        for (int i = _half - 6; i < (_half + 6); i++)
+            _heat[i] = 230;
+    }
+    else if (random8() < _sparking)
+    {
+        int y_back = random8(_half, _half + 6);
+        int y_front = random8(_half - 6, _half);
+        _heat[y_back] = qadd8(_heat[y_back], random8(160, 256));
+        _heat[y_front] = qadd8(_heat[y_front], random8(160, 256));
     }
 
-    // <gerstle> current flame height should increment up to match next flame height
-    if (*next_height <= *current_height)
-        *current_height = *next_height;
+    // Step 4.  Map from _heat cells to LED colors
+    for (int j = 0; j < _pixelCount; j++)
+        _pixels[j] = heatColor(_heat[j]);
+}
+
+
+// CRGB HeatColor( uint8_t temperature)
+// [to be included in the forthcoming FastLED v2.1]
+//
+// Approximates a 'black body radiation' spectrum for 
+// a given '_heat' level.  This is useful for animations of 'fire'.
+// Heat is specified as an arbitrary scale from 0 (cool) to 255 (hot).
+// This is NOT a chromatically correct 'black body radiation' 
+// spectrum, but it's surprisingly close, and it's extremely fast and small.
+//
+// On AVR/Arduino, this typically takes around 70 bytes of program memory, 
+// versus 768 bytes for a full 256-entry RGB lookup table.
+
+CRGB FlamesLegMode::heatColor(uint8_t temperature)
+{
+    CRGB heatcolor;
+
+    // Scale '_heat' down from 0-255 to 0-191,
+    // which can then be easily divided into three
+    // equal 'thirds' of 64 units each.
+    uint8_t t192 = scale8_video(temperature, 192);
+
+    // calculate a value that ramps up from
+    // zero to 255 in each 'third' of the scale.
+    uint8_t heatramp = t192 & 0x3F; // 0..63
+    heatramp <<= 2; // scale up to 0..252
+
+    // now figure out which third of the spectrum we're in:
+    if (t192 & 0x80)
+    {
+        // we're in the hottest third
+        heatcolor.r = 255; // full red
+        heatcolor.g = 255; // full green
+        heatcolor.b = heatramp; // ramp up blue
+    }
+    else if(t192 & 0x40)
+    {
+        // we're in the middle third
+        heatcolor.r = 255; // full red
+        heatcolor.g = heatramp; // ramp up green
+        heatcolor.b = 0; // no blue
+    }
     else
-        *current_height = min(*current_height + 1, count);
-        
-    // <gerstle> 0 -> current_height: increment up to color
-    for (int i = 0; i < *current_height; i++)
     {
-        if (!invert)
-            tmpIndex = start + i;
-        else
-            tmpIndex = start + count - 1 - i;
-
-        _pixels[tmpIndex] += CHSV(random(0, 10), 255, 20);
-
-        if (_currentTime > (_lastStepTime + _config->flames.stepMillis))
-        {
-            // <gerstle> keep them from staying static yellow
-            if (_pixels[tmpIndex].g > 90)
-                _pixels[tmpIndex].g -= random(0, 30);
-        }
-        else
-            _pixels[tmpIndex].g = 0;
-
+        // we're in the coolest third
+        heatcolor.r = heatramp; // ramp up red
+        heatcolor.g = 0; // no green
+        heatcolor.b = 0; // no blue
     }
-
-    // <gerstle> if the current_height & next_height < half,
-    // introduce some runners
-    if ((*current_height < half) && (*next_height < half) &&(random(0, 3) <= 1))
-    {
-        if (*reset_accent)
-        {
-            *accent_low_end = random(*next_height + 3, count - 3);
-            *accent_low_end = max(*accent_low_end, 0);
-
-            *accent_high_end = random(*accent_low_end + 1, count - 1);
-            *accent_high_end = min(*accent_high_end, count - 1);
-
-            *reset_accent = false;
-        }
-
-        for (int i = *accent_low_end; ((i <= *accent_high_end) && (i <= (count - 1))); i++)
-        {
-            if (!invert)
-                tmpIndex = start + i;
-            else
-                tmpIndex = start + count - 1 - i;
-
-            _pixels[tmpIndex] += CHSV(random(32, 60), 255, random(20, 40));
-        }
-    }
-    else
-        *reset_accent = true;
-
-    // <gerstle> >= current_height: slowly darken to black
-    for (int i = *current_height; i < count; i++)
-    {
-        if (!invert)
-            tmpIndex = start + i;
-        else
-            tmpIndex = start + count - 1 - i;
-
-        _pixels[tmpIndex].fadeToBlackBy(random(1, 20));
-    }
+      
+    return heatcolor;
 }

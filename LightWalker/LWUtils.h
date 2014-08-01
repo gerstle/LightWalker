@@ -23,6 +23,7 @@ class LWUtilsClass
         static void printRGB(byte r, byte g, byte b, bool newLine);
         static void setTransitionColor(CRGB* led, double numerator, double denomenator, CHSV fromColor, CHSV toColor);
         static void setTransitionColor(CRGB* led, double numerator, double denomenator, CRGB fromColor, CRGB toColor);
+        static double perlinNoise(double x, double y, double z);
 };
 
 extern LWUtilsClass LWUtils;

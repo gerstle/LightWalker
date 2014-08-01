@@ -9,6 +9,7 @@
  ****************************************************************************/
 
 #include "EqualizerLegMode.h"
+#include "LWUtils.h"
 
 void EqualizerLegMode::setup(LWConfigs *c, char *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p)
 {
@@ -24,6 +25,8 @@ void EqualizerLegMode::setup(LWConfigs *c, char *n, int i2c_channel, ADXL345 *ad
     _half = half;
     _pixels = p;
 
+    _perlinZ = (double) random8() / (double) 25500;
+
     _setup_complete = true;
 }
 
@@ -33,6 +36,16 @@ void EqualizerLegMode::frame()
     int i = 0;
     int lower_threshold = _half - (eqLevel * _half);
     int upper_threshold = (eqLevel * _half) + _half;
+    double half_min = (double)_config->equalizer.minValue / 2;
+    unsigned long currentTime = millis();
+    bool recalculateNoise = false;
+
+    if (currentTime > (_lastChangeTimer + 50))
+    {
+        _lastChangeTimer = currentTime;
+        _perlinZ += 0.001;
+        recalculateNoise = true;
+    }
 
     for (i = 0; i < _pixelCount; i++)
     {
@@ -42,19 +55,26 @@ void EqualizerLegMode::frame()
         {
             if (_config->equalizer.minValue > 0)
             {
+                if (recalculateNoise)
+                {
+                    _perlinZ += 0.0005;
+                    double noiseModifier = LWUtils.perlinNoise(_perlinZ + sin(i /  4), cos(_perlinZ), _perlinZ);
+                    _previousValues[i] = (noiseModifier * half_min) + half_min;
+                }
+
                 if (_config->equalizer.mode == EQSingleRainbow)
-                    _pixels[i].setHSV(map(i, 0, _pixelCount, 0, 255), 255, _config->equalizer.minValue);
+                    _pixels[i].setHSV(map(i, 0, _pixelCount, 0, 255), 255, _previousValues[i]);
                 else if (_config->equalizer.mode == EQDoubleRainbow)
                 {
                     // <gerstle> setting _pixels[_pixelCount - 1 - i] to _pixels[i] would work if half
                     // was actually half... so, run through both sides... :(
                     if (i < _half)
-                        _pixels[i].setHSV(map(i, 0, _half, 0, 255), 255, _config->equalizer.minValue);
+                        _pixels[i].setHSV(map(i, 0, _half, 0, 255), 255, _previousValues[i]);
                     else if (i > _half)
-                        _pixels[i].setHSV(map((_pixelCount - i - 1), 0, (_pixelCount - _half - 1), 0, 255), 255, _config->equalizer.minValue);
+                        _pixels[i].setHSV(map((_pixelCount - i - 1), 0, (_pixelCount - _half - 1), 0, 255), 255, _previousValues[i]);
                 }
                 else
-                    _pixels[i].setHSV(_config->equalizer.color.hue, _config->equalizer.color.saturation, _config->equalizer.minValue);
+                    _pixels[i].setHSV(_config->equalizer.color.hue, _config->equalizer.color.saturation, _previousValues[i]);
             }
             else
                 _pixels[i] = CRGB::Black;
