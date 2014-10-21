@@ -46,8 +46,8 @@
     #define LED_DATA_PIN 52
 #endif
 
-#define LEG_PIXEL_COUNT 75
-#define LEG_HALF 35
+#define LEG_PIXEL_COUNT 50 // 75
+#define LEG_HALF 23 // 35
 #define LEFT_ARM_PIXEL_COUNT 100
 #define LEFT_ARM_HALF 50
 #define RIGHT_ARM_PIXEL_COUNT 102 // <gerstle> right arm has the hat attached with 2 pixels
