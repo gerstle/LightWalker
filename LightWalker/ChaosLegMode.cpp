@@ -51,24 +51,40 @@ void ChaosLegMode::frame()
     }
     else
     {
-        if (_currentTime > (_timer + _config->chaos.delay))
+        if (_currentTime > (_lastChangeTimer + 400))
         {
-            _timer = _currentTime;
-            _x += 4;
-            _y -= 4;
-            for (int i = 0; i < _pixelCount; i++)
+            _lastChangeTimer = _currentTime;
+            if (random8(2) == 0)
+                _direction = -1;
+            else
+                _direction = 1;
+        }
+
+        _x += (_config->chaos.speed * _direction);
+        _y += (_config->chaos.speed * _direction);
+
+
+        for (int i = 0; i < _pixelCount; i++)
+        {
+            _perlinsTracker += 0.0005;
+            //double adjuster = LWUtils.perlinNoise(_perlinsTracker + sin(i /  4), cos(_perlinsTracker), _perlinsTracker);
+            double adjuster = inoise8(_x + i * 20, _y + i * 10, _perlinsTracker);
+
+            if (_config->chaos.sparse)
             {
-                _perlinsTracker += 0.0005;
-                //double adjuster = LWUtils.perlinNoise(_perlinsTracker + sin(i /  4), cos(_perlinsTracker), _perlinsTracker);
-                double adjuster = inoise8(_x + i * 20, _y + i * 10, _perlinsTracker);
-                _pixels[i].setHSV(adjuster,
-                                  _config->chaos.color.s,
-                                  adjuster);
-                //_pixels[i].setHSV(_config->chaos.color.h + (adjuster * (double)_config->chaos.swing),
-                                  //_config->chaos.color.s,
-                                  //(adjuster * (double) 127) + 128);
-                //_pixels[i].setHSV(0, 255, 100);
+                // <cgerstle> this basically takes it to -1, 0, or 1 and creates a cool effect
+                adjuster = map(adjuster, 0, 255, -1, 1.0);
             }
+            else
+                adjuster = (adjuster - 128) / (double) 128;
+
+            //if (_channel == ADXL_ONE)
+                //Serial.println(adjuster);
+
+            //_pixels[i].setHSV(adjuster, _config->chaos.color.s, adjuster);
+            _pixels[i].setHSV(_config->chaos.color.h + (adjuster * (double)_config->chaos.swing),
+                              _config->chaos.color.s,
+                              (adjuster * (double) 127) + 128);
         }
     }
 }

@@ -88,9 +88,10 @@ enum Preferences
     //------------------------------------------------------------------------
     chaosMinValue,
     chaosStepLength,
-    chaosDelay,
+    chaosSpeed,
     chaosColor,
     chaosSwing,
+    chaosSparse,
     
     //------------------------------------------------------------------------
     // Flames

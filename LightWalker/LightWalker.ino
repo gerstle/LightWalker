@@ -293,8 +293,8 @@ bool executeCommand(int key, char *value, int valueLen)
             lw.config.chaos.stepLength = atoi(value);
             break;
 
-        case chaosDelay:
-            lw.config.chaos.delay = atoi(value);
+        case chaosSpeed:
+            lw.config.chaos.speed = atoi(value);
             break;
 
         case chaosColor:
@@ -303,6 +303,10 @@ bool executeCommand(int key, char *value, int valueLen)
 
         case chaosSwing:
             lw.config.chaos.swing = atoi(value);
+            break;
+
+        case chaosSparse:
+            lw.config.chaos.sparse = atoi(value);
             break;
 
         

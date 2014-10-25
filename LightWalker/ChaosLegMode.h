@@ -14,11 +14,12 @@ class ChaosLegMode : public LegMode
     private:
         unsigned long _currentTime;
         unsigned long _lastStepTime;
-        unsigned long _timer;
         double _perlinsTracker;
         double _x;
         double _y;
         byte _hue;
+        int _direction;
+        unsigned long _lastChangeTimer;
 };
 
 #endif
