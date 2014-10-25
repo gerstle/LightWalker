@@ -136,12 +136,12 @@ byte RainbowLegMode::_getValue(int i)
 {
     float value;
 
-    // <gerstle> if we didn't just step, return the min
     if (_currentTime > (_lastStepTime + 1000))
     {
-        _perlinZ += 0.0005;
+        _perlinZ += 0.0015;
         double noiseModifier = LWUtils.perlinNoise(_perlinZ + sin(i /  4), cos(_perlinZ), _perlinZ);
-        return (noiseModifier * (double)_halfMin) + (double)_halfMin * 1.5;
+        //return (noiseModifier * (double)_halfMin) + (double)_halfMin * 1.5;
+        return map((noiseModifier * (double)127) + (double)128, 0, 255, 30, (double)_config->main.maxBrightness * (double) 0.6);
     }
 
     // <cgerstle> value based on location... brighter at the bottom

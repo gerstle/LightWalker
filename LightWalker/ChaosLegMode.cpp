@@ -78,10 +78,6 @@ void ChaosLegMode::frame()
             else
                 adjuster = (adjuster - 128) / (double) 128;
 
-            //if (_channel == ADXL_ONE)
-                //Serial.println(adjuster);
-
-            //_pixels[i].setHSV(adjuster, _config->chaos.color.s, adjuster);
             _pixels[i].setHSV(_config->chaos.color.h + (adjuster * (double)_config->chaos.swing),
                               _config->chaos.color.s,
                               (adjuster * (double) 127) + 128);
