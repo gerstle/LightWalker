@@ -98,6 +98,10 @@ void Leg::setWalkingMode(WalkingModeEnum mode)
             _leg_mode = &zebraLegMode;
             break;
 
+        case chaos:
+            _leg_mode = &chaosLegMode;
+            break;
+
         case flames:
             _leg_mode = &flamesLegMode;
     }
@@ -116,6 +120,7 @@ void Leg::frame()
         case bubble:
         case rainbow:
         case zebra:
+        case chaos:
         case flames:
             _leg_mode->stepDetected = detectStep();
             break;
@@ -175,8 +180,6 @@ bool Leg::detectStep()
             lastStepTimer = millis();
             step_detected = true;
             readyForStep = false;
-//             if (_channel == ADXL_TWO)
-//                 Serial.print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
         }
     }
 
@@ -186,8 +189,6 @@ bool Leg::detectStep()
         {
             lastStepTimer = millis();
             step_detected = true;
-//             if (_channel == ADXL_TWO)
-//                 Serial.print("YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY");
         }
     }
 
@@ -198,14 +199,13 @@ bool Leg::detectStep()
         {
             lastStepTimer = millis();
             step_detected = true;
-//             if (_channel == ADXL_TWO)
-//                 Serial.print("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ");
         }
     }
-//     if (_channel == ADXL_TWO)
-//         Serial.println();
+
     if (step_detected)
-        Serial.print("\t\t\t\tSTEP!");
+    {
+        Serial.print("\t\t\t\tSTEP["); Serial.print(name); Serial.println("]!");
+    }
 
     return step_detected;
 }

@@ -67,6 +67,7 @@
 #include "BubbleConfigs.h"
 #include "RainbowConfigs.h"
 #include "ZebraConfigs.h"
+#include "ChaosConfigs.h"
 #include "FlamesConfigs.h"
 
 class LWConfigs
@@ -80,6 +81,7 @@ class LWConfigs
         BubbleConfigs bubble;
         RainbowConfigs rainbow;
         ZebraConfigs zebra;
+        ChaosConfigs chaos;
         FlamesConfigs flames;
 };
 #endif

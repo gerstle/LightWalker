@@ -25,7 +25,11 @@ void EqualizerLegMode::setup(LWConfigs *c, char *n, int i2c_channel, ADXL345 *ad
     _half = half;
     _pixels = p;
 
-    _perlinZ = (double) random8() / (double) 25500;
+    //_perlinZ = (double) random8() / (double) 25500;
+    _perlinsTracker = random16();
+    _x = random16();
+    _y = random16();
+    _lastChangeTimer = millis();
 
     _setup_complete = true;
 }
@@ -38,43 +42,45 @@ void EqualizerLegMode::frame()
     int upper_threshold = (eqLevel * _half) + _half;
     double half_min = (double)_config->equalizer.minValue / 2;
     unsigned long currentTime = millis();
-    bool recalculateNoise = false;
 
-    if (currentTime > (_lastChangeTimer + 50))
+    if (currentTime > (_lastChangeTimer + 400))
     {
         _lastChangeTimer = currentTime;
-        _perlinZ += 0.001;
-        recalculateNoise = true;
+        if (random8(2) == 0)
+            _direction = -1;
+        else
+            _direction = 1;
     }
+
+    _x += (2 * _direction);
+    _y += (2 * _direction);
 
     for (i = 0; i < _pixelCount; i++)
     {
         // <cgerstle> this is the "OFF"
-        if (((i < _half) && (i < lower_threshold)) ||
+        if (((i <= _half) && (i < lower_threshold)) ||
             ((i > _half) && (i > upper_threshold)))
         {
             if (_config->equalizer.minValue > 0)
             {
-                if (recalculateNoise)
-                {
-                    _perlinZ += 0.0005;
-                    double noiseModifier = LWUtils.perlinNoise(_perlinZ + sin(i /  4), cos(_perlinZ), _perlinZ);
-                    _previousValues[i] = (noiseModifier * half_min) + half_min;
-                }
+                _perlinsTracker += 0.0005;
+                byte value = inoise8(_x + i * 20, _y + i * 10, _perlinsTracker);
+                // <cgerstle> 0-255, scale down a bit
+                value = map(value, 20, 255, 0, _config->equalizer.minValue);
 
                 if (_config->equalizer.mode == EQSingleRainbow)
-                    _pixels[i].setHSV(map(i, 0, _pixelCount, 0, 255), 255, _previousValues[i]);
+                    _pixels[i].setHSV(map(i, 0, _pixelCount, 0, 255), 255, value);
                 else if (_config->equalizer.mode == EQDoubleRainbow)
                 {
                     // <gerstle> setting _pixels[_pixelCount - 1 - i] to _pixels[i] would work if half
                     // was actually half... so, run through both sides... :(
                     if (i < _half)
-                        _pixels[i].setHSV(map(i, 0, _half, 0, 255), 255, _previousValues[i]);
+                        _pixels[i].setHSV(map(i, 0, _half, 0, 255), 255, value);
                     else if (i > _half)
-                        _pixels[i].setHSV(map((_pixelCount - i - 1), 0, (_pixelCount - _half - 1), 0, 255), 255, _previousValues[i]);
+                        _pixels[i].setHSV(map((_pixelCount - i - 1), 0, (_pixelCount - _half - 1), 0, 255), 255, value);
                 }
                 else
-                    _pixels[i].setHSV(_config->equalizer.color.hue, _config->equalizer.color.saturation, _previousValues[i]);
+                    _pixels[i].setHSV(_config->equalizer.color.hue, _config->equalizer.color.saturation, value);
             }
             else
                 _pixels[i] = CRGB::Black;
@@ -84,7 +90,7 @@ void EqualizerLegMode::frame()
             _pixels[i].setHSV(map(i, 0, _pixelCount, 0, 255), 255, 255);
         else if (_config->equalizer.mode == EQDoubleRainbow)
         {
-            if (i < _half)
+            if (i <= _half)
                 _pixels[i].setHSV(map(i, 0, _half, 0, 255), 255, 255);
             else if (i > _half)
                 _pixels[i].setHSV(map((_pixelCount - i - 1), 0, (_pixelCount - _half - 1), 0, 255), 255, 255);
