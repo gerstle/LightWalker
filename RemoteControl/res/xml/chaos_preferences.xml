@@ -3,4 +3,53 @@
        xmlns:android="http://schemas.android.com/apk/res/android"
        xmlns:robobunny="http://robobunny.com"
        android:key="chaos_preferences">
+       
+    chaosStepLength,
+    chaosDelay,
+    <com.robobunny.SeekBarPreference
+        android:key="chaosMinValue"
+        android:title="min value"
+        android:defaultValue="100"
+        robobunny:min="20"
+        android:max="200"
+        robobunny:unitsLeft=""
+        robobunny:unitsRight="" />
+
+    <com.robobunny.SeekBarPreference
+        android:key="chaosStepLength"
+        android:title="step length"
+        android:defaultValue="1250"
+        robobunny:min="500"
+        android:max="4000"
+        robobunny:unitsLeft=""
+        robobunny:unitsRight="" />    
+    
+    <com.robobunny.SeekBarPreference
+        android:key="chaosSpeed"
+        android:title="speed"
+        android:defaultValue="4"
+        robobunny:min="0"
+        android:max="30"
+        robobunny:unitsLeft=""
+        robobunny:unitsRight="" />
+
+    <com.robobunny.SeekBarPreference
+        android:key="chaosSwing"
+        android:title="color variance"
+        android:defaultValue="30"
+        robobunny:min="0"
+        android:max="100"
+        robobunny:unitsLeft=""
+        robobunny:unitsRight="" />
+
+    
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="chaosSparse"
+        android:title="sparse mode" />       
+    
+    <com.inappropirates.util.ColorPickerPreference
+        android:key="chaosColor"
+        android:title="color"
+        />
 </PreferenceScreen>

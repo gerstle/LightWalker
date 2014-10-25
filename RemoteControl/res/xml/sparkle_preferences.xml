@@ -7,16 +7,16 @@
     <com.robobunny.SeekBarPreference
         android:key="sparkleFadeRate"
         android:title="fade rate"
-        android:defaultValue="38"
-        robobunny:min="20"
-        android:max="200"
+        android:defaultValue="5"
+        robobunny:min="1"
+        android:max="60"
         robobunny:unitsLeft=""
         robobunny:unitsRight="" />
     
     <com.robobunny.SeekBarPreference
         android:key="sparkleFlashLength"
         android:title="length of flash time (ms)"
-        android:defaultValue="200"
+        android:defaultValue="525"
         android:max="1000"
         robobunny:min="0"
         robobunny:unitsLeft=""
@@ -25,8 +25,8 @@
     <com.robobunny.SeekBarPreference
         android:key="sparkleSparkleLength"
         android:title="length of sparkle time (ms)"
-        android:defaultValue="700"
-        android:max="5000"
+        android:defaultValue="575"
+        android:max="2000"
         robobunny:min="100"
         robobunny:unitsLeft=""
 		robobunny:unitsRight="" />

@@ -15,7 +15,7 @@
     <com.robobunny.SeekBarPreference
         android:key="flamesDelay"
         android:title="Delay"
-        android:defaultValue="25"
+        android:defaultValue="30"
         android:max="500"
         robobunny:min="0"
         />

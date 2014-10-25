@@ -15,7 +15,7 @@
     <com.robobunny.SeekBarPreference
         android:key="eqMinValue"
         android:title="Min Brightness"
-        android:defaultValue="50"
+        android:defaultValue="175"
         android:max="255"
         robobunny:min="0"
         />
