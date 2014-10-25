@@ -63,7 +63,6 @@ void FlamesLegMode::fire2012()
     //if (random8() < SPARKING)
     if ((_currentTime - _lastStepTime) < 200)
     {
-        Serial.println("-----------STEP!");
         for (int i = _half - 6; i < (_half + 6); i++)
             _heat[i] = 230;
     }

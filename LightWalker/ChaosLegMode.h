@@ -1,21 +1,23 @@
-#ifndef EqualizerLegMode_h
-#define EqualizerLegMode_h
+#ifndef ChaosLegMode_h
+#define ChaosLegMode_h
 
 #include "LegMode.h"
 
-class EqualizerLegMode : public LegMode
+class ChaosLegMode : public LegMode
 {
     public:
-        EqualizerLegMode() : eqLevel(0.0), _direction(1) {}
+        ChaosLegMode() : _lastStepTime(millis()), _perlinsTracker(0.0), _hue(0) {}
 
-        float eqLevel;
         virtual void setup(LWConfigs *c, char *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p);
         virtual void frame();
 
     private:
+        unsigned long _currentTime;
+        unsigned long _lastStepTime;
         double _perlinsTracker;
         double _x;
         double _y;
+        byte _hue;
         int _direction;
         unsigned long _lastChangeTimer;
 };

@@ -71,6 +71,14 @@ void LWUtilsClass::printRGB(byte r, byte g, byte b, bool newLine)
         Serial.println();
 }
 
+void LWUtilsClass::setTransitionColor(CRGB* led, double numerator, double denomenator, CHSV fromColor, CHSV toColor)
+{
+    CRGB from = fromColor;
+    CRGB to = toColor;
+
+    LWUtilsClass::setTransitionColor(led, numerator, denomenator, from, to);
+}
+
 void LWUtilsClass::setTransitionColor(CRGB* led, double numerator, double denomenator, CRGB fromColor, CRGB toColor)
 {
     if (numerator <= 0)

@@ -55,7 +55,7 @@ void setup()
     // <gerstle> lights setup
     Serial.print("leds... ");
     //FastLED.setDither(0);
-    LEDS.addLeds<P9813, LED_CLOCK_PIN, LED_DATA_PIN, RGB, DATA_RATE_MHZ(15)>((CRGB *)(lw.leds), LED_COUNT);
+    LEDS.addLeds<P9813, LED_CLOCK_PIN, LED_DATA_PIN, RGB, DATA_RATE_MHZ(10)>((CRGB *)(lw.leds), LED_COUNT);
     LEDS.setBrightness(50);
     LEDS.showColor(CRGB::Green);
     delay(400);
@@ -285,6 +285,30 @@ bool executeCommand(int key, char *value, int valueLen)
         //------------------------------------------------------------------------
         // Chaos
         //------------------------------------------------------------------------
+        case chaosMinValue:
+            lw.config.chaos.minValue = atoi(value);
+            break;
+
+        case chaosStepLength:
+            lw.config.chaos.stepLength = atoi(value);
+            break;
+
+        case chaosSpeed:
+            lw.config.chaos.speed = atoi(value);
+            break;
+
+        case chaosColor:
+            ParseColor(value, &(lw.config.chaos.color));
+            break;
+
+        case chaosSwing:
+            lw.config.chaos.swing = atoi(value);
+            break;
+
+        case chaosSparse:
+            lw.config.chaos.sparse = atoi(value);
+            break;
+
         
         //------------------------------------------------------------------------
         // Flames
@@ -297,7 +321,7 @@ bool executeCommand(int key, char *value, int valueLen)
             break;
 
         default:
-            Serial.print(" <------------- not recognized");
+            Serial.println(" <------------- not recognized");
             return false;
             break;
     }
