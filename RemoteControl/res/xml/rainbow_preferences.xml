@@ -9,7 +9,7 @@
     	android:title="mode"
     	android:entries="@array/rainbowModes"
     	android:entryValues="@array/rainbowModeValues"
-    	android:defaultValue="1">
+    	android:defaultValue="3">
 	</ListPreference>
 
     <com.robobunny.SeekBarPreference
@@ -23,7 +23,7 @@
     <com.robobunny.SeekBarPreference
         android:key="rainbowDelay"
         android:title="Delay"
-        android:defaultValue="25"
+        android:defaultValue="35"
         android:max="500"
         robobunny:min="0"
         />

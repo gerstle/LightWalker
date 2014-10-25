@@ -35,7 +35,7 @@
 
     <com.robobunny.SeekBarPreference
         android:key="chaosSwing"
-        android:title="swing"
+        android:title="color variance"
         android:defaultValue="30"
         robobunny:min="0"
         android:max="100"
