@@ -22,7 +22,7 @@ class LW
         LW() : config(), eqLevel(0.0), _mode(masterOff), _pulse_length(0) {}
 
         LWConfigs config;
-        CRGB leds[LEG_PIXEL_COUNT + LEG_PIXEL_COUNT + LEFT_ARM_PIXEL_COUNT + RIGHT_ARM_PIXEL_COUNT];
+        CRGB leds[LEG_PIXEL_COUNT + LEG_PIXEL_COUNT + ARM_PIXEL_COUNT + ARM_PIXEL_COUNT + HEAD_PIXEL_COUNT];
         float eqLevel;
 
         void initLegs(WalkingModeEnum m);

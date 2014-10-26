@@ -19,6 +19,7 @@ class ChaosLegMode : public LegMode
         double _y;
         byte _hue;
         int _direction;
+        int _directionTimer;
         unsigned long _lastChangeTimer;
 };
 

@@ -42,6 +42,7 @@ void EqualizerLegMode::frame()
     int upper_threshold = (eqLevel * _half) + _half;
     double half_min = (double)_config->equalizer.minValue / 2;
     unsigned long currentTime = millis();
+    //delay(2);
 
     if (currentTime > (_lastChangeTimer + 400))
     {

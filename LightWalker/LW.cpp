@@ -20,11 +20,11 @@ void LW::initLegs(WalkingModeEnum m)
     Serial.println("    right leg");
     testLeg(1, CRGB::Yellow);
 
-    _legs[2].init(&config, "left arm", ADXL_THREE, _mode, &_adxl, LEFT_ARM_PIXEL_COUNT, LEFT_ARM_HALF, &(leds[LEG_PIXEL_COUNT * 2]));
+    _legs[2].init(&config, "left arm", ADXL_THREE, _mode, &_adxl, ARM_PIXEL_COUNT, ARM_HALF, &(leds[LEG_PIXEL_COUNT * 2]));
     Serial.println("    left arm");
     testLeg(2, CRGB::Purple);
 
-    _legs[3].init(&config, "right arm", ADXL_FOUR, _mode, &_adxl, RIGHT_ARM_PIXEL_COUNT, RIGHT_ARM_HALF, &(leds[LEG_PIXEL_COUNT * 2 + LEFT_ARM_PIXEL_COUNT]));
+    _legs[3].init(&config, "right arm", ADXL_FOUR, _mode, &_adxl, ARM_PIXEL_COUNT, ARM_HALF, &(leds[LEG_PIXEL_COUNT * 2 + ARM_PIXEL_COUNT]));
     Serial.println("    right arm");
     testLeg(3, CRGB::Green);
 
@@ -121,6 +121,14 @@ void LW::walk()
         // <cgerstle> paint the lights.
         _legs[i].frame();
     }
+
+    // <cgerstle> for the head, set the last 2 pixels = to the halfway point of the right arm's hue but full value
+    int index = LED_COUNT - 3;
+    while ((index > 0) && (leds[index].r == 0 && leds[index].g == 0 && leds[index].b == 0))
+        index--;
+    leds[LED_COUNT - 2] = leds[index];
+    leds[LED_COUNT - 2].maximizeBrightness();
+    leds[LED_COUNT - 1] = leds[LED_COUNT - 2];
 
     // <cgerstle> sends the colors out to the lights
     LEDS.show();

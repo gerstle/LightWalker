@@ -55,7 +55,7 @@ void setup()
     // <gerstle> lights setup
     Serial.print("leds... ");
     //FastLED.setDither(0);
-    LEDS.addLeds<P9813, LED_CLOCK_PIN, LED_DATA_PIN, RGB, DATA_RATE_MHZ(10)>((CRGB *)(lw.leds), LED_COUNT);
+    LEDS.addLeds<P9813, LED_CLOCK_PIN, LED_DATA_PIN, RGB, DATA_RATE_MHZ(8)>((CRGB *)(lw.leds), LED_COUNT);
     LEDS.setBrightness(50);
     LEDS.showColor(CRGB::Green);
     delay(400);

@@ -30,6 +30,7 @@ void ChaosLegMode::setup(LWConfigs *c, char *n, int i2c_channel, ADXL345 *adxl, 
     _x = random16();
     _y = random16();
     _hue = 0;
+    _directionTimer = random16(100, 5000);
 
     _setup_complete = true;
 }
@@ -51,13 +52,15 @@ void ChaosLegMode::frame()
     }
     else
     {
-        if (_currentTime > (_lastChangeTimer + 400))
+        if (_currentTime > (_lastChangeTimer + _directionTimer))
         {
             _lastChangeTimer = _currentTime;
+            _directionTimer = random16(100, 1500);
+            int multiplier = random8(1, 4); 
             if (random8(2) == 0)
-                _direction = -1;
+                _direction = -1 * multiplier;
             else
-                _direction = 1;
+                _direction = 1 * multiplier;
         }
 
         _x += (_config->chaos.speed * _direction);

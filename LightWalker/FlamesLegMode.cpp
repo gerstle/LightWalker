@@ -39,10 +39,6 @@ void FlamesLegMode::frame()
     {
         _lastFrame = _currentTime;
         fire2012();
-
-        // <cgerstle> the horns never get lit, just light 'em
-        if (_channel == ADXL_FOUR)
-            _pixels[_pixelCount - 1] = _pixels[_pixelCount -2] = CRGB::Red;
     }
 }
 

@@ -19,7 +19,7 @@ class FlamesLegMode : public LegMode
         unsigned int _cooling = 120;
         unsigned int _sparking = 50;
         // Array of temperature readings at each simulation cell
-        byte _heat[MAX_PIXELS_PER_LEG];
+        byte _heat[ARM_PIXEL_COUNT];
 
         CRGB heatColor(uint8_t temperature);
         void fire2012();
