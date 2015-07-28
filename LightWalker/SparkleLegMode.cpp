@@ -63,7 +63,7 @@ void SparkleLegMode::_setState(LightStateEnum newState)
 {
     if (_state != newState)
     {
-//         if (_channel == ADXL_ONE)
+//          if (_channel == ADXL_ONE)
 //             Serial.println("resetting timer");
         _lastChangeTimer = _currentTime;
     }
@@ -173,9 +173,9 @@ void SparkleLegMode::_sparkle()
     }
 
     //foot
-    Serial.print(_currentTime); Serial.print("\t");
-    Serial.print(_lastChangeTimer); Serial.print("\t");
-    Serial.println(_config->sparkle.flashLength);
+    //Serial.print(_currentTime); Serial.print("\t");
+    //Serial.print(_lastChangeTimer); Serial.print("\t");
+    //Serial.println(_config->sparkle.flashLength);
     CHSV *footColor = &_config->sparkle.footFlashColor;
     if (_currentTime >= (_lastChangeTimer + _config->sparkle.flashLength))
         footColor = &_config->sparkle.sparkleColor;
@@ -197,30 +197,22 @@ void SparkleLegMode::_sparkle()
     // <gerstle> if we're past our sparkle time, start fading
     if (_currentTime >= (_lastChangeTimer + _config->sparkle.sparkleLength))
     {
-//         for (int i = 0; i < _pixelCount; i++)
-//             if ((i >= _lowerFootBorder) && (i <= _upperFootBorder))
         for (int i = _lowerFootBorder; i <= _upperFootBorder; i++)
                 _pixels[i] = _config->sparkle.sparkleColor;
-//         Serial.println("setting to fade");
+         //Serial.println("setting to fade");
         _setState(Fade);
     }
     else
     {
-//         Serial.println("setting to sparkle");
-        _setState(SparkleSparkle);
+         //Serial.println("setting to sparkle");
+         _setState(SparkleSparkle);
     }
 }
 
 // <gerstle> footdown -> flash -> sparkle -> fade -> off/shimmer
 void SparkleLegMode::_fade()
 {
-//     if (_channel == ADXL_ONE)
-//     {
-//         Serial.print("\t\tfading "); Serial.println(_legName);
-//     }
-
-    int still_fading = 0;
-
+    int still_fading = 1;
     for (int i = 0; i < _pixelCount; i++)
         if (((_pixels[i].r - _config->sparkle.fadeRate) > 0) ||
             ((_pixels[i].g - _config->sparkle.fadeRate) > 0) ||
@@ -229,11 +221,15 @@ void SparkleLegMode::_fade()
             _pixels[i].fadeToBlackBy(_config->sparkle.fadeRate);
             still_fading++;
         }
+    //if (_channel == ADXL_ONE)
+    //{
+        //Serial.print("\t\tstill fading"); Serial.println(still_fading);
+    //}
 
-        if ((_config->sparkle.minValue > 0) && (still_fading > (_pixelCount / 2)))
-            _setState(Fade);
-        else if ((_config->sparkle.minValue == 0) && (still_fading))
-            _setState(Fade);
-        else
-            _setState(Off);
+    if ((_config->sparkle.minValue > 0) && (still_fading > (_pixelCount / 3)))
+        _setState(Fade);
+    else if ((_config->sparkle.minValue == 0) && (still_fading))
+        _setState(Fade);
+    else
+        _setState(Off);
 }

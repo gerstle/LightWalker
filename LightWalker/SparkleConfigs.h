@@ -7,7 +7,7 @@
 class SparkleConfigs
 {
     public:
-        SparkleConfigs() : footFlashColor(CHSV(255, 0, 255)), sparkleColor(CHSV(255, 0, 255)), flashLength(500), sparkleLength(500), fadeRate(2), minValue(30) {}
+        SparkleConfigs() : footFlashColor(CHSV(255, 0, 255)), sparkleColor(CHSV(255, 0, 255)), flashLength(500), sparkleLength(500), fadeRate(1), minValue(30) {}
 
         CHSV footFlashColor;
         CHSV sparkleColor;
