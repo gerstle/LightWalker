@@ -38,7 +38,7 @@
         android:title="color variance"
         android:defaultValue="30"
         robobunny:min="0"
-        android:max="100"
+        android:max="200"
         robobunny:unitsLeft=""
         robobunny:unitsRight="" />
 
