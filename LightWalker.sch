@@ -225,7 +225,7 @@
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="TEENSY_3.0_BASIC">
+<deviceset name="TEENSY_3.0_BASIC" prefix="TNSY">
 <description>Basic Teensy 3.0 with none of the 'inner' pins enabled. &lt;p&gt;See '+4', 'AllAnalogPins", and 'AllPins' packages for additional pin holes, as needed.</description>
 <gates>
 <gate name="G$1" symbol="TEENSY_3.0_BASIC" x="0" y="0"/>
@@ -8775,8 +8775,8 @@ long pads (0.024 x 0.08 in)</description>
 <wire x1="4.953" y1="1.7272" x2="-4.9022" y2="1.7272" width="0.1524" layer="21"/>
 <wire x1="-4.9022" y1="1.7272" x2="-4.9022" y2="-2.1082" width="0.1524" layer="21"/>
 <wire x1="-5.144" y1="4.0836" x2="-5.144" y2="-4.4646" width="0.2" layer="39"/>
-<wire x1="-5.144" y1="-4.4646" x2="5.1948" y2="-4.4392" width="0.2" layer="39"/>
-<wire x1="5.1948" y1="-4.4392" x2="5.1948" y2="4.0836" width="0.2" layer="39"/>
+<wire x1="-5.144" y1="-4.4646" x2="5.1948" y2="-4.4646" width="0.2" layer="39"/>
+<wire x1="5.1948" y1="-4.4646" x2="5.1948" y2="4.0836" width="0.2" layer="39"/>
 <wire x1="5.1948" y1="4.0836" x2="-5.144" y2="4.0836" width="0.2" layer="39"/>
 <text x="-3.175" y="0.254" size="1.27" layer="25" ratio="10">&gt;NAME</text>
 <text x="-3.175" y="-1.524" size="1.27" layer="27" ratio="10">&gt;VALUE</text>
@@ -8827,26 +8827,26 @@ long pads (0.024 x 0.08 in)</description>
 <wire x1="-7.747" y1="3.683" x2="-2.794" y2="3.683" width="0.1524" layer="95"/>
 <text x="-10.16" y="10.795" size="1.778" layer="95">&gt;NAME</text>
 <text x="-10.16" y="-15.24" size="1.778" layer="96">&gt;VALUE</text>
-<pin name="SD0" x="-15.24" y="0" length="middle" direction="in"/>
-<pin name="GND" x="-15.24" y="-10.16" length="middle" direction="in"/>
-<pin name="SD2" x="15.24" y="-10.16" length="middle" direction="in" rot="R180"/>
+<pin name="SD0" x="-15.24" y="0" length="middle"/>
+<pin name="GND" x="-15.24" y="-10.16" length="middle" direction="pwr"/>
+<pin name="SD2" x="15.24" y="-10.16" length="middle" rot="R180"/>
 <pin name="A0" x="-15.24" y="7.62" length="middle" direction="in"/>
-<pin name="VCC" x="15.24" y="7.62" length="middle" direction="hiz" rot="R180"/>
-<pin name="SC1" x="-15.24" y="-7.62" length="middle" direction="in"/>
-<pin name="A2" x="15.24" y="0" length="middle" direction="pwr" rot="R180"/>
+<pin name="VCC" x="15.24" y="7.62" length="middle" direction="pwr" rot="R180"/>
+<pin name="SC1" x="-15.24" y="-7.62" length="middle" direction="out"/>
+<pin name="A2" x="15.24" y="0" length="middle" direction="in" rot="R180"/>
 <pin name="A1" x="-15.24" y="5.08" length="middle" direction="in"/>
-<pin name="SC0" x="-15.24" y="-2.54" length="middle" direction="in"/>
-<pin name="SD1" x="-15.24" y="-5.08" length="middle" direction="in"/>
-<pin name="SC2" x="15.24" y="-7.62" length="middle" direction="hiz" rot="R180"/>
-<pin name="SD3" x="15.24" y="-5.08" length="middle" direction="out" rot="R180"/>
-<pin name="SC3" x="15.24" y="-2.54" length="middle" direction="pwr" rot="R180"/>
-<pin name="SCL" x="15.24" y="2.54" length="middle" direction="out" rot="R180"/>
-<pin name="SDA" x="15.24" y="5.08" length="middle" direction="hiz" rot="R180"/>
-<pin name="RESET" x="-15.24" y="2.54" length="middle" direction="out" function="dot"/>
+<pin name="SC0" x="-15.24" y="-2.54" length="middle" direction="out"/>
+<pin name="SD1" x="-15.24" y="-5.08" length="middle"/>
+<pin name="SC2" x="15.24" y="-7.62" length="middle" direction="out" rot="R180"/>
+<pin name="SD3" x="15.24" y="-5.08" length="middle" rot="R180"/>
+<pin name="SC3" x="15.24" y="-2.54" length="middle" direction="out" rot="R180"/>
+<pin name="SCL" x="15.24" y="2.54" length="middle" direction="in" rot="R180"/>
+<pin name="SDA" x="15.24" y="5.08" length="middle" rot="R180"/>
+<pin name="RESET" x="-15.24" y="2.54" length="middle" direction="in" function="dot"/>
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="TCA9546A">
+<deviceset name="TCA9546A" prefix="I2CMULTI">
 <gates>
 <gate name="G$1" symbol="TCA9546A" x="0" y="0"/>
 </gates>
@@ -12361,10 +12361,10 @@ DIN A3, landscape with extra doc field</description>
 <part name="GND1" library="supply1" deviceset="GND" device=""/>
 <part name="GND2" library="supply1" deviceset="GND" device=""/>
 <part name="IC1" library="74xx-eu" deviceset="74*245" device="N" technology="HCT"/>
-<part name="P+1" library="supply1" deviceset="+5V" device=""/>
-<part name="C1" library="rcl" deviceset="CPOL-US" device="E3.5-8" value="1000uf"/>
-<part name="I2CMULTIPLEX" library="minty" deviceset="TCA9546A" device=""/>
-<part name="BLUEFRUIT_EZLINK" library="pinhead" deviceset="PINHD-1X7" device=""/>
+<part name="P+2" library="supply1" deviceset="+5V" device=""/>
+<part name="C2" library="rcl" deviceset="CPOL-US" device="E3.5-8" value="1000uf"/>
+<part name="I2CMULTI1" library="minty" deviceset="TCA9546A" device=""/>
+<part name="BLUETOOTH" library="pinhead" deviceset="PINHD-1X7" device=""/>
 <part name="R1" library="resistor" deviceset="R-US_" device="0207/10" value="10k"/>
 <part name="LLX" library="pinhead" deviceset="PINHD-1X4" device=""/>
 <part name="RLX" library="pinhead" deviceset="PINHD-1X4" device=""/>
@@ -12374,29 +12374,29 @@ DIN A3, landscape with extra doc field</description>
 <part name="LED_R_ARM" library="pinhead" deviceset="PINHD-1X4" device=""/>
 <part name="LED_HORNS" library="pinhead" deviceset="PINHD-1X4" device=""/>
 <part name="LED_LEGS" library="pinhead" deviceset="PINHD-1X4" device=""/>
-<part name="MAX9814_MIC" library="pinhead" deviceset="PINHD-1X5" device=""/>
-<part name="P+10" library="supply1" deviceset="+5V" device=""/>
-<part name="C2" library="rcl" deviceset="CPOL-US" device="E3.5-8" value="0.1uf"/>
-<part name="R2" library="resistor" deviceset="R-US_" device="0207/10" value="100"/>
-<part name="R3" library="resistor" deviceset="R-US_" device="0207/10" value="100"/>
-<part name="R4" library="resistor" deviceset="R-US_" device="0207/10" value="100"/>
-<part name="R5" library="resistor" deviceset="R-US_" device="0207/10" value="100"/>
-<part name="R6" library="resistor" deviceset="R-US_" device="0207/10" value="100"/>
-<part name="R7" library="resistor" deviceset="R-US_" device="0207/10" value="100"/>
-<part name="R8" library="resistor" deviceset="R-US_" device="0207/10" value="100"/>
-<part name="R9" library="resistor" deviceset="R-US_" device="0207/10" value="100"/>
-<part name="+3V3" library="supply1" deviceset="+3V3" device=""/>
+<part name="MIC" library="pinhead" deviceset="PINHD-1X5" device=""/>
+<part name="P+1" library="supply1" deviceset="+5V" device=""/>
+<part name="C1" library="rcl" deviceset="CPOL-US" device="E3.5-8" value="0.1uf"/>
+<part name="R12" library="resistor" deviceset="R-US_" device="0207/10" value="100"/>
+<part name="R13" library="resistor" deviceset="R-US_" device="0207/10" value="100"/>
+<part name="R14" library="resistor" deviceset="R-US_" device="0207/10" value="100"/>
+<part name="R15" library="resistor" deviceset="R-US_" device="0207/10" value="100"/>
+<part name="R16" library="resistor" deviceset="R-US_" device="0207/10" value="100"/>
+<part name="R17" library="resistor" deviceset="R-US_" device="0207/10" value="100"/>
+<part name="R18" library="resistor" deviceset="R-US_" device="0207/10" value="100"/>
+<part name="R19" library="resistor" deviceset="R-US_" device="0207/10" value="100"/>
+<part name="+3V31" library="supply1" deviceset="+3V3" device=""/>
+<part name="R5" library="resistor" deviceset="R-US_" device="0207/10" value="10k"/>
+<part name="R4" library="resistor" deviceset="R-US_" device="0207/10" value="10k"/>
+<part name="R3" library="resistor" deviceset="R-US_" device="0207/10" value="10k"/>
+<part name="R2" library="resistor" deviceset="R-US_" device="0207/10" value="10k"/>
+<part name="R6" library="resistor" deviceset="R-US_" device="0207/10" value="10k"/>
+<part name="R7" library="resistor" deviceset="R-US_" device="0207/10" value="10k"/>
+<part name="R8" library="resistor" deviceset="R-US_" device="0207/10" value="10k"/>
+<part name="R9" library="resistor" deviceset="R-US_" device="0207/10" value="10k"/>
 <part name="R10" library="resistor" deviceset="R-US_" device="0207/10" value="10k"/>
 <part name="R11" library="resistor" deviceset="R-US_" device="0207/10" value="10k"/>
-<part name="R12" library="resistor" deviceset="R-US_" device="0207/10" value="10k"/>
-<part name="R13" library="resistor" deviceset="R-US_" device="0207/10" value="10k"/>
-<part name="R14" library="resistor" deviceset="R-US_" device="0207/10" value="10k"/>
-<part name="R15" library="resistor" deviceset="R-US_" device="0207/10" value="10k"/>
-<part name="R16" library="resistor" deviceset="R-US_" device="0207/10" value="10k"/>
-<part name="R17" library="resistor" deviceset="R-US_" device="0207/10" value="10k"/>
-<part name="R18" library="resistor" deviceset="R-US_" device="0207/10" value="10k"/>
-<part name="R19" library="resistor" deviceset="R-US_" device="0207/10" value="10k"/>
-<part name="+3V2" library="supply1" deviceset="+3V3" device=""/>
+<part name="+3V32" library="supply1" deviceset="+3V3" device=""/>
 <part name="FRAME1" library="frames" deviceset="DINA3_L" device=""/>
 </parts>
 <sheets>
@@ -12412,10 +12412,10 @@ DIN A3, landscape with extra doc field</description>
 <instance part="GND2" gate="1" x="182.88" y="93.98" rot="R90"/>
 <instance part="IC1" gate="A" x="170.18" y="114.3" rot="R180"/>
 <instance part="IC1" gate="P" x="170.18" y="93.98" rot="R90"/>
-<instance part="P+1" gate="1" x="157.48" y="93.98" rot="R90"/>
-<instance part="C1" gate="G$1" x="254" y="142.24" rot="R90"/>
-<instance part="I2CMULTIPLEX" gate="G$1" x="193.04" y="208.28"/>
-<instance part="BLUEFRUIT_EZLINK" gate="A" x="127" y="160.02" rot="R180"/>
+<instance part="P+2" gate="1" x="157.48" y="93.98" rot="R90"/>
+<instance part="C2" gate="G$1" x="254" y="142.24" rot="R90"/>
+<instance part="I2CMULTI1" gate="G$1" x="193.04" y="208.28"/>
+<instance part="BLUETOOTH" gate="A" x="127" y="160.02" rot="R180"/>
 <instance part="R1" gate="G$1" x="132.08" y="187.96" rot="R90"/>
 <instance part="LLX" gate="A" x="91.44" y="157.48"/>
 <instance part="RLX" gate="A" x="91.44" y="137.16"/>
@@ -12425,29 +12425,29 @@ DIN A3, landscape with extra doc field</description>
 <instance part="LED_R_ARM" gate="A" x="297.18" y="119.38" rot="R180"/>
 <instance part="LED_HORNS" gate="A" x="297.18" y="160.02" rot="R180"/>
 <instance part="LED_LEGS" gate="A" x="297.18" y="96.52" rot="R180"/>
-<instance part="MAX9814_MIC" gate="A" x="236.22" y="162.56"/>
-<instance part="P+10" gate="1" x="330.2" y="180.34" rot="R270"/>
-<instance part="C2" gate="G$1" x="210.82" y="165.1" rot="R180"/>
-<instance part="R2" gate="G$1" x="144.78" y="127"/>
-<instance part="R3" gate="G$1" x="139.7" y="121.92"/>
-<instance part="R4" gate="G$1" x="144.78" y="116.84"/>
-<instance part="R5" gate="G$1" x="137.16" y="111.76"/>
-<instance part="R6" gate="G$1" x="144.78" y="106.68"/>
-<instance part="R7" gate="G$1" x="137.16" y="101.6"/>
-<instance part="R8" gate="G$1" x="142.24" y="96.52"/>
-<instance part="R9" gate="G$1" x="137.16" y="91.44"/>
-<instance part="+3V3" gate="G$1" x="320.04" y="182.88" rot="R270"/>
-<instance part="R10" gate="G$1" x="172.72" y="187.96" rot="R90"/>
-<instance part="R11" gate="G$1" x="162.56" y="187.96" rot="R90"/>
-<instance part="R12" gate="G$1" x="152.4" y="187.96" rot="R90"/>
-<instance part="R13" gate="G$1" x="142.24" y="187.96" rot="R90"/>
-<instance part="R14" gate="G$1" x="210.82" y="187.96" rot="R90"/>
-<instance part="R15" gate="G$1" x="220.98" y="187.96" rot="R90"/>
-<instance part="R16" gate="G$1" x="231.14" y="187.96" rot="R90"/>
-<instance part="R17" gate="G$1" x="241.3" y="187.96" rot="R90"/>
-<instance part="R18" gate="G$1" x="256.54" y="187.96" rot="R90"/>
-<instance part="R19" gate="G$1" x="264.16" y="187.96" rot="R90"/>
-<instance part="+3V2" gate="G$1" x="256.54" y="129.54" rot="R270"/>
+<instance part="MIC" gate="A" x="236.22" y="162.56"/>
+<instance part="P+1" gate="1" x="330.2" y="180.34" rot="R270"/>
+<instance part="C1" gate="G$1" x="210.82" y="165.1" rot="R180"/>
+<instance part="R12" gate="G$1" x="144.78" y="127"/>
+<instance part="R13" gate="G$1" x="137.16" y="121.92"/>
+<instance part="R14" gate="G$1" x="144.78" y="116.84"/>
+<instance part="R15" gate="G$1" x="137.16" y="111.76"/>
+<instance part="R16" gate="G$1" x="144.78" y="106.68"/>
+<instance part="R17" gate="G$1" x="137.16" y="101.6"/>
+<instance part="R18" gate="G$1" x="142.24" y="96.52"/>
+<instance part="R19" gate="G$1" x="137.16" y="91.44"/>
+<instance part="+3V31" gate="G$1" x="320.04" y="182.88" rot="R270"/>
+<instance part="R5" gate="G$1" x="172.72" y="187.96" rot="R90"/>
+<instance part="R4" gate="G$1" x="162.56" y="187.96" rot="R90"/>
+<instance part="R3" gate="G$1" x="152.4" y="187.96" rot="R90"/>
+<instance part="R2" gate="G$1" x="142.24" y="187.96" rot="R90"/>
+<instance part="R6" gate="G$1" x="210.82" y="187.96" rot="R90"/>
+<instance part="R7" gate="G$1" x="220.98" y="187.96" rot="R90"/>
+<instance part="R8" gate="G$1" x="231.14" y="187.96" rot="R90"/>
+<instance part="R9" gate="G$1" x="241.3" y="187.96" rot="R90"/>
+<instance part="R10" gate="G$1" x="256.54" y="187.96" rot="R90"/>
+<instance part="R11" gate="G$1" x="264.16" y="187.96" rot="R90"/>
+<instance part="+3V32" gate="G$1" x="256.54" y="129.54" rot="R270"/>
 <instance part="FRAME1" gate="G$1" x="2.54" y="2.54"/>
 <instance part="FRAME1" gate="G$2" x="289.56" y="2.54"/>
 </instances>
@@ -12484,11 +12484,11 @@ DIN A3, landscape with extra doc field</description>
 <wire x1="152.4" y1="177.8" x2="177.8" y2="177.8" width="0.1524" layer="91"/>
 <wire x1="177.8" y1="177.8" x2="157.48" y2="177.8" width="0.1524" layer="91"/>
 <label x="53.34" y="177.8" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="BLUEFRUIT_EZLINK" gate="A" pin="6"/>
+<pinref part="BLUETOOTH" gate="A" pin="6"/>
 <wire x1="129.54" y1="165.1" x2="152.4" y2="165.1" width="0.1524" layer="91"/>
 <wire x1="152.4" y1="165.1" x2="152.4" y2="177.8" width="0.1524" layer="91"/>
 <junction x="152.4" y="177.8"/>
-<pinref part="I2CMULTIPLEX" gate="G$1" pin="GND"/>
+<pinref part="I2CMULTI1" gate="G$1" pin="GND"/>
 <wire x1="177.8" y1="198.12" x2="177.8" y2="177.8" width="0.1524" layer="91"/>
 <junction x="177.8" y="177.8"/>
 <pinref part="LLX" gate="A" pin="2"/>
@@ -12507,10 +12507,10 @@ DIN A3, landscape with extra doc field</description>
 <wire x1="81.28" y1="160.02" x2="81.28" y2="177.8" width="0.1524" layer="91"/>
 <junction x="81.28" y="160.02"/>
 <junction x="81.28" y="177.8"/>
-<pinref part="C2" gate="G$1" pin="-"/>
+<pinref part="C1" gate="G$1" pin="-"/>
 <wire x1="210.82" y1="170.18" x2="210.82" y2="177.8" width="0.1524" layer="91"/>
 <junction x="210.82" y="177.8"/>
-<pinref part="MAX9814_MIC" gate="A" pin="1"/>
+<pinref part="MIC" gate="A" pin="1"/>
 <wire x1="233.68" y1="167.64" x2="228.6" y2="167.64" width="0.1524" layer="91"/>
 <wire x1="228.6" y1="167.64" x2="228.6" y2="177.8" width="0.1524" layer="91"/>
 <junction x="228.6" y="177.8"/>
@@ -12518,9 +12518,9 @@ DIN A3, landscape with extra doc field</description>
 <wire x1="182.88" y1="127" x2="185.42" y2="127" width="0.1524" layer="91"/>
 <wire x1="185.42" y1="127" x2="185.42" y2="177.8" width="0.1524" layer="91"/>
 <junction x="185.42" y="177.8"/>
-<pinref part="I2CMULTIPLEX" gate="G$1" pin="A0"/>
+<pinref part="I2CMULTI1" gate="G$1" pin="A0"/>
 <wire x1="177.8" y1="215.9" x2="121.92" y2="215.9" width="0.1524" layer="91"/>
-<pinref part="I2CMULTIPLEX" gate="G$1" pin="A1"/>
+<pinref part="I2CMULTI1" gate="G$1" pin="A1"/>
 <wire x1="121.92" y1="215.9" x2="119.38" y2="215.9" width="0.1524" layer="91"/>
 <wire x1="177.8" y1="213.36" x2="121.92" y2="213.36" width="0.1524" layer="91"/>
 <wire x1="121.92" y1="213.36" x2="121.92" y2="215.9" width="0.1524" layer="91"/>
@@ -12539,7 +12539,7 @@ DIN A3, landscape with extra doc field</description>
 <wire x1="261.62" y1="157.48" x2="261.62" y2="142.24" width="0.1524" layer="91"/>
 <wire x1="261.62" y1="142.24" x2="261.62" y2="127" width="0.1524" layer="91"/>
 <wire x1="261.62" y1="127" x2="246.38" y2="127" width="0.1524" layer="91"/>
-<pinref part="C1" gate="G$1" pin="-"/>
+<pinref part="C2" gate="G$1" pin="-"/>
 <wire x1="259.08" y1="142.24" x2="261.62" y2="142.24" width="0.1524" layer="91"/>
 <junction x="261.62" y="142.24"/>
 <label x="261.62" y="142.24" size="1.778" layer="95" xref="yes"/>
@@ -12549,10 +12549,10 @@ DIN A3, landscape with extra doc field</description>
 <segment>
 <pinref part="IC1" gate="P" pin="VCC"/>
 <wire x1="160.02" y1="93.98" x2="162.56" y2="93.98" width="0.1524" layer="91"/>
-<pinref part="P+1" gate="1" pin="+5V"/>
+<pinref part="P+2" gate="1" pin="+5V"/>
 </segment>
 <segment>
-<pinref part="P+10" gate="1" pin="+5V"/>
+<pinref part="P+1" gate="1" pin="+5V"/>
 <pinref part="BRAINS" gate="G$1" pin="VIN"/>
 <wire x1="248.92" y1="180.34" x2="304.8" y2="180.34" width="0.1524" layer="91"/>
 <wire x1="304.8" y1="180.34" x2="327.66" y2="180.34" width="0.1524" layer="91"/>
@@ -12563,7 +12563,7 @@ DIN A3, landscape with extra doc field</description>
 <wire x1="248.92" y1="160.02" x2="248.92" y2="180.34" width="0.1524" layer="91"/>
 <wire x1="261.62" y1="160.02" x2="248.92" y2="160.02" width="0.1524" layer="91"/>
 <junction x="248.92" y="160.02"/>
-<pinref part="C1" gate="G$1" pin="+"/>
+<pinref part="C2" gate="G$1" pin="+"/>
 <wire x1="251.46" y1="142.24" x2="248.92" y2="142.24" width="0.1524" layer="91"/>
 <junction x="248.92" y="142.24"/>
 <pinref part="LED_LEGS" gate="A" pin="4"/>
@@ -12594,7 +12594,7 @@ DIN A3, landscape with extra doc field</description>
 </net>
 <net name="BT_STATUS" class="0">
 <segment>
-<pinref part="BLUEFRUIT_EZLINK" gate="A" pin="7"/>
+<pinref part="BLUETOOTH" gate="A" pin="7"/>
 <wire x1="129.54" y1="167.64" x2="134.62" y2="167.64" width="0.1524" layer="91"/>
 <label x="134.62" y="167.64" size="1.778" layer="95" xref="yes"/>
 </segment>
@@ -12613,7 +12613,7 @@ DIN A3, landscape with extra doc field</description>
 <segment>
 <wire x1="129.54" y1="157.48" x2="142.24" y2="157.48" width="0.1524" layer="91"/>
 <label x="142.24" y="157.48" size="1.778" layer="95" xref="yes"/>
-<pinref part="BLUEFRUIT_EZLINK" gate="A" pin="3"/>
+<pinref part="BLUETOOTH" gate="A" pin="3"/>
 </segment>
 </net>
 <net name="TX" class="0">
@@ -12623,17 +12623,17 @@ DIN A3, landscape with extra doc field</description>
 <label x="210.82" y="129.54" size="1.778" layer="95" rot="R180" xref="yes"/>
 </segment>
 <segment>
-<pinref part="BLUEFRUIT_EZLINK" gate="A" pin="2"/>
+<pinref part="BLUETOOTH" gate="A" pin="2"/>
 <wire x1="129.54" y1="154.94" x2="134.62" y2="154.94" width="0.1524" layer="91"/>
 <label x="134.62" y="154.94" size="1.778" layer="95" xref="yes"/>
 </segment>
 </net>
 <net name="SDA" class="0">
 <segment>
-<pinref part="I2CMULTIPLEX" gate="G$1" pin="SDA"/>
+<pinref part="I2CMULTI1" gate="G$1" pin="SDA"/>
 <wire x1="208.28" y1="213.36" x2="264.16" y2="213.36" width="0.1524" layer="91"/>
 <label x="264.16" y="213.36" size="1.778" layer="95" xref="yes"/>
-<pinref part="R19" gate="G$1" pin="2"/>
+<pinref part="R11" gate="G$1" pin="2"/>
 <wire x1="264.16" y1="213.36" x2="264.16" y2="193.04" width="0.1524" layer="91"/>
 </segment>
 <segment>
@@ -12645,9 +12645,9 @@ DIN A3, landscape with extra doc field</description>
 <net name="SCL0" class="0">
 <segment>
 <label x="152.4" y="205.74" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="I2CMULTIPLEX" gate="G$1" pin="SC0"/>
+<pinref part="I2CMULTI1" gate="G$1" pin="SC0"/>
 <wire x1="177.8" y1="205.74" x2="152.4" y2="205.74" width="0.1524" layer="91"/>
-<pinref part="R12" gate="G$1" pin="2"/>
+<pinref part="R3" gate="G$1" pin="2"/>
 <wire x1="152.4" y1="193.04" x2="152.4" y2="205.74" width="0.1524" layer="91"/>
 <junction x="152.4" y="205.74"/>
 </segment>
@@ -12661,8 +12661,8 @@ DIN A3, landscape with extra doc field</description>
 <segment>
 <wire x1="177.8" y1="208.28" x2="142.24" y2="208.28" width="0.1524" layer="91"/>
 <label x="142.24" y="208.28" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="I2CMULTIPLEX" gate="G$1" pin="SD0"/>
-<pinref part="R13" gate="G$1" pin="2"/>
+<pinref part="I2CMULTI1" gate="G$1" pin="SD0"/>
+<pinref part="R2" gate="G$1" pin="2"/>
 <wire x1="142.24" y1="193.04" x2="142.24" y2="208.28" width="0.1524" layer="91"/>
 <junction x="142.24" y="208.28"/>
 </segment>
@@ -12674,10 +12674,10 @@ DIN A3, landscape with extra doc field</description>
 </net>
 <net name="SCL1" class="0">
 <segment>
-<pinref part="I2CMULTIPLEX" gate="G$1" pin="SC1"/>
+<pinref part="I2CMULTI1" gate="G$1" pin="SC1"/>
 <wire x1="177.8" y1="200.66" x2="172.72" y2="200.66" width="0.1524" layer="91"/>
 <label x="172.72" y="200.66" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="R10" gate="G$1" pin="2"/>
+<pinref part="R5" gate="G$1" pin="2"/>
 <wire x1="172.72" y1="193.04" x2="172.72" y2="200.66" width="0.1524" layer="91"/>
 <junction x="172.72" y="200.66"/>
 </segment>
@@ -12689,10 +12689,10 @@ DIN A3, landscape with extra doc field</description>
 </net>
 <net name="SDA1" class="0">
 <segment>
-<pinref part="I2CMULTIPLEX" gate="G$1" pin="SD1"/>
+<pinref part="I2CMULTI1" gate="G$1" pin="SD1"/>
 <wire x1="177.8" y1="203.2" x2="162.56" y2="203.2" width="0.1524" layer="91"/>
 <label x="162.56" y="203.2" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="R11" gate="G$1" pin="2"/>
+<pinref part="R4" gate="G$1" pin="2"/>
 <wire x1="162.56" y1="193.04" x2="162.56" y2="203.2" width="0.1524" layer="91"/>
 <junction x="162.56" y="203.2"/>
 </segment>
@@ -12704,10 +12704,10 @@ DIN A3, landscape with extra doc field</description>
 </net>
 <net name="SCL2" class="0">
 <segment>
-<pinref part="I2CMULTIPLEX" gate="G$1" pin="SC2"/>
+<pinref part="I2CMULTI1" gate="G$1" pin="SC2"/>
 <wire x1="208.28" y1="200.66" x2="220.98" y2="200.66" width="0.1524" layer="91"/>
 <label x="220.98" y="200.66" size="1.778" layer="95" xref="yes"/>
-<pinref part="R15" gate="G$1" pin="2"/>
+<pinref part="R7" gate="G$1" pin="2"/>
 <wire x1="220.98" y1="193.04" x2="220.98" y2="200.66" width="0.1524" layer="91"/>
 </segment>
 <segment>
@@ -12723,9 +12723,9 @@ DIN A3, landscape with extra doc field</description>
 <label x="68.58" y="114.3" size="1.778" layer="95" rot="R180" xref="yes"/>
 </segment>
 <segment>
-<pinref part="I2CMULTIPLEX" gate="G$1" pin="SD2"/>
+<pinref part="I2CMULTI1" gate="G$1" pin="SD2"/>
 <wire x1="208.28" y1="198.12" x2="210.82" y2="198.12" width="0.1524" layer="91"/>
-<pinref part="R14" gate="G$1" pin="2"/>
+<pinref part="R6" gate="G$1" pin="2"/>
 <wire x1="210.82" y1="198.12" x2="210.82" y2="193.04" width="0.1524" layer="91"/>
 <label x="210.82" y="198.12" size="1.778" layer="95" xref="yes"/>
 </segment>
@@ -12739,7 +12739,7 @@ DIN A3, landscape with extra doc field</description>
 <segment>
 <wire x1="139.7" y1="127" x2="129.54" y2="127" width="0.1524" layer="91"/>
 <label x="129.54" y="127" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="R2" gate="G$1" pin="1"/>
+<pinref part="R12" gate="G$1" pin="1"/>
 </segment>
 </net>
 <net name="DATA0" class="0">
@@ -12749,9 +12749,9 @@ DIN A3, landscape with extra doc field</description>
 <label x="320.04" y="154.94" size="1.778" layer="95" xref="yes"/>
 </segment>
 <segment>
-<wire x1="134.62" y1="121.92" x2="129.54" y2="121.92" width="0.1524" layer="91"/>
+<wire x1="132.08" y1="121.92" x2="129.54" y2="121.92" width="0.1524" layer="91"/>
 <label x="129.54" y="121.92" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="R3" gate="G$1" pin="1"/>
+<pinref part="R13" gate="G$1" pin="1"/>
 </segment>
 </net>
 <net name="CS1" class="0">
@@ -12763,7 +12763,7 @@ DIN A3, landscape with extra doc field</description>
 <segment>
 <wire x1="139.7" y1="116.84" x2="129.54" y2="116.84" width="0.1524" layer="91"/>
 <label x="129.54" y="116.84" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="R4" gate="G$1" pin="1"/>
+<pinref part="R14" gate="G$1" pin="1"/>
 </segment>
 </net>
 <net name="CS2" class="0">
@@ -12775,7 +12775,7 @@ DIN A3, landscape with extra doc field</description>
 <segment>
 <wire x1="139.7" y1="106.68" x2="129.54" y2="106.68" width="0.1524" layer="91"/>
 <label x="129.54" y="106.68" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="R6" gate="G$1" pin="1"/>
+<pinref part="R16" gate="G$1" pin="1"/>
 </segment>
 </net>
 <net name="DATA1" class="0">
@@ -12787,14 +12787,14 @@ DIN A3, landscape with extra doc field</description>
 <segment>
 <wire x1="132.08" y1="111.76" x2="129.54" y2="111.76" width="0.1524" layer="91"/>
 <label x="129.54" y="111.76" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="R5" gate="G$1" pin="1"/>
+<pinref part="R15" gate="G$1" pin="1"/>
 </segment>
 </net>
 <net name="DATA2" class="0">
 <segment>
 <wire x1="132.08" y1="101.6" x2="129.54" y2="101.6" width="0.1524" layer="91"/>
 <label x="129.54" y="101.6" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="R7" gate="G$1" pin="1"/>
+<pinref part="R17" gate="G$1" pin="1"/>
 </segment>
 <segment>
 <pinref part="LED_R_ARM" gate="A" pin="1"/>
@@ -12804,7 +12804,7 @@ DIN A3, landscape with extra doc field</description>
 </net>
 <net name="AR" class="0">
 <segment>
-<pinref part="MAX9814_MIC" gate="A" pin="5"/>
+<pinref part="MIC" gate="A" pin="5"/>
 <wire x1="233.68" y1="157.48" x2="228.6" y2="157.48" width="0.1524" layer="91"/>
 <label x="228.6" y="157.48" size="1.778" layer="95" rot="R180" xref="yes"/>
 </segment>
@@ -12816,10 +12816,10 @@ DIN A3, landscape with extra doc field</description>
 </net>
 <net name="MIC_OUT" class="0">
 <segment>
-<pinref part="MAX9814_MIC" gate="A" pin="4"/>
+<pinref part="MIC" gate="A" pin="4"/>
 <wire x1="233.68" y1="160.02" x2="210.82" y2="160.02" width="0.1524" layer="91"/>
 <label x="205.74" y="160.02" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="C2" gate="G$1" pin="+"/>
+<pinref part="C1" gate="G$1" pin="+"/>
 <wire x1="210.82" y1="160.02" x2="205.74" y2="160.02" width="0.1524" layer="91"/>
 <wire x1="210.82" y1="160.02" x2="210.82" y2="162.56" width="0.1524" layer="91"/>
 <junction x="210.82" y="160.02"/>
@@ -12832,7 +12832,7 @@ DIN A3, landscape with extra doc field</description>
 </net>
 <net name="GAIN" class="0">
 <segment>
-<pinref part="MAX9814_MIC" gate="A" pin="3"/>
+<pinref part="MIC" gate="A" pin="3"/>
 <wire x1="233.68" y1="162.56" x2="228.6" y2="162.56" width="0.1524" layer="91"/>
 <label x="228.6" y="162.56" size="1.778" layer="95" rot="R180" xref="yes"/>
 </segment>
@@ -12844,10 +12844,10 @@ DIN A3, landscape with extra doc field</description>
 </net>
 <net name="SCL" class="0">
 <segment>
-<pinref part="I2CMULTIPLEX" gate="G$1" pin="SCL"/>
+<pinref part="I2CMULTI1" gate="G$1" pin="SCL"/>
 <wire x1="208.28" y1="210.82" x2="256.54" y2="210.82" width="0.1524" layer="91"/>
 <label x="256.54" y="210.82" size="1.778" layer="95" xref="yes"/>
-<pinref part="R18" gate="G$1" pin="2"/>
+<pinref part="R10" gate="G$1" pin="2"/>
 <wire x1="256.54" y1="193.04" x2="256.54" y2="210.82" width="0.1524" layer="91"/>
 </segment>
 <segment>
@@ -12860,7 +12860,7 @@ DIN A3, landscape with extra doc field</description>
 <segment>
 <wire x1="137.16" y1="96.52" x2="129.54" y2="96.52" width="0.1524" layer="91"/>
 <label x="129.54" y="96.52" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="R8" gate="G$1" pin="1"/>
+<pinref part="R18" gate="G$1" pin="1"/>
 </segment>
 <segment>
 <pinref part="LED_LEGS" gate="A" pin="2"/>
@@ -12872,7 +12872,7 @@ DIN A3, landscape with extra doc field</description>
 <segment>
 <wire x1="132.08" y1="91.44" x2="129.54" y2="91.44" width="0.1524" layer="91"/>
 <label x="129.54" y="91.44" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="R9" gate="G$1" pin="1"/>
+<pinref part="R19" gate="G$1" pin="1"/>
 </segment>
 <segment>
 <pinref part="LED_LEGS" gate="A" pin="1"/>
@@ -12882,10 +12882,10 @@ DIN A3, landscape with extra doc field</description>
 </net>
 <net name="SDA3" class="0">
 <segment>
-<pinref part="I2CMULTIPLEX" gate="G$1" pin="SD3"/>
+<pinref part="I2CMULTI1" gate="G$1" pin="SD3"/>
 <wire x1="208.28" y1="203.2" x2="231.14" y2="203.2" width="0.1524" layer="91"/>
 <label x="231.14" y="203.2" size="1.778" layer="95" xref="yes"/>
-<pinref part="R16" gate="G$1" pin="2"/>
+<pinref part="R8" gate="G$1" pin="2"/>
 <wire x1="231.14" y1="193.04" x2="231.14" y2="203.2" width="0.1524" layer="91"/>
 </segment>
 <segment>
@@ -12896,10 +12896,10 @@ DIN A3, landscape with extra doc field</description>
 </net>
 <net name="SCL3" class="0">
 <segment>
-<pinref part="I2CMULTIPLEX" gate="G$1" pin="SC3"/>
+<pinref part="I2CMULTI1" gate="G$1" pin="SC3"/>
 <wire x1="208.28" y1="205.74" x2="241.3" y2="205.74" width="0.1524" layer="91"/>
 <label x="241.3" y="205.74" size="1.778" layer="95" xref="yes"/>
-<pinref part="R17" gate="G$1" pin="2"/>
+<pinref part="R9" gate="G$1" pin="2"/>
 <wire x1="241.3" y1="193.04" x2="241.3" y2="205.74" width="0.1524" layer="91"/>
 </segment>
 <segment>
@@ -12910,45 +12910,45 @@ DIN A3, landscape with extra doc field</description>
 </net>
 <net name="+3V3" class="0">
 <segment>
-<pinref part="R10" gate="G$1" pin="1"/>
+<pinref part="R5" gate="G$1" pin="1"/>
 <wire x1="162.56" y1="182.88" x2="172.72" y2="182.88" width="0.1524" layer="91"/>
-<pinref part="R11" gate="G$1" pin="1"/>
+<pinref part="R4" gate="G$1" pin="1"/>
 <junction x="162.56" y="182.88"/>
-<pinref part="R12" gate="G$1" pin="1"/>
+<pinref part="R3" gate="G$1" pin="1"/>
 <wire x1="132.08" y1="182.88" x2="142.24" y2="182.88" width="0.1524" layer="91"/>
 <wire x1="142.24" y1="182.88" x2="152.4" y2="182.88" width="0.1524" layer="91"/>
 <wire x1="152.4" y1="182.88" x2="129.54" y2="182.88" width="0.1524" layer="91"/>
 <junction x="152.4" y="182.88"/>
-<pinref part="R13" gate="G$1" pin="1"/>
+<pinref part="R2" gate="G$1" pin="1"/>
 <junction x="142.24" y="182.88"/>
 <pinref part="R1" gate="G$1" pin="1"/>
 <wire x1="152.4" y1="182.88" x2="154.94" y2="182.88" width="0.1524" layer="91"/>
 <wire x1="154.94" y1="182.88" x2="162.56" y2="182.88" width="0.1524" layer="91"/>
 <wire x1="172.72" y1="182.88" x2="210.82" y2="182.88" width="0.1524" layer="91"/>
 <junction x="172.72" y="182.88"/>
-<pinref part="R14" gate="G$1" pin="1"/>
+<pinref part="R6" gate="G$1" pin="1"/>
 <wire x1="210.82" y1="182.88" x2="220.98" y2="182.88" width="0.1524" layer="91"/>
 <junction x="210.82" y="182.88"/>
-<pinref part="R15" gate="G$1" pin="1"/>
+<pinref part="R7" gate="G$1" pin="1"/>
 <junction x="220.98" y="182.88"/>
-<pinref part="R16" gate="G$1" pin="1"/>
+<pinref part="R8" gate="G$1" pin="1"/>
 <wire x1="231.14" y1="182.88" x2="241.3" y2="182.88" width="0.1524" layer="91"/>
 <junction x="231.14" y="182.88"/>
 <wire x1="220.98" y1="182.88" x2="226.06" y2="182.88" width="0.1524" layer="91"/>
-<pinref part="R17" gate="G$1" pin="1"/>
+<pinref part="R9" gate="G$1" pin="1"/>
 <junction x="241.3" y="182.88"/>
-<pinref part="R19" gate="G$1" pin="1"/>
+<pinref part="R11" gate="G$1" pin="1"/>
 <wire x1="226.06" y1="182.88" x2="231.14" y2="182.88" width="0.1524" layer="91"/>
 <wire x1="241.3" y1="182.88" x2="251.46" y2="182.88" width="0.1524" layer="91"/>
-<pinref part="R18" gate="G$1" pin="1"/>
+<pinref part="R10" gate="G$1" pin="1"/>
 <wire x1="256.54" y1="182.88" x2="251.46" y2="182.88" width="0.1524" layer="91"/>
 <junction x="256.54" y="182.88"/>
-<pinref part="I2CMULTIPLEX" gate="G$1" pin="A2"/>
+<pinref part="I2CMULTI1" gate="G$1" pin="A2"/>
 <wire x1="251.46" y1="182.88" x2="264.16" y2="182.88" width="0.1524" layer="91"/>
 <wire x1="208.28" y1="208.28" x2="251.46" y2="208.28" width="0.1524" layer="91"/>
 <wire x1="251.46" y1="208.28" x2="251.46" y2="182.88" width="0.1524" layer="91"/>
 <junction x="251.46" y="182.88"/>
-<pinref part="+3V3" gate="G$1" pin="+3V3"/>
+<pinref part="+3V31" gate="G$1" pin="+3V3"/>
 <junction x="264.16" y="182.88"/>
 <wire x1="264.16" y1="182.88" x2="274.32" y2="182.88" width="0.1524" layer="91"/>
 <wire x1="274.32" y1="182.88" x2="317.5" y2="182.88" width="0.1524" layer="91"/>
@@ -12972,15 +12972,15 @@ DIN A3, landscape with extra doc field</description>
 <wire x1="83.82" y1="162.56" x2="83.82" y2="182.88" width="0.1524" layer="91"/>
 <junction x="83.82" y="162.56"/>
 <junction x="83.82" y="182.88"/>
-<pinref part="BLUEFRUIT_EZLINK" gate="A" pin="4"/>
+<pinref part="BLUETOOTH" gate="A" pin="4"/>
 <wire x1="129.54" y1="160.02" x2="154.94" y2="160.02" width="0.1524" layer="91"/>
 <wire x1="154.94" y1="160.02" x2="154.94" y2="182.88" width="0.1524" layer="91"/>
 <junction x="154.94" y="182.88"/>
-<pinref part="MAX9814_MIC" gate="A" pin="2"/>
+<pinref part="MIC" gate="A" pin="2"/>
 <wire x1="233.68" y1="165.1" x2="226.06" y2="165.1" width="0.1524" layer="91"/>
 <wire x1="226.06" y1="165.1" x2="226.06" y2="182.88" width="0.1524" layer="91"/>
 <junction x="226.06" y="182.88"/>
-<pinref part="I2CMULTIPLEX" gate="G$1" pin="VCC"/>
+<pinref part="I2CMULTI1" gate="G$1" pin="VCC"/>
 <wire x1="274.32" y1="215.9" x2="208.28" y2="215.9" width="0.1524" layer="91"/>
 <wire x1="274.32" y1="215.9" x2="274.32" y2="182.88" width="0.1524" layer="91"/>
 <junction x="274.32" y="182.88"/>
@@ -12988,12 +12988,12 @@ DIN A3, landscape with extra doc field</description>
 <segment>
 <pinref part="BRAINS" gate="G$1" pin="3.3V"/>
 <wire x1="246.38" y1="129.54" x2="254" y2="129.54" width="0.1524" layer="91"/>
-<pinref part="+3V2" gate="G$1" pin="+3V3"/>
+<pinref part="+3V32" gate="G$1" pin="+3V3"/>
 </segment>
 </net>
 <net name="RESET" class="0">
 <segment>
-<pinref part="I2CMULTIPLEX" gate="G$1" pin="RESET"/>
+<pinref part="I2CMULTI1" gate="G$1" pin="RESET"/>
 <wire x1="177.8" y1="210.82" x2="132.08" y2="210.82" width="0.1524" layer="91"/>
 <pinref part="R1" gate="G$1" pin="2"/>
 <wire x1="132.08" y1="193.04" x2="132.08" y2="210.82" width="0.1524" layer="91"/>
@@ -13004,56 +13004,56 @@ DIN A3, landscape with extra doc field</description>
 <net name="N$1" class="0">
 <segment>
 <pinref part="IC1" gate="A" pin="B8"/>
-<pinref part="R2" gate="G$1" pin="2"/>
+<pinref part="R12" gate="G$1" pin="2"/>
 <wire x1="157.48" y1="119.38" x2="149.86" y2="127" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$3" class="0">
 <segment>
 <pinref part="IC1" gate="A" pin="B7"/>
-<pinref part="R3" gate="G$1" pin="2"/>
-<wire x1="157.48" y1="116.84" x2="144.78" y2="121.92" width="0.1524" layer="91"/>
+<pinref part="R13" gate="G$1" pin="2"/>
+<wire x1="157.48" y1="116.84" x2="142.24" y2="121.92" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$4" class="0">
 <segment>
 <pinref part="IC1" gate="A" pin="B6"/>
-<pinref part="R4" gate="G$1" pin="2"/>
+<pinref part="R14" gate="G$1" pin="2"/>
 <wire x1="157.48" y1="114.3" x2="149.86" y2="116.84" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$5" class="0">
 <segment>
 <pinref part="IC1" gate="A" pin="B5"/>
-<pinref part="R5" gate="G$1" pin="2"/>
+<pinref part="R15" gate="G$1" pin="2"/>
 <wire x1="157.48" y1="111.76" x2="142.24" y2="111.76" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$6" class="0">
 <segment>
 <pinref part="IC1" gate="A" pin="B4"/>
-<pinref part="R6" gate="G$1" pin="2"/>
+<pinref part="R16" gate="G$1" pin="2"/>
 <wire x1="157.48" y1="109.22" x2="149.86" y2="106.68" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$7" class="0">
 <segment>
 <pinref part="IC1" gate="A" pin="B3"/>
-<pinref part="R7" gate="G$1" pin="2"/>
+<pinref part="R17" gate="G$1" pin="2"/>
 <wire x1="157.48" y1="106.68" x2="142.24" y2="101.6" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$8" class="0">
 <segment>
 <pinref part="IC1" gate="A" pin="B2"/>
-<pinref part="R8" gate="G$1" pin="2"/>
+<pinref part="R18" gate="G$1" pin="2"/>
 <wire x1="157.48" y1="104.14" x2="147.32" y2="96.52" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$9" class="0">
 <segment>
 <pinref part="IC1" gate="A" pin="B1"/>
-<pinref part="R9" gate="G$1" pin="2"/>
+<pinref part="R19" gate="G$1" pin="2"/>
 <wire x1="157.48" y1="101.6" x2="142.24" y2="91.44" width="0.1524" layer="91"/>
 </segment>
 </net>
@@ -13122,10 +13122,9 @@ DIN A3, landscape with extra doc field</description>
 <approved hash="104,1,246.38,129.54,BRAINS,3.3V,+3V3,,,"/>
 <approved hash="204,1,246.38,137.16,BRAINS,VBAT,,,,"/>
 <approved hash="104,1,162.56,93.98,IC1P,VCC,+5V,,,"/>
-<approved hash="104,1,208.28,208.28,I2CMULTIPLEX,A2,+3V3,,,"/>
-<approved hash="104,1,208.28,205.74,I2CMULTIPLEX,SC3,SCL3,,,"/>
+<approved hash="104,1,208.28,215.9,I2CMULTI1,VCC,+3V3,,,"/>
 <approved hash="113,1,261.857,160.151,5V_IN,,,,,"/>
-<approved hash="113,1,122.09,158.619,BLUEFRUIT_EZLINK,,,,,"/>
+<approved hash="113,1,126.276,158.619,BLUETOOTH,,,,,"/>
 <approved hash="113,1,89.1371,160.151,LLX,,,,,"/>
 <approved hash="113,1,89.1371,139.831,RLX,,,,,"/>
 <approved hash="113,1,89.1371,119.511,LAX,,,,,"/>
@@ -13134,7 +13133,7 @@ DIN A3, landscape with extra doc field</description>
 <approved hash="113,1,296.604,116.709,LED_R_ARM,,,,,"/>
 <approved hash="113,1,296.519,157.349,LED_HORNS,,,,,"/>
 <approved hash="113,1,297.719,93.8488,LED_LEGS,,,,,"/>
-<approved hash="113,1,238.051,163.961,MAX9814_MIC,,,,,"/>
+<approved hash="113,1,233.917,163.961,MIC,,,,,"/>
 <approved hash="113,1,196.746,134.516,FRAME1,,,,,"/>
 </errors>
 </schematic>
