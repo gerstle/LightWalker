@@ -157,6 +157,44 @@ bool executeCommand(int key, char *value, int valueLen)
         // ------------------------------------------------------------------------
         case mode:
             lw.setMode(static_cast<WalkingModeEnum>(atoi(value)));
+            /*
+            Serial.print("\nmode set to ");
+            switch (lw._mode)
+            {
+                case masterOff:
+                    Serial.println("off");
+                    break;
+                case pulse:
+                    Serial.println("pulse");
+                    break;
+                case sparkle:
+                    Serial.println("sparkle");
+                    break;
+                case equalizer:
+                    Serial.println("equalizer");
+                    break;
+                case gravity:
+                    Serial.println("gravity");
+                    break;
+                case bubble:
+                    Serial.println("bubble");
+                    break;
+                case rainbow:
+                    Serial.println("rainbow");
+                    break;
+                case zebra:
+                    Serial.println("zebra");
+                    break;
+                case chaos:
+                    Serial.println("chaos");
+                    break;
+                case flames:
+                    Serial.println("flames");
+                    break;
+                default:
+                    Serial.println("nada");
+            }
+            */
             break;
 
         // ------------------------------------------------------------------------

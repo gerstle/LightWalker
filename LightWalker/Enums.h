@@ -3,7 +3,6 @@
 enum WalkingModeEnum
 {
     masterOff,
-    main,
     pulse,
     sparkle,
     equalizer,
