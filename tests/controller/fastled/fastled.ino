@@ -1,14 +1,20 @@
 #include "FastLED.h"
 
-#define LED_COUNT 200
+#define LED_COUNT 3
 CRGB leds[LED_COUNT];
 
 void setup()
 {
     Serial.print("leds... ");
-    // <gerstle> teensy is 11 & 13, mega is 51 & 52
-//     LEDS.addLeds<P9813, 11, 13, RGB, DATA_RATE_MHZ(15)>(leds, LED_COUNT);
-    LEDS.addLeds<P9813, 51, 52, RGB, DATA_RATE_MHZ(15)>(leds, LED_COUNT);
+    // left arm
+    //LEDS.addLeds<P9813, 8, 9, RGB, DATA_RATE_MHZ(15)>(leds, LED_COUNT);
+    // horns
+    //LEDS.addLeds<P9813, 4, 5, RGB, DATA_RATE_MHZ(15)>(leds, LED_COUNT);
+    // right arm
+    //LEDS.addLeds<P9813, 6, 7, RGB, DATA_RATE_MHZ(15)>(leds, LED_COUNT);
+    // legs
+    LEDS.addLeds<P9813, 10, 11, RGB, DATA_RATE_MHZ(15)>(leds, LED_COUNT);
+
     LEDS.setBrightness(25);
     LEDS.showColor(CRGB::Green);
     delay(400);
