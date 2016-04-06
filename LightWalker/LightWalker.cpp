@@ -12,7 +12,7 @@ void setup()
 {
     delay(2000);
     Serial.begin(9600);
-    Serial.println("yep starting!");
+    Serial.println("yep starting");
 
     bluetooth.init(&lightwalker);
 
