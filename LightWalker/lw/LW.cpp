@@ -20,11 +20,11 @@ void LW::initLegs(WalkingModeEnum m)
     Serial.println("    right leg");
     testLeg(1, CRGB::Yellow);
 
-    _legs[2].init(&config, "left arm", ADXL_LEFT_ARM, _mode, &_adxl, ARM_PIXEL_COUNT, ARM_HALF, &(leds[LEG_PIXEL_COUNT * 2]));
+    _legs[2].init(&config, "left arm", ADXL_LEFT_ARM, _mode, &_adxl, ARM_PIXEL_COUNT, ARM_HALF, leds_left_arm);
     Serial.println("    left arm");
     testLeg(2, CRGB::Purple);
 
-    _legs[3].init(&config, "right arm", ADXL_RIGHT_ARM, _mode, &_adxl, ARM_PIXEL_COUNT, ARM_HALF, &(leds[LEG_PIXEL_COUNT * 2 + ARM_PIXEL_COUNT]));
+    _legs[3].init(&config, "right arm", ADXL_RIGHT_ARM, _mode, &_adxl, ARM_PIXEL_COUNT, ARM_HALF, leds_right_arm);
     Serial.println("    right arm");
     testLeg(3, CRGB::Green);
 
