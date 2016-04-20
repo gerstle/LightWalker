@@ -26,10 +26,10 @@
 
 // <gerstle> ACCELEROMETERS
 #define I2C_MULTIPLEXER 0x74 // 1110100
-#define ADXL_ONE 0x1
-#define ADXL_TWO 0x2
-#define ADXL_THREE 0x4
-#define ADXL_FOUR 0x8
+#define ADXL_LEFT_ARM 0x1
+#define ADXL_LEFT_LEG 0x8
+#define ADXL_RIGHT_ARM 0x2
+#define ADXL_RIGHT_LEG 0x4
 
 // <gerstle> LEDS
 #define LED_CLOCK_PIN 11

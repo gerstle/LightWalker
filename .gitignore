@@ -1,3 +1,5 @@
 bin/
+Release/
+.settings/
 *.class
 *.swp

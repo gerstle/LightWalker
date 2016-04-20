@@ -12,19 +12,19 @@
 void LW::initLegs(WalkingModeEnum m)
 {
     Serial.print("total LED count: "); Serial.println(LED_COUNT);
-    _legs[0].init(&config, "left leg", ADXL_ONE, _mode, &_adxl, LEG_PIXEL_COUNT, LEG_HALF, leds);
+    _legs[0].init(&config, "left leg", ADXL_LEFT_LEG, _mode, &_adxl, LEG_PIXEL_COUNT, LEG_HALF, leds);
     Serial.println("    left leg");
     testLeg(0, CRGB::Blue);
 
-    _legs[1].init(&config, "right leg", ADXL_TWO, _mode, &_adxl, LEG_PIXEL_COUNT, LEG_HALF, &(leds[LEG_PIXEL_COUNT]));
+    _legs[1].init(&config, "right leg", ADXL_RIGHT_LEG, _mode, &_adxl, LEG_PIXEL_COUNT, LEG_HALF, &(leds[LEG_PIXEL_COUNT]));
     Serial.println("    right leg");
     testLeg(1, CRGB::Yellow);
 
-    _legs[2].init(&config, "left arm", ADXL_THREE, _mode, &_adxl, ARM_PIXEL_COUNT, ARM_HALF, &(leds[LEG_PIXEL_COUNT * 2]));
+    _legs[2].init(&config, "left arm", ADXL_LEFT_ARM, _mode, &_adxl, ARM_PIXEL_COUNT, ARM_HALF, &(leds[LEG_PIXEL_COUNT * 2]));
     Serial.println("    left arm");
     testLeg(2, CRGB::Purple);
 
-    _legs[3].init(&config, "right arm", ADXL_FOUR, _mode, &_adxl, ARM_PIXEL_COUNT, ARM_HALF, &(leds[LEG_PIXEL_COUNT * 2 + ARM_PIXEL_COUNT]));
+    _legs[3].init(&config, "right arm", ADXL_RIGHT_ARM, _mode, &_adxl, ARM_PIXEL_COUNT, ARM_HALF, &(leds[LEG_PIXEL_COUNT * 2 + ARM_PIXEL_COUNT]));
     Serial.println("    right arm");
     testLeg(3, CRGB::Green);
 
