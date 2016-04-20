@@ -5,12 +5,12 @@
  *      Author: cgerstle
  */
 
-#ifndef COMMS_BLUETOOTH_H_
-#define COMMS_BLUETOOTH_H_
+#ifndef UTIL_BLUETOOTH_H_
+#define UTIL_BLUETOOTH_H_
 
 #include "../lw/LW.h"
 
-namespace comms {
+namespace util {
 
 class Bluetooth {
 public:
@@ -33,6 +33,6 @@ private:
 
 };
 
-} /* namespace comms */
+} /* namespace util */
 
-#endif /* COMMS_BLUETOOTH_H_ */
+#endif /* UTIL_BLUETOOTH_H_ */

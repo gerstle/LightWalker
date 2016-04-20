@@ -7,7 +7,6 @@
  ****************************************************************************/
 
 #include  "LW.h"
-#include "../audio/audio.h"
 
 void LW::initLegs(WalkingModeEnum m)
 {
@@ -44,20 +43,16 @@ void LW::testLeg(byte legIndex, CRGB color)
     LEDS.show();
 }
 
+void LW::initAudio()
+{
+	eq.init();
+}
+
 void LW::setMode(WalkingModeEnum m)
 {
     _mode = m;
     for (int i = 0; i < LEG_COUNT; i++)
         _legs[i].setWalkingMode(_mode);
-
-    switch (_mode)
-    {
-        case equalizer:
-            equalizerBaseline(&config);
-            break;
-        default:
-        	break;
-    }
 }
 
 void LW::off()
@@ -77,7 +72,7 @@ void LW::walk()
 
     // <gerstle> only listen to the EQ once per frame
     if (_mode == equalizer)
-        eqLevel = equalizerListen(&config);
+        eqLevel = eq.listen();
 
     // <gerstle> foreach leg, check the sensor
     for (int i = 0; i < LEG_COUNT; i++)

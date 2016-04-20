@@ -4,6 +4,7 @@
 
 #include <i2c_t3.h>
 #include <FastLED.h>
-#include "comms/Bluetooth.h"
+
+#include "util/Bluetooth.h"
 
 #endif /* _LightWalker_H_ */

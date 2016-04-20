@@ -14,6 +14,7 @@
 #include "FastLED.h"
 #include "LWUtils.h"
 #include "../config/LWConfigs.h"
+#include "../util/EQ.h"
 #include "Leg.h"
 
 class LW
@@ -35,6 +36,7 @@ class LW
         float eqLevel;
 
         void initLegs(WalkingModeEnum m);
+        void initAudio();
         void off();
         void walk();
         void setMode(WalkingModeEnum m);
@@ -43,9 +45,8 @@ class LW
         WalkingModeEnum _mode;
         Leg _legs[LEG_COUNT];
         ADXL345 _adxl;
-
-        // <gerstle> pulse
         int _pulse_length;
+        util::EQ eq;
 
         void testLeg(byte legIndex, CRGB color);
 };

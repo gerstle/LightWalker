@@ -1,11 +1,10 @@
 // Do not remove the include below
 #include "LightWalker.h"
 #include "lw/LW.h"
-#include "audio/audio.h"
 
 #define FLOATING_PIN 20
 
-comms::Bluetooth bluetooth;
+util::Bluetooth bluetooth;
 LW lightwalker;
 
 void setup()
@@ -32,10 +31,9 @@ void setup()
     delay(400);
     Serial.println("check");
 
-    // <gerstle> audio setup
+    // <gerstle> eq setup
     Serial.print("microphone... ");
-    pinMode(AUDIO_PIN, INPUT);
-    audioSetup();
+    lightwalker.initAudio();
     Serial.println("check");
 
     // <cgerstle> Join i2c bus as master

@@ -5,11 +5,12 @@
  *      Author: cgerstle
  */
 
+#include "../util/Bluetooth.h"
+
 #include <Arduino.h>
-#include "../comms/Bluetooth.h"
 #include "../config/Enums.h"
 
-namespace comms {
+namespace util {
 
 static const char one_str[] = "1";
 
@@ -302,4 +303,4 @@ void Bluetooth::parseColor(char *colorString, CHSV *color)
 Bluetooth::~Bluetooth() {
 }
 
-} /* namespace comms */
+} /* namespace util */
