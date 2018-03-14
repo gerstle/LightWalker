@@ -125,13 +125,16 @@ void LW::walk()
         _legs[i].frame();
     }
 
-    // <cgerstle> for the head, set the last 2 pixels = to the halfway point of the right arm's hue but full value
-    int index = LED_COUNT - 3;
+    // <cgerstle> set the head to the last set of pixel values it can find that are populated
+    int index = LED_COUNT - HEAD_PIXEL_COUNT - 1;
     while ((index > 0) && (leds[index].r == 0 && leds[index].g == 0 && leds[index].b == 0))
         index--;
-    leds[LED_COUNT - 2] = leds[index];
-    leds[LED_COUNT - 2].maximizeBrightness();
-    leds[LED_COUNT - 1] = leds[LED_COUNT - 2];
+
+    leds[LED_COUNT - HEAD_PIXEL_COUNT] = leds[index];
+    leds[LED_COUNT - HEAD_PIXEL_COUNT].maximizeBrightness();
+
+    for (int i = (HEAD_PIXEL_COUNT - 1); i > 0; i--)
+		leds[LED_COUNT - i] = leds[LED_COUNT - HEAD_PIXEL_COUNT];
 
     // <cgerstle> sends the colors out to the lights
     LEDS.show();

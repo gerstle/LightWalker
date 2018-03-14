@@ -18,13 +18,13 @@ void setup()
     // <gerstle> lights setup
     Serial.print("leds... ");
     // legs
-    LEDS.addLeds<P9813, 10, 11, RGB, DATA_RATE_MHZ(8)>(lightwalker.leds_legs, LED_COUNT);
+    LEDS.addLeds<P9813, 10, 11, RGB, DATA_RATE_MHZ(15)>(lightwalker.leds_legs, LEG_PIXEL_COUNT * 2);
     // left arm
-    LEDS.addLeds<P9813, 8, 9, RGB, DATA_RATE_MHZ(8)>(lightwalker.leds_left_arm, LED_COUNT);
+    LEDS.addLeds<P9813, 8, 9, RGB, DATA_RATE_MHZ(15)>(lightwalker.leds_left_arm, ARM_PIXEL_COUNT);
     // right arm
-    LEDS.addLeds<P9813, 6, 7, RGB, DATA_RATE_MHZ(8)>(lightwalker.leds_right_arm, LED_COUNT);
+    LEDS.addLeds<P9813, 6, 7, RGB, DATA_RATE_MHZ(15)>(lightwalker.leds_right_arm, ARM_PIXEL_COUNT);
     // horns
-    LEDS.addLeds<P9813, 4, 5, RGB, DATA_RATE_MHZ(8)>(lightwalker.leds_horns, LED_COUNT);
+    LEDS.addLeds<P9813, 4, 5, RGB, DATA_RATE_MHZ(15)>(lightwalker.leds_horns, HEAD_PIXEL_COUNT);
 
     LEDS.setBrightness(50);
     LEDS.showColor(CRGB::Green);

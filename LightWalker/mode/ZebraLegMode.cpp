@@ -44,7 +44,7 @@ void ZebraLegMode::frame()
     if (stepDetected)
     {
         _lastSlowTimer = _currentTime;
-        _frames = 3;
+        _frames = 2;
     }
 
     if (_frames < 5000)
