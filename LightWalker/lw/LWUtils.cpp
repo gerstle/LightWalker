@@ -29,9 +29,9 @@ bool LWUtilsClass::debounce(int switchPin, bool lastState)
 
 void LWUtilsClass::selectI2CChannels(int channels) 
 {
-    Wire.beginTransmission(I2C_MULTIPLEXER);
-    Wire.write(channels);
-    Wire.endTransmission();  
+    Wire1.beginTransmission(I2C_MULTIPLEXER);
+    Wire1.write(channels);
+    Wire1.endTransmission();
 }
 
 void LWUtilsClass::initADXL(ADXL345 *adxl)

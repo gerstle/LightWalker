@@ -1,6 +1,7 @@
 // Do not remove the include below
 #include "LightWalker.h"
 #include "lw/LW.h"
+#include <vector>
 
 #define FLOATING_PIN 20
 
@@ -11,7 +12,7 @@ void setup()
 {
     delay(2000);
     Serial.begin(9600);
-    Serial.println("yep starting");
+    Serial.println("starting");
 
     bluetooth.init(&lightwalker);
 
@@ -38,7 +39,7 @@ void setup()
 
     // <cgerstle> Join i2c bus as master
     Serial.print("i2c bus...");
-    Wire.begin();
+    Wire1.begin();
     Serial.println("check");
 
     Serial.println("legs...");

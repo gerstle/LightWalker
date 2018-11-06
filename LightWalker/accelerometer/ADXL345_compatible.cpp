@@ -41,7 +41,7 @@ ADXL345::ADXL345() {
 }
 
 void ADXL345::powerOn() {
-	Wire.begin();        // join i2c bus (address optional for master)
+	Wire1.begin();        // join i2c bus (address optional for master)
 	//Turning on the ADXL345
 	writeTo(ADXL345_POWER_CTL, 0);      
 	writeTo(ADXL345_POWER_CTL, 16);
@@ -72,32 +72,32 @@ void ADXL345::getAcceleration(double *xyz){
 }
 // Writes val to address register on device
 void ADXL345::writeTo(byte address, byte val) {
-	Wire.beginTransmission(ADXL345_DEVICE); // start transmission to device 
-	Wire.write(address);             // send register address
-	Wire.write(val);                 // send value to write
-	Wire.endTransmission();         // end transmission
+	Wire1.beginTransmission(ADXL345_DEVICE); // start transmission to device
+	Wire1.write(address);             // send register address
+	Wire1.write(val);                 // send value to write
+	Wire1.endTransmission();         // end transmission
 }
 
 // Reads num bytes starting from address register on device in to _buff array
 void ADXL345::readFrom(byte address, short num, byte _buff[]) {
-	Wire.beginTransmission(ADXL345_DEVICE); // start transmission to device 
-	Wire.write(address);             // sends address to read from
-	Wire.endTransmission();         // end transmission
+	Wire1.beginTransmission(ADXL345_DEVICE); // start transmission to device
+	Wire1.write(address);             // sends address to read from
+	Wire1.endTransmission();         // end transmission
 	
-	Wire.beginTransmission(ADXL345_DEVICE); // start transmission to device
-	Wire.requestFrom(ADXL345_DEVICE, num);    // request 6 bytes from device
+	Wire1.beginTransmission(ADXL345_DEVICE); // start transmission to device
+	Wire1.requestFrom(ADXL345_DEVICE, num);    // request 6 bytes from device
 	
 	short i = 0;
-	while(Wire.available())         // device may send less than requested (abnormal)
+	while(Wire1.available())         // device may send less than requested (abnormal)
 	{ 
-		_buff[i] = Wire.read();    // receive a byte
+		_buff[i] = Wire1.read();    // receive a byte
 		i++;
 	}
 	if(i != num){
 		status = ADXL345_ERROR;
 		error_code = ADXL345_READ_ERROR;
 	}
-	Wire.endTransmission();         // end transmission
+	Wire1.endTransmission();         // end transmission
 }
 
 // Gets the range setting and return it into rangeSetting

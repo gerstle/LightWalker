@@ -31,6 +31,7 @@ void Leg::init(LWConfigs *c, char const *n, int i2c_channel, WalkingModeEnum mod
     double xValueTotal = 0;
     double yValueTotal = 0;
     double zValueTotal  = 0;
+    Serial.println("    initializing accelerometer");
     for (valueIndex = 0; valueIndex < ADXL_VALUE_COUNT; valueIndex++)
     {
         _adxl->readXYZ(&x, &y, &z); //read the accelerometer values and store them in variables  x,y,z
@@ -56,6 +57,7 @@ void Leg::init(LWConfigs *c, char const *n, int i2c_channel, WalkingModeEnum mod
     xEMA = xValueTotal / ADXL_VALUE_COUNT;
     yEMA = yValueTotal / ADXL_VALUE_COUNT;
     zEMA = zValueTotal / ADXL_VALUE_COUNT;
+    Serial.println("    done.");
 }
 
 void Leg::setWalkingMode(WalkingModeEnum mode)

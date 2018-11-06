@@ -10,6 +10,7 @@
 
 #include "../lw/LW.h"
 
+
 namespace util {
 
 class Bluetooth {
@@ -24,7 +25,6 @@ private:
 	void parseColor(char *colorString, CHSV *color);
 
 	static const int msgLength = 128;
-	//static const unsigned char* one_str;
 	char msg[msgLength];
 	int msgIndex = 0;
 	char *pKey = NULL;

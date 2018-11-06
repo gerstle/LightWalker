@@ -9,27 +9,46 @@
 
 #include <Arduino.h>
 #include "../config/Enums.h"
+#include <Adafruit_BLE.h>
+#include <Adafruit_BluefruitLE_UART.h>
 
 namespace util {
 
 static const char one_str[] = "1";
+Adafruit_BluefruitLE_UART ble(Serial4, 0);
 
 Bluetooth::Bluetooth() {
 }
 
 void Bluetooth::init(LW *lw) {
-	Serial.println("setting up bluetooth...");
+	Serial.print("setting up bluetooth...");
 
 	this->lw = lw;
-	Serial1.begin(9600);
+	/* Initialise the module */
+	ble.echo(false);
+	if (!ble.begin(false))
+	{
+	    Serial.println("Couldn't find BLE, make sure it's in CoMmanD mode & check wiring?");
+	}
+	Serial.println("done.");
+	Serial.print("waiting for bluetooth connection...");
 
-	Serial.println("done");
+	while (!ble.isConnected()) {
+	    delay(500);
+	}
+	Serial.println("connected.");
+
+	ble.sendCommandCheckOK("AT+HWModeLED=BLUEART");
+	ble.setMode(BLUEFRUIT_MODE_DATA);
+
+	Serial.println("bluetooth setup complete.");
 }
 
 void Bluetooth::listen() {
-    if (Serial1.available())
+    while (ble.available())
     {
-        msg[msgIndex++] = (char)Serial1.read();
+    	int temp = ble.read();
+        msg[msgIndex++] = temp;
 
         if (msg[msgIndex - 1] == '\r')
         {
@@ -40,10 +59,8 @@ void Bluetooth::listen() {
                 *pValue = '\0';
                 pValue++;
 
-                if (executeCommand(atoi(pKey), pValue, msgIndex - (pValue - pKey) - 1))
-                    Serial1.print("OK\r");
-                else
-                    Serial1.print("?\r");
+                executeCommand(atoi(pKey), pValue, msgIndex - (pValue - pKey) - 1);
+				ble.print("K");
             }
 
             memset(msg, '\0', msgIndex - 1);
@@ -54,7 +71,7 @@ void Bluetooth::listen() {
 
 bool Bluetooth::executeCommand(int key, char *value, int valueLen)
 {
-	Serial.printf("key: %d value: %s\r\n", key, value);
+	Serial.printf("setting %d=%s\r\n", key, value);
 	int valueInt;
 
 	switch (key)
@@ -74,44 +91,6 @@ bool Bluetooth::executeCommand(int key, char *value, int valueLen)
 		// ------------------------------------------------------------------------
 		case mode:
 			lw->setMode(static_cast<WalkingModeEnum>(atoi(value)));
-			/*
-			Serial.print("\nmode set to ");
-			switch (lw->_mode)
-			{
-				case masterOff:
-					Serial.println("off");
-					break;
-				case pulse:
-					Serial.println("pulse");
-					break;
-				case sparkle:
-					Serial.println("sparkle");
-					break;
-				case equalizer:
-					Serial.println("equalizer");
-					break;
-				case gravity:
-					Serial.println("gravity");
-					break;
-				case bubble:
-					Serial.println("bubble");
-					break;
-				case rainbow:
-					Serial.println("rainbow");
-					break;
-				case zebra:
-					Serial.println("zebra");
-					break;
-				case chaos:
-					Serial.println("chaos");
-					break;
-				case flames:
-					Serial.println("flames");
-					break;
-				default:
-					Serial.println("nada");
-			}
-			*/
 			break;
 
 		// ------------------------------------------------------------------------
