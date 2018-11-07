@@ -11,7 +11,7 @@
 #include "ZebraLegMode.h"
 #include "../lw/LWUtils.h"
 
-void ZebraLegMode::setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p)
+void ZebraLegMode::setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p, int baseIndex)
 {
     if (_setup_complete)
         return;
@@ -24,6 +24,7 @@ void ZebraLegMode::setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *
     _pixelCount = count;
     _half = half;
     _pixels = p;
+    _baseIndex = baseIndex;
 
     // <gerstle> paint the initial canvas
     byte stage = _startStage;

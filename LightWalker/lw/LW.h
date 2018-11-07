@@ -21,7 +21,8 @@ class LW
 {
     public:
         LW() : config(), eqLevel(0.0), _mode(masterOff), _pulse_length(0),
-				leds_legs(leds),
+				leds_left_leg(leds),
+				leds_right_leg(&(leds[LEG_PIXEL_COUNT])),
 				leds_left_arm(&(leds[LEG_PIXEL_COUNT * 2])),
 				leds_right_arm(&(leds[LEG_PIXEL_COUNT * 2 + ARM_PIXEL_COUNT])),
 				leds_horns(&(leds[LEG_PIXEL_COUNT * 2 + ARM_PIXEL_COUNT * 2]))
@@ -29,10 +30,12 @@ class LW
 
         LWConfigs config;
         CRGB leds[LEG_PIXEL_COUNT + LEG_PIXEL_COUNT + ARM_PIXEL_COUNT + ARM_PIXEL_COUNT + HEAD_PIXEL_COUNT];
-        CRGB *leds_legs;
+        CRGB *leds_left_leg;
+        CRGB *leds_right_leg;
         CRGB *leds_left_arm;
         CRGB *leds_right_arm;
         CRGB *leds_horns;
+
         float eqLevel;
 
         void initLegs(WalkingModeEnum m);
@@ -49,6 +52,7 @@ class LW
         util::EQ eq;
 
         void testLeg(byte legIndex, CRGB color);
+        void writeLeg(Leg *leg);
 };
 
 #endif

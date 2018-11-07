@@ -8,7 +8,7 @@ class ChaosLegMode : public LegMode
     public:
         ChaosLegMode() : _lastStepTime(millis()), _perlinsTracker(0.0), _hue(0) {}
 
-        virtual void setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p);
+        virtual void setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p, int baseIndex);
         virtual void frame();
 
     private:

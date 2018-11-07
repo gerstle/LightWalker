@@ -12,7 +12,7 @@
 #include "ChaosLegMode.h"
 #include "../lw/LWUtils.h"
 
-void ChaosLegMode::setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p)
+void ChaosLegMode::setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p, int baseIndex)
 {
     if (_setup_complete)
         return;
@@ -25,6 +25,7 @@ void ChaosLegMode::setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *
     _pixelCount = count;
     _half = half;
     _pixels = p;
+    _baseIndex = baseIndex;
 
     _perlinsTracker = random16();
     _x = random16();

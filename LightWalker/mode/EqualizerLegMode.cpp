@@ -11,7 +11,7 @@
 #include "EqualizerLegMode.h"
 #include "../lw/LWUtils.h"
 
-void EqualizerLegMode::setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p)
+void EqualizerLegMode::setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p, int baseIndex)
 {
     if (_setup_complete)
         return;
@@ -24,6 +24,7 @@ void EqualizerLegMode::setup(LWConfigs *c, char const *n, int i2c_channel, ADXL3
     _pixelCount = count;
     _half = half;
     _pixels = p;
+    _baseIndex = baseIndex;
 
     //_perlinZ = (double) random8() / (double) 25500;
     _perlinsTracker = random16();

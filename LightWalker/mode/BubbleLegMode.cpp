@@ -10,7 +10,7 @@
 
 #include "BubbleLegMode.h"
 
-void BubbleLegMode::setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p)
+void BubbleLegMode::setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p, int baseIndex)
 {
     _leadingBubbleBottom = -10;
     _trailingBubbleBottom = _pixelCount + 10;
@@ -26,6 +26,7 @@ void BubbleLegMode::setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 
     _pixelCount = count;
     _half = half;
     _pixels = p;
+    _baseIndex = baseIndex;
 
     _setup_complete = true;
 }

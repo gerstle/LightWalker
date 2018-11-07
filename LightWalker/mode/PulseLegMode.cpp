@@ -10,7 +10,7 @@
 
 #include "PulseLegMode.h"
 
-void PulseLegMode::setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p)
+void PulseLegMode::setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p, int baseIndex)
 {
     if (_setup_complete)
         return;
@@ -23,6 +23,7 @@ void PulseLegMode::setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *
     _pixelCount = count;
     _half = half;
     _pixels = p;
+    _baseIndex = baseIndex;
 
     _pulseColor = _config->pulse.color;
     _isDimming = false;

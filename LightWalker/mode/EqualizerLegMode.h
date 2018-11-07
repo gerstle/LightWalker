@@ -9,7 +9,7 @@ class EqualizerLegMode : public LegMode
         EqualizerLegMode() : eqLevel(0.0), _direction(1) {}
 
         float eqLevel;
-        virtual void setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p);
+        virtual void setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p, int baseIndex);
         virtual void frame();
 
     private:

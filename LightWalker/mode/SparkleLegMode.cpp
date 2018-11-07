@@ -10,7 +10,7 @@
 
 #include "SparkleLegMode.h"
 
-void SparkleLegMode::setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p)
+void SparkleLegMode::setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p, int baseIndex)
 {
     _state = Off;
     _lastChangeTimer = millis();
@@ -26,6 +26,7 @@ void SparkleLegMode::setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345
     _pixelCount = count;
     _half = half;
     _pixels = p;
+    _baseIndex = baseIndex;
 
     if ((_pixelCount % 2) > 0)
         _lowerFootBorder = _half - 4;

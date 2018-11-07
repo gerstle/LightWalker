@@ -4,6 +4,7 @@
 
 #include <i2c_t3.h>
 #include <FastLED.h>
+#include <OctoWS2811.h>
 
 #include "util/Bluetooth.h"
 

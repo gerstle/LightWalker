@@ -12,7 +12,7 @@ class LegMode
 
         bool stepDetected;
 
-        virtual void setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p) = 0;
+        virtual void setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p, int baseIndex) = 0;
         virtual void frame() = 0;
 
     protected:
@@ -26,6 +26,7 @@ class LegMode
         byte _pixelCount;
         byte _half;
         CRGB *_pixels;
+        int _baseIndex;
 };
 
 #endif

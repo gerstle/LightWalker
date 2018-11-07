@@ -8,7 +8,7 @@ class FlamesLegMode : public LegMode
     public:
         FlamesLegMode() : _lastStepTime(millis()), _lastFrame(millis()) {}
 
-        virtual void setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p);
+        virtual void setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p, int baseIndex);
         virtual void frame();
 
     private:

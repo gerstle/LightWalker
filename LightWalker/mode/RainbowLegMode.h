@@ -8,7 +8,7 @@ class RainbowLegMode : public LegMode
     public:
         RainbowLegMode() : _lastStepTime(millis()), _lastStartHue(0), _increment(0), _perlinZ(0.0) {}
 
-        virtual void setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p);
+        virtual void setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p, int baseIndex);
         virtual void frame();
 
     private:

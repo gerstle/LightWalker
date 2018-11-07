@@ -8,7 +8,7 @@ class GravityLegMode : public LegMode
     public:
         GravityLegMode() : _indexOne(0), _indexTwo(1), _indexThree(2), _lastXSwitch(millis()), _lastYSwitch(millis()), _canXSwitch(true), _canYSwitch(true) {}
 
-        virtual void setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p);
+        virtual void setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p, int baseIndex);
         virtual void frame();
 
     private:

@@ -7,7 +7,7 @@
 class PulseLegMode : public LegMode
 {
     public:
-        virtual void setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p);
+        virtual void setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p, int baseIndex);
         virtual void frame();
         void setSyncData(int syncLength, int syncValue, bool changeColor, bool dimming);
 

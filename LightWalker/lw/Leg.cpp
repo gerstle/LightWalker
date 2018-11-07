@@ -8,7 +8,7 @@
 
 #include "Leg.h"
 
-void Leg::init(LWConfigs *c, char const *n, int i2c_channel, WalkingModeEnum mode, ADXL345 *adxl, byte count, byte half, CRGB *p)
+void Leg::init(LWConfigs *c, char const *n, int i2c_channel, WalkingModeEnum mode, ADXL345 *adxl, byte count, byte half, CRGB *p, int octoIndex)
 {
     _config = c;
     name = n;
@@ -17,6 +17,7 @@ void Leg::init(LWConfigs *c, char const *n, int i2c_channel, WalkingModeEnum mod
     _adxl = adxl;
     pixelCount = count;
     _half = half;
+    baseIndex = octoIndex;
 
     LWUtils.selectI2CChannels(_channel);
     LWUtils.initADXL(_adxl);
@@ -110,7 +111,7 @@ void Leg::setWalkingMode(WalkingModeEnum mode)
     }
 
     if (_leg_mode != NULL)
-        _leg_mode->setup(_config, name, _channel, _adxl, pixelCount, _half, pixels);
+        _leg_mode->setup(_config, name, _channel, _adxl, pixelCount, _half, pixels, baseIndex);
 }
 
 void Leg::frame()

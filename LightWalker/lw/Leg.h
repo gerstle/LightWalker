@@ -38,6 +38,7 @@ class Leg
         Leg() : name(NULL),
 				pixels(NULL),
 				pixelCount(0),
+				baseIndex(0),
                 _config(NULL),
                 _adxl(NULL),
                 _leg_mode(NULL),
@@ -65,6 +66,7 @@ class Leg
         char const *name;
         CRGB *pixels;
         byte pixelCount;
+        int baseIndex;
 
         PulseLegMode pulseLegMode;
         SparkleLegMode sparkleLegMode;
@@ -76,7 +78,7 @@ class Leg
         ChaosLegMode chaosLegMode;
         FlamesLegMode flamesLegMode;
 
-        void init(LWConfigs *c, char const *n, int i2c_channel, WalkingModeEnum mode, ADXL345 *adxl, byte count, byte half, CRGB *p);
+        void init(LWConfigs *c, char const *n, int i2c_channel, WalkingModeEnum mode, ADXL345 *adxl, byte count, byte half, CRGB *p, int octoIndex);
         void off();
         void setWalkingMode(WalkingModeEnum mode);
         bool detectStep();

@@ -11,7 +11,7 @@
 #include "RainbowLegMode.h"
 #include "../lw/LWUtils.h"
 
-void RainbowLegMode::setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p)
+void RainbowLegMode::setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p, int baseIndex)
 {
     _lastStartHue = 0;
     _increment = (float)255/(float)count;
@@ -27,6 +27,7 @@ void RainbowLegMode::setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345
     _pixelCount = count;
     _half = half;
     _pixels = p;
+    _baseIndex = baseIndex;
 
     _perlinZ = (double) random8() / (double) 25500;
 

@@ -10,7 +10,7 @@ class ZebraLegMode : public LegMode
     public:
         ZebraLegMode() : _lastSlowTimer(millis()), _startStage(0), _frame(0), _frames(4) {}
 
-        virtual void setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p);
+        virtual void setup(LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p, int baseIndex);
         virtual void frame();
 
     private:

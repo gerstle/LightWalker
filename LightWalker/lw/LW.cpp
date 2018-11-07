@@ -7,23 +7,30 @@
  ****************************************************************************/
 
 #include  "LW.h"
+#include <OctoWS2811.h>
+
+DMAMEM int displayMemory[LEDS_PER_STRIP * 6];
+int drawingMemory[LEDS_PER_STRIP * 6];
+OctoWS2811 octoLeds(LEDS_PER_STRIP, displayMemory, drawingMemory, WS2811_RGB | WS2811_800kHz);
 
 void LW::initLegs(WalkingModeEnum m)
 {
+	octoLeds.begin();
+
     Serial.print("total LED count: "); Serial.println(LED_COUNT);
-    _legs[0].init(&config, "left leg", ADXL_LEFT_LEG, _mode, &_adxl, LEG_PIXEL_COUNT, LEG_HALF, leds);
+    _legs[0].init(&config, "left leg", ADXL_LEFT_LEG, _mode, &_adxl, LEG_PIXEL_COUNT, LEG_HALF, leds_left_leg, 100);
     Serial.println("    left leg");
     testLeg(0, CRGB::Blue);
 
-    _legs[1].init(&config, "right leg", ADXL_RIGHT_LEG, _mode, &_adxl, LEG_PIXEL_COUNT, LEG_HALF, &(leds[LEG_PIXEL_COUNT]));
+    _legs[1].init(&config, "right leg", ADXL_RIGHT_LEG, _mode, &_adxl, LEG_PIXEL_COUNT, LEG_HALF, leds_right_leg, 300);
     Serial.println("    right leg");
     testLeg(1, CRGB::Yellow);
 
-    _legs[2].init(&config, "left arm", ADXL_LEFT_ARM, _mode, &_adxl, ARM_PIXEL_COUNT, ARM_HALF, leds_left_arm);
+    _legs[2].init(&config, "left arm", ADXL_LEFT_ARM, _mode, &_adxl, ARM_PIXEL_COUNT, ARM_HALF, leds_left_arm, 0);
     Serial.println("    left arm");
     testLeg(2, CRGB::Purple);
 
-    _legs[3].init(&config, "right arm", ADXL_RIGHT_ARM, _mode, &_adxl, ARM_PIXEL_COUNT, ARM_HALF, leds_right_arm);
+    _legs[3].init(&config, "right arm", ADXL_RIGHT_ARM, _mode, &_adxl, ARM_PIXEL_COUNT, ARM_HALF, leds_right_arm, 200);
     Serial.println("    right arm");
     testLeg(3, CRGB::Green);
 
@@ -39,8 +46,9 @@ void LW::testLeg(byte legIndex, CRGB color)
 {
     for (int i = 0; i < _legs[legIndex].pixelCount; i++)
         _legs[legIndex].pixels[i] = color;
-    delay(350);
-    LEDS.show();
+    writeLeg(&_legs[legIndex]);
+    octoLeds.show();
+    delay(2000);
 }
 
 void LW::initAudio()
@@ -59,6 +67,12 @@ void LW::off()
 {
     for (int i = 0; i < LEG_COUNT; i++)
         _legs[i].off();
+}
+
+void LW::writeLeg(Leg *leg)
+{
+	for (int j = 0; j < leg->pixelCount; j++)
+		octoLeds.setPixel(leg->baseIndex + j, leg->pixels[j].r, leg->pixels[j].g, leg->pixels[j].b);
 }
 
 // <gerstle> check for inputs
@@ -123,20 +137,22 @@ void LW::walk()
 
         // <cgerstle> paint the lights.
         _legs[i].frame();
+        writeLeg(&_legs[i]);
     }
 
     // <cgerstle> set the head to the last set of pixel values it can find that are populated
-    int index = LED_COUNT - HEAD_PIXEL_COUNT - 1;
-    while ((index > 0) && (leds[index].r == 0 && leds[index].g == 0 && leds[index].b == 0))
-        index--;
-
-    leds[LED_COUNT - HEAD_PIXEL_COUNT] = leds[index];
-    leds[LED_COUNT - HEAD_PIXEL_COUNT].maximizeBrightness();
-
-    for (int i = (HEAD_PIXEL_COUNT - 1); i > 0; i--)
-		leds[LED_COUNT - i] = leds[LED_COUNT - HEAD_PIXEL_COUNT];
+    // TODO
+//    int index = LED_COUNT - HEAD_PIXEL_COUNT - 1;
+//    while ((index > 0) && (leds[index].r == 0 && leds[index].g == 0 && leds[index].b == 0))
+//        index--;
+//
+//    leds[LED_COUNT - HEAD_PIXEL_COUNT] = leds[index];
+//    leds[LED_COUNT - HEAD_PIXEL_COUNT].maximizeBrightness();
+//
+//    for (int i = (HEAD_PIXEL_COUNT - 1); i > 0; i--)
+//		leds[LED_COUNT - i] = leds[LED_COUNT - HEAD_PIXEL_COUNT];
 
     // <cgerstle> sends the colors out to the lights
-    LEDS.show();
+    octoLeds.show();
 }
 
