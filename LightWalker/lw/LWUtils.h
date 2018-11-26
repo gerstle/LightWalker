@@ -9,7 +9,6 @@
 #ifndef LWUtils_h
 #define LWUtils_h
 
-#include "../accelerometer/ADXL345_compatible.h"
 #include "FastLED.h"
 
 class LWUtilsClass
@@ -17,8 +16,6 @@ class LWUtilsClass
     public:
         static void goDark(int pixel_count); 
         static bool debounce(int switchPin, bool lastState);
-        static void selectI2CChannels(int channels);
-        static void initADXL(ADXL345 *adxl);
         static void printRGB(CRGB color, bool newLine);
         static void printRGB(byte r, byte g, byte b, bool newLine);
         static void setTransitionColor(CRGB* led, double numerator, double denomenator, CHSV fromColor, CHSV toColor);

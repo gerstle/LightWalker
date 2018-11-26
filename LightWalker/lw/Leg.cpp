@@ -8,7 +8,20 @@
 
 #include "Leg.h"
 
-void Leg::init(LWConfigs *c, char const *n, int i2c_channel, WalkingModeEnum mode, ADXL345 *adxl, byte count, byte half, CRGB *p, int octoIndex)
+Leg::Leg()
+{
+	lastStepTimer = millis();
+	xStepDuration = 150;
+	yStepDuration = 350;
+	zStepDuration = 350;
+	xAvgDiffThreshold = 170;
+	yAvgDiffThreshold = 150;
+	zAvgDiffThreshold = 150;
+	xSignificantlyLowerThanAverageThreshold = 45;
+	readyForStep = true;
+}
+
+void Leg::init(config::LWConfigs *c, char const *n, int i2c_channel, WalkingModeEnum mode, ADXL345 *adxl, byte count, byte half, CRGB *p, int octoIndex)
 {
     _config = c;
     name = n;
@@ -19,46 +32,46 @@ void Leg::init(LWConfigs *c, char const *n, int i2c_channel, WalkingModeEnum mod
     _half = half;
     baseIndex = octoIndex;
 
-    LWUtils.selectI2CChannels(_channel);
-    LWUtils.initADXL(_adxl);
+//    LWUtils.selectI2CChannels(_channel);
+//    LWUtils.initADXL(_adxl);
 
     Serial.print(name); Serial.println(" initialized with:");
     Serial.print("    pixel count: "); Serial.println(pixelCount);
     Serial.print("    half: "); Serial.println(_half);
 
-    // <gerstle> init ADXL EMA's
-    short x, y, z;
-    int valueIndex = 0;
-    double xValueTotal = 0;
-    double yValueTotal = 0;
-    double zValueTotal  = 0;
-    Serial.println("    initializing accelerometer");
-    for (valueIndex = 0; valueIndex < ADXL_VALUE_COUNT; valueIndex++)
-    {
-        _adxl->readXYZ(&x, &y, &z); //read the accelerometer values and store them in variables  x,y,z
-
-        // x = x;
-        y = abs(y);
-        z = abs(z);
-
-        xValueTotal += x;
-        yValueTotal += y;
-        zValueTotal += z;
-
-        xNMinus2 = xNMinus1;
-        xNMinus1 = x;
-
-        yNMinus2 = yNMinus1;
-        yNMinus1 = y;
-
-        zNMinus2 = zNMinus1;
-        zNMinus1 = z;
-    }
-
-    xEMA = xValueTotal / ADXL_VALUE_COUNT;
-    yEMA = yValueTotal / ADXL_VALUE_COUNT;
-    zEMA = zValueTotal / ADXL_VALUE_COUNT;
-    Serial.println("    done.");
+//    // <gerstle> init ADXL EMA's
+//    short x, y, z;
+//    int valueIndex = 0;
+//    double xValueTotal = 0;
+//    double yValueTotal = 0;
+//    double zValueTotal  = 0;
+//    Serial.println("    initializing accelerometer");
+//    for (valueIndex = 0; valueIndex < ADXL_VALUE_COUNT; valueIndex++)
+//    {
+//        _adxl->readXYZ(&x, &y, &z); //read the accelerometer values and store them in variables  x,y,z
+//
+//        // x = x;
+//        y = abs(y);
+//        z = abs(z);
+//
+//        xValueTotal += x;
+//        yValueTotal += y;
+//        zValueTotal += z;
+//
+//        xNMinus2 = xNMinus1;
+//        xNMinus1 = x;
+//
+//        yNMinus2 = yNMinus1;
+//        yNMinus1 = y;
+//
+//        zNMinus2 = zNMinus1;
+//        zNMinus1 = z;
+//    }
+//
+//    xEMA = xValueTotal / ADXL_VALUE_COUNT;
+//    yEMA = yValueTotal / ADXL_VALUE_COUNT;
+//    zEMA = zValueTotal / ADXL_VALUE_COUNT;
+//    Serial.println("    done.");
 }
 
 void Leg::setWalkingMode(WalkingModeEnum mode)
@@ -66,49 +79,49 @@ void Leg::setWalkingMode(WalkingModeEnum mode)
     _walkingMode = mode;
     off();
 
-    switch (_walkingMode)
-    {
-        case masterOff:
-            _leg_mode = NULL;
-            off();
-            break;
-
-        case pulse:
-            _leg_mode = &pulseLegMode;
-            break;
-
-        case sparkle:
-            _leg_mode = &sparkleLegMode;
-            break;
-
-        case equalizer:
-            _leg_mode = &equalizerLegMode;
-            break;
-
-        case gravity:
-            _leg_mode = &gravityLegMode;
-            break;
-
-        case bubble:
-            _leg_mode = &bubbleLegMode;
-            break;
-
-        case rainbow:
-            _leg_mode = &rainbowLegMode;
-            break;
-
-        case zebra:
-            _leg_mode = &zebraLegMode;
-            break;
-
-        case chaos:
-            _leg_mode = &chaosLegMode;
-            break;
-
-        case flames:
-            _leg_mode = &flamesLegMode;
-        	break;
-    }
+//    switch (_walkingMode)
+//    {
+//        case masterOff:
+//            _leg_mode = NULL;
+//            off();
+//            break;
+//
+//        case pulse:
+//            _leg_mode = &pulseLegMode;
+//            break;
+//
+//        case sparkle:
+//            _leg_mode = &sparkleLegMode;
+//            break;
+//
+//        case equalizer:
+//            _leg_mode = &equalizerLegMode;
+//            break;
+//
+//        case gravity:
+//            _leg_mode = &gravityLegMode;
+//            break;
+//
+//        case bubble:
+//            _leg_mode = &bubbleLegMode;
+//            break;
+//
+//        case rainbow:
+//            _leg_mode = &rainbowLegMode;
+//            break;
+//
+//        case zebra:
+//            _leg_mode = &zebraLegMode;
+//            break;
+//
+//        case chaos:
+//            _leg_mode = &chaosLegMode;
+//            break;
+//
+//        case flames:
+//            _leg_mode = &flamesLegMode;
+//        	break;
+//    }
 
     if (_leg_mode != NULL)
         _leg_mode->setup(_config, name, _channel, _adxl, pixelCount, _half, pixels, baseIndex);
@@ -143,7 +156,7 @@ bool Leg::detectStep()
     bool step_detected = false;
     unsigned long currentTime = millis();
 
-    LWUtils.selectI2CChannels(_channel);
+    //LWUtils.selectI2CChannels(_channel);
     _adxl->readXYZ(&x, &y, &z); //read the accelerometer values and store them in variables  x,y,z
 
     // x = x;

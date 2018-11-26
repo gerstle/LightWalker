@@ -1,0 +1,38 @@
+#ifndef SparkleLegMode_h
+#define SparkleLegMode_h
+
+#include "../modes/LegMode.h"
+
+enum LightStateEnum
+{
+    None,
+    Flash,
+    SparkleSparkle,
+    Fade,
+    Off
+};
+
+class SparkleLegMode : public LegMode
+{
+    public:
+        SparkleLegMode() : _state(None) {}
+
+        virtual void setup(config::LWConfigs *c, char const *n, int i2c_channel, ADXL345 *adxl, byte count, byte half, CRGB *p, int baseIndex);
+        virtual void frame();
+
+    private:
+        LightStateEnum _state;
+        unsigned long _currentTime;
+
+        int _lowerFootBorder;
+        int _upperFootBorder;
+
+        void _setState(LightStateEnum newState);
+        void _sameStatus();
+        void _flash();
+        void _shimmer();
+        void _sparkle();
+        void _fade();
+};
+
+#endif

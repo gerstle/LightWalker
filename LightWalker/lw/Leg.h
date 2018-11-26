@@ -18,16 +18,14 @@
 // <cgerstle> leg modes are what control the lights for each mode
 // each leg has one because a lot of the settings/state is leg
 // specific
-#include "../mode/LegMode.h"
-#include "../mode/PulseLegMode.h"
-#include "../mode/SparkleLegMode.h"
-#include "../mode/EqualizerLegMode.h"
-#include "../mode/GravityLegMode.h"
-#include "../mode/BubbleLegMode.h"
-#include "../mode/RainbowLegMode.h"
-#include "../mode/ZebraLegMode.h"
-#include "../mode/ChaosLegMode.h"
-#include "../mode/FlamesLegMode.h"
+#include "../modes/BubbleLegMode.h"
+#include "../modes/FlamesLegMode.h"
+#include "../modes/GravityLegMode.h"
+#include "../modes/LegMode.h"
+#include "../modes/PulseLegMode.h"
+#include "../modes/RainbowLegMode.h"
+#include "../modes/SparkleLegMode.h"
+#include "../modes/ZebraLegMode.h"
 
 #define ADXL_VALUE_COUNT 100
 
@@ -35,50 +33,24 @@
 class Leg
 {
     public:
-        Leg() : name(NULL),
-				pixels(NULL),
-				pixelCount(0),
-				baseIndex(0),
-                _config(NULL),
-                _adxl(NULL),
-                _leg_mode(NULL),
-				_half(0),
-                lastStepTimer(millis()),
-                xEMA(0),
-                yEMA(0),
-                zEMA(0),
-                xNMinus1(0),
-                xNMinus2(0),
-                yNMinus1(0),
-                yNMinus2(0),
-                zNMinus1(0),
-                zNMinus2(0),
-                xStepDuration(150),
-                yStepDuration(350),
-                zStepDuration(350),
-                xAvgDiffThreshold(170),
-                yAvgDiffThreshold(150),
-                zAvgDiffThreshold(150),
-                xSignificantlyLowerThanAverageThreshold(45),
-                readyForStep(true) {}
-
+        Leg();
         // <gerstle> Generic
         char const *name;
         CRGB *pixels;
         byte pixelCount;
         int baseIndex;
 
-        PulseLegMode pulseLegMode;
-        SparkleLegMode sparkleLegMode;
-        EqualizerLegMode equalizerLegMode;
-        GravityLegMode gravityLegMode;
-        BubbleLegMode bubbleLegMode;
-        RainbowLegMode rainbowLegMode;
-        ZebraLegMode zebraLegMode;
-        ChaosLegMode chaosLegMode;
-        FlamesLegMode flamesLegMode;
+//        PulseLegMode pulseLegMode;
+//        SparkleLegMode sparkleLegMode;
+//        EqualizerLegMode equalizerLegMode;
+//        GravityLegMode gravityLegMode;
+//        BubbleLegMode bubbleLegMode;
+//        RainbowLegMode rainbowLegMode;
+//        ZebraLegMode zebraLegMode;
+//        ChaosLegMode chaosLegMode;
+//        FlamesLegMode flamesLegMode;
 
-        void init(LWConfigs *c, char const *n, int i2c_channel, WalkingModeEnum mode, ADXL345 *adxl, byte count, byte half, CRGB *p, int octoIndex);
+        void init(config::LWConfigs *c, char const *n, int i2c_channel, WalkingModeEnum mode, ADXL345 *adxl, byte count, byte half, CRGB *p, int octoIndex);
         void off();
         void setWalkingMode(WalkingModeEnum mode);
         bool detectStep();
@@ -91,7 +63,7 @@ class Leg
     private:
         // <gerstle> Generic stuff
         WalkingModeEnum _walkingMode;
-        LWConfigs *_config;
+        config::LWConfigs *_config;
         byte _channel;
         ADXL345 *_adxl;
         LegMode *_leg_mode;

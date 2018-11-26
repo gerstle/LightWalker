@@ -9,7 +9,6 @@
 #include <math.h>
 #include "LWUtils.h"
 #include "../config/LWConfigs.h"
-#include <i2c_t3.h>
 
 LWUtilsClass LWUtils;
 
@@ -25,33 +24,6 @@ bool LWUtilsClass::debounce(int switchPin, bool lastState)
     }
 
     return currentState;
-}
-
-void LWUtilsClass::selectI2CChannels(int channels) 
-{
-    Wire1.beginTransmission(I2C_MULTIPLEXER);
-    Wire1.write(channels);
-    Wire1.endTransmission();
-}
-
-void LWUtilsClass::initADXL(ADXL345 *adxl)
-{
-    adxl->powerOn();
-    adxl->setRangeSetting(2);
-
-    //set activity/ inactivity thresholds (0-255)
-    adxl->setActivityThreshold(75); //62.5mg per increment
-    adxl->setInactivityThreshold(75); //62.5mg per increment
-    adxl->setTimeInactivity(10); // how many seconds of no activity is inactive?
-
-    //look of activity movement on this axes - 1 == on; 0 == off 
-    adxl->setActivityX(1);
-    adxl->setActivityY(1);
-    adxl->setActivityZ(1);
-
-    //set values for what is considered freefall (0-255)
-    adxl->setFreeFallThreshold(7); //(5 - 9) recommended - 62.5mg per increment
-    adxl->setFreeFallDuration(45); //(20 - 70) recommended - 5ms per increment
 }
 
 void LWUtilsClass::printRGB(CRGB color, bool newLine)

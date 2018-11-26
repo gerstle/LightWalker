@@ -53,6 +53,7 @@ enum Preferences
 	eqColor,
 	eqAllBands,
 	eqMinValue,    
+	eqLevel,
 
     //------------------------------------------------------------------------
     // Gravity

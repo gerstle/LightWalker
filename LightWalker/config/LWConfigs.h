@@ -13,10 +13,12 @@
 #ifndef LWConfigs_h
 #define LWConfigs_h
 
+#define FLOATING_PIN 15
+
 // <gerstle> MICROPHONE
-#define AR_PIN 14
-#define MIC_PIN 15
-#define GAIN_PIN 16
+#define AR_PIN 23
+#define MIC_PIN 22
+#define GAIN_PIN 19
 
 // <gerstle> ACCELEROMETERS
 #define I2C_MULTIPLEXER 0x74 // 1110100
@@ -29,11 +31,11 @@
 #define LED_CLOCK_PIN 11
 #define LED_DATA_PIN 13
 
-#define LEG_PIXEL_COUNT 75
-#define LEG_HALF 35
+#define LEG_PIXEL_COUNT 100
+#define LEG_HALF 50
 #define ARM_PIXEL_COUNT 100
 #define ARM_HALF 50
-#define HEAD_PIXEL_COUNT 11
+#define HEAD_PIXEL_COUNT 100
 #define LED_COUNT (LEG_PIXEL_COUNT + LEG_PIXEL_COUNT + ARM_PIXEL_COUNT + ARM_PIXEL_COUNT + HEAD_PIXEL_COUNT)
 
 #define LED_STRIPS 5
@@ -46,13 +48,13 @@
 #include "MainConfigs.h"
 #include "PulseConfigs.h"
 #include "SparkleConfigs.h"
-#include "EqualizerConfigs.h"
 #include "GravityConfigs.h"
 #include "BubbleConfigs.h"
 #include "RainbowConfigs.h"
 #include "ZebraConfigs.h"
-#include "ChaosConfigs.h"
 #include "FlamesConfigs.h"
+
+namespace config {
 
 class LWConfigs
 {
@@ -60,12 +62,13 @@ class LWConfigs
         MainConfigs main;
         PulseConfigs pulse;
         SparkleConfigs sparkle;
-        EqualizerConfigs equalizer;
         GravityConfigs gravity;
         BubbleConfigs bubble;
         RainbowConfigs rainbow;
         ZebraConfigs zebra;
-        ChaosConfigs chaos;
         FlamesConfigs flames;
 };
+
+} /* namespace config */
+
 #endif

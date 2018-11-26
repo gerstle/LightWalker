@@ -9,13 +9,12 @@
 #define UTIL_EQ_H_
 
 #include "Ema.h"
-#include "Arduino.h"
 
 namespace util {
 
 class EQ {
 public:
-	EQ() : maxEma(20), lastVolume(0), lastMark(millis()), sampleWindow(30) {}
+	EQ() : maxEma(20), lastVolume(0), lastMark(0), sampleWindow(30) {}
 	virtual ~EQ();
 
 	void init();
