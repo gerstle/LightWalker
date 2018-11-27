@@ -18,8 +18,8 @@ class LWUtilsClass
         static bool debounce(int switchPin, bool lastState);
         static void printRGB(CRGB color, bool newLine);
         static void printRGB(byte r, byte g, byte b, bool newLine);
-        static void setTransitionColor(CRGB* led, double numerator, double denomenator, CHSV fromColor, CHSV toColor);
-        static void setTransitionColor(CRGB* led, double numerator, double denomenator, CRGB fromColor, CRGB toColor);
+        static void setTransitionColor(CRGB* led, double numerator, double denomenator, CHSV *fromColor, CHSV *toColor);
+        static void setTransitionColor(CRGB* led, double numerator, double denomenator, CRGB *fromColor, CRGB *toColor);
         static double perlinNoise(double x, double y, double z);
 };
 

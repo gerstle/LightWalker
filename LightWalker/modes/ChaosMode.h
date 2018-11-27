@@ -1,9 +1,3 @@
-/*
- * ChaosMode.h
- *
- *  Created on: Nov 8, 2018
- *      Author: cgerstle
- */
 
 #ifndef MODESCHAOSMODEH
 #define MODESCHAOSMODEH

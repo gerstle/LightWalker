@@ -1,17 +1,9 @@
-/*
- * AccelerometerLedStrip.h
- *
- *  Created on: Nov 8, 2018
- *      Author: cgerstle
- */
-
 #ifndef LW_ACCELEROMETERLEDSTRIP_H_
 #define LW_ACCELEROMETERLEDSTRIP_H_
 
 #define ADXL_VALUE_COUNT 100
 
 #include "LedStrip.h"
-#include "../accelerometer/LWAccelerometer.h"
 
 namespace lw {
 
@@ -23,7 +15,6 @@ public:
 	void frame();
 private:
 	bool detectStep();
-	LWAccelerometer accelerometer;
 	unsigned long lastStepTimer;
 	float xEMA;
 	float yEMA;

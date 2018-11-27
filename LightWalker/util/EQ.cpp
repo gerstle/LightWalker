@@ -8,11 +8,11 @@
 #include "EQ.h"
 
 #include "../config/LWConfigs.h"
+#include <Arduino.h>
 
 namespace util {
 
 EQ::~EQ() {
-	// TODO Auto-generated destructor stub
 }
 
 void EQ::init() {

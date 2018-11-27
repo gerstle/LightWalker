@@ -1,10 +1,3 @@
-/*
- * OffMode.h
- *
- *  Created on: Nov 25, 2018
- *      Author: cgerstle
- */
-
 #ifndef MODES_OFFMODE_H_
 #define MODES_OFFMODE_H_
 
@@ -16,8 +9,8 @@ class OffMode: public modes::Mode {
 public:
 	OffMode(config::Properties *properties, config::LedStripConfig *config);
 	virtual ~OffMode();
-	void frame(bool stepDetected);
 	const char* getName();
+	void frame(bool stepDetected);
 };
 
 } /* namespace config */

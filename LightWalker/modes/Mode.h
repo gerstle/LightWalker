@@ -1,10 +1,3 @@
-/*
- * Mode.h
- *
- *  Created on: Nov 8, 2018
- *      Author: cgerstle
- */
-
 #ifndef MODES_MODE_H_
 #define MODES_MODE_H_
 

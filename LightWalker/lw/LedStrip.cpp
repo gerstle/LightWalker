@@ -9,6 +9,12 @@
 #include "../modes/OffMode.h"
 #include "../modes/ChaosMode.h"
 #include "../modes/EqualizerMode.h"
+#include "../modes/SparkleMode.h"
+#include "../modes/RainbowMode.h"
+#include "../modes/ZebraMode.h"
+#include "../modes/BubbleMode.h"
+#include "../modes/FlamesMode.h"
+#include "../modes/GravityMode.h"
 #include "../config/Enums.h"
 
 namespace lw {
@@ -21,6 +27,12 @@ LedStrip::LedStrip(config::Properties *properties, config::LedStripConfig *confi
 	modes[masterOff] = offMode;
 	modes[chaos] = new modes::ChaosMode(properties, config);
 	modes[equalizer] = new modes::EqualizerMode(properties, config);
+	modes[sparkle] = new modes::SparkleMode(properties, config);
+	modes[rainbow] = new modes::RainbowMode(properties, config);
+	modes[zebra] = new modes::ZebraMode(properties, config);
+	modes[bubble] = new modes::BubbleMode(properties, config);
+	modes[flames] = new modes::FlamesMode(properties, config);
+	modes[gravity] = new modes::GravityMode(properties, config);
 
 	currentMode = offMode;
 }

@@ -23,7 +23,7 @@ private:
 	Ema maxEma;
 	double lastVolume;
 	unsigned long lastMark;
-	int sampleWindow; // Sample window width in mS (50 mS = 20Hz)
+	unsigned int sampleWindow; // Sample window width in mS (50 mS = 20Hz)
 };
 
 } /* namespace util */

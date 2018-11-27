@@ -1,10 +1,3 @@
-/*
- * ChaosMode.cpp
- *
- *  Created on: Nov 8, 2018
- *      Author: cgerstle
- */
-
 #include "ChaosMode.h"
 #include <FastLED.h>
 

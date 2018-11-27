@@ -41,34 +41,4 @@
 #define LED_STRIPS 5
 #define LEDS_PER_STRIP 100
 
-// <gerstle> LIGHTWALKER
-#define LEG_COUNT 4
-
-#include "Enums.h"
-#include "MainConfigs.h"
-#include "PulseConfigs.h"
-#include "SparkleConfigs.h"
-#include "GravityConfigs.h"
-#include "BubbleConfigs.h"
-#include "RainbowConfigs.h"
-#include "ZebraConfigs.h"
-#include "FlamesConfigs.h"
-
-namespace config {
-
-class LWConfigs
-{
-    public:
-        MainConfigs main;
-        PulseConfigs pulse;
-        SparkleConfigs sparkle;
-        GravityConfigs gravity;
-        BubbleConfigs bubble;
-        RainbowConfigs rainbow;
-        ZebraConfigs zebra;
-        FlamesConfigs flames;
-};
-
-} /* namespace config */
-
 #endif

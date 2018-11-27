@@ -1,10 +1,3 @@
-/*
- * EqualizerMode.cpp
- *
- *  Created on: Nov 26, 2018
- *      Author: cgerstle
- */
-
 #include "EqualizerMode.h"
 
 namespace modes {

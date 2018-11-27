@@ -1,16 +1,10 @@
-/*
- * AccelerometerLedStrip.cpp
- *
- *  Created on: Nov 8, 2018
- *      Author: cgerstle
- */
-
 #include "AccelerometerLedStrip.h"
+#include "../accelerometer/LWAccelerometer.h"
 
 namespace lw {
 
 AccelerometerLedStrip::AccelerometerLedStrip(config::Properties *properties, config::LedStripConfig *configs, byte channel) :
-		LedStrip(properties, configs), accelerometer(channel) {
+		LedStrip(properties, configs) {
 	lastStepTimer = millis();
 	xStepDuration = 150;
 	yStepDuration = 350;
@@ -24,9 +18,12 @@ AccelerometerLedStrip::AccelerometerLedStrip(config::Properties *properties, con
 	xEMA = yEMA = zEMA = 0;
 
 	xNMinus1 = xNMinus2 = yNMinus1 = yNMinus2 = zNMinus1 = zNMinus2 = 0;
+
+	config->setAccelerometer(new lw::LWAccelerometer(channel));
 }
 
 AccelerometerLedStrip::~AccelerometerLedStrip() {
+	delete config->accelerometer;
 }
 
 void AccelerometerLedStrip::init() {
@@ -34,7 +31,7 @@ void AccelerometerLedStrip::init() {
 	LedStrip::init();
 
 	Serial.println("    initializing accelerometer");
-	accelerometer.init();
+	config->accelerometer->init();
 
 	// <gerstle> init ADXL EMA's
 	short x, y, z;
@@ -43,7 +40,7 @@ void AccelerometerLedStrip::init() {
 	double yValueTotal = 0;
 	double zValueTotal = 0;
 	for (valueIndex = 0; valueIndex < ADXL_VALUE_COUNT; valueIndex++) {
-		accelerometer.readXYZ(&x, &y, &z); //read the accelerometer values and store them in variables  x,y,z
+		config->accelerometer->readXYZ(&x, &y, &z); //read the accelerometer values and store them in variables  x,y,z
 
 		// x = x;
 		y = abs(y);
@@ -81,7 +78,7 @@ bool AccelerometerLedStrip::detectStep()
     unsigned long currentTime = millis();
 
     //LWUtils.selectI2CChannels(_channel);
-    accelerometer.readXYZ(&x, &y, &z); //read the accelerometer values and store them in variables  x,y,z
+    config->accelerometer->readXYZ(&x, &y, &z); //read the accelerometer values and store them in variables  x,y,z
 
     // x = x;
     y = abs(y);

@@ -1,10 +1,3 @@
-/*
- * EqualizerMode.h
- *
- *  Created on: Nov 26, 2018
- *      Author: cgerstle
- */
-
 #ifndef MODES_EQUALIZERMODE_H_
 #define MODES_EQUALIZERMODE_H_
 

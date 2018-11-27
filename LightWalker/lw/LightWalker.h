@@ -1,11 +1,3 @@
-/*****************************************************************************
- * LW.h
- *
- * Copyright 2013 Casey Gerstle
- * This program is distributed under the Apache License 2.0.
- * A copy is included in the file LICENSE
- ****************************************************************************/
-
 #ifndef LW_h
 #define LW_h
 
@@ -13,7 +5,6 @@
 #include "LWUtils.h"
 #include "../config/LWConfigs.h"
 #include "../util/EQ.h"
-#include "Leg.h"
 #include <vector>
 #include "LedStrip.h"
 #include "../config/Properties.h"

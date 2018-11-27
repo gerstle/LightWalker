@@ -1,10 +1,3 @@
-/*
- * OffMode.cpp
- *
- *  Created on: Nov 25, 2018
- *      Author: cgerstle
- */
-
 #include "OffMode.h"
 
 namespace modes {
