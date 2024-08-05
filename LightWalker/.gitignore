@@ -3,3 +3,5 @@
 spec.d
 /core
 /libraries
+
+.pio

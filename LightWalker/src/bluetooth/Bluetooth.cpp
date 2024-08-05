@@ -57,8 +57,8 @@ void Bluetooth::listen() {
                 *pValue = '\0';
                 pValue++;
 
-                processMessage(atoi(pKey), pValue);
 				ble.print("K");
+                processMessage(atoi(pKey), pValue);
             }
 
             memset(msg, '\0', msgIndex - 1);

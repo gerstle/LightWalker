@@ -63,7 +63,7 @@ void LightWalker::testLeg(LedStrip *strip) {
 	strip->setColor(CHSV(h, 255, 255));
 	transferToOcto(strip);
 	octoLeds.show();
-	delay(200);
+	delay(250);
 }
 
 void LightWalker::initAudio() {
