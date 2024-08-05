@@ -9,8 +9,7 @@ namespace lw {
 
 DMAMEM int displayMemory[LEDS_PER_STRIP * 6];
 int drawingMemory[LEDS_PER_STRIP * 6];
-OctoWS2811 octoLeds(LEDS_PER_STRIP, displayMemory, drawingMemory,
-		WS2811_RGB | WS2811_800kHz);
+OctoWS2811 octoLeds(LEDS_PER_STRIP, displayMemory, drawingMemory, WS2811_RGB | WS2811_800kHz);
 
 LightWalker::LightWalker(config::Properties *properties) {
 	this->properties = properties;
@@ -54,6 +53,7 @@ void LightWalker::initLegs() {
 	}
 
 	LEDS.show();
+	LEDS.setBrightness(255);
 	delay(1000);
 }
 
