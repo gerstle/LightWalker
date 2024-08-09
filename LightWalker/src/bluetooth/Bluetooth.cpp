@@ -26,13 +26,13 @@ void Bluetooth::init() {
 	ble.echo(false);
 	if (!ble.begin(false))
 	{
-	    Serial.println("Couldn't find BLE, make sure it's in CoMmanD mode & check wiring?");
+	    Serial.println("Couldn't find BLE, make sure it's in command mode & check wiring?");
 	}
 	Serial.println("done.");
 	Serial.print("waiting for bluetooth connection...");
 
 	while (!ble.isConnected()) {
-	    delay(500);
+	    delay(125);
 	}
 	Serial.println("connected.");
 

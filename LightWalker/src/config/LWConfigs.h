@@ -32,7 +32,7 @@
 #define LED_DATA_PIN 13
 
 #define LEG_PIXEL_COUNT 73
-#define LEG_HALF 36
+#define LEG_HALF 35
 #define ARM_PIXEL_COUNT 100
 #define ARM_HALF 51
 #define HEAD_PIXEL_COUNT 20

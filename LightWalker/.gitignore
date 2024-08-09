@@ -5,3 +5,5 @@ spec.d
 /libraries
 
 .pio
+.vscode
+.idea

@@ -111,7 +111,7 @@ void SparkleMode::_shimmer()
         // <cgerstle> sparkle the rest if minbrightness is on
         else if (dice == 0)
         {
-            config->pixels[i].setHSV(sparkleColor.h, sparkleColor.s, max(minValue, (sparkleColor.v - random(minValue, 255)) / 2));
+            config->pixels[i].setHSV(sparkleColor.h, sparkleColor.s, max(minValue, abs(sparkleColor.v - random(minValue, 255)) / 2));
         }
     }
 
